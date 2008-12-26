@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B5E59861-198D-4494-9301-B0B4135667DA}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CrystalBoy.Decompiler</RootNamespace>
+    <AssemblyName>CrystalBoy.Decompiler</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Analyzer\ArithmeticInstruction.cs" />
+    <Compile Include="Analyzer\ArithmeticOperation.cs" />
+    <Compile Include="Analyzer\BinaryInstruction.cs" />
+    <Compile Include="Analyzer\BitInstruction.cs" />
+    <Compile Include="Analyzer\BitOperation.cs" />
+    <Compile Include="Analyzer\ControlInstruction.cs" />
+    <Compile Include="Analyzer\ControlInstructionType.cs" />
+    <Compile Include="Analyzer\SimulationContext.cs" />
+    <Compile Include="Analyzer\EndOfBankInstruction.cs" />
+    <Compile Include="Analyzer\FlowControlInstruction.cs" />
+    <Compile Include="Analyzer\IncompleteInstruction.cs" />
+    <Compile Include="Analyzer\LoadInstruction.cs" />
+    <Compile Include="Analyzer\LoadOperationType.cs" />
+    <Compile Include="Analyzer\PopInstruction.cs" />
+    <Compile Include="Analyzer\PushInstruction.cs" />
+    <Compile Include="Analyzer\ShiftInstruction.cs" />
+    <Compile Include="Analyzer\ShiftInstructionFlags.cs" />
+    <Compile Include="Analyzer\Operand.cs" />
+    <Compile Include="Analyzer\Register16.cs" />
+    <Compile Include="Analyzer\Register8.cs" />
+    <Compile Include="Analyzer\ReturnInstruction.cs" />
+    <Compile Include="Analyzer\SwapInstruction.cs" />
+    <Compile Include="Analyzer\UnaryInstruction.cs" />
+    <Compile Include="Analyzer\Condition.cs" />
+    <Compile Include="Analyzer\JumpType.cs" />
+    <Compile Include="Analyzer\ResolvedJumpInstruction.cs" />
+    <Compile Include="Analyzer\JumpInstruction.cs" />
+    <Compile Include="Analyzer\Instruction.cs" />
+    <Compile Include="Analyzer\Label.cs" />
+    <Compile Include="Analyzer\CodeMap.cs" />
+    <Compile Include="Analyzer\UtilityInstruction.cs" />
+    <Compile Include="Analyzer\UtilityOperation.cs" />
+    <Compile Include="FileTooLongException.cs" />
+    <Compile Include="FlexibleGameBoyMemory.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
+      <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
+      <Name>CrystalBoy.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CrystalBoy.Disassembly\CrystalBoy.Disassembly.csproj">
+      <Project>{E40F73A5-B0AF-4D25-99D6-772E44EFC563}</Project>
+      <Name>CrystalBoy.Disassembly</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+</Project>

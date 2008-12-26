@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{48489DFD-05FC-4AF5-B238-15912EC77719}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CrystalBoy.Emulation</RootNamespace>
+    <AssemblyName>CrystalBoy.Emulation</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>CrystalBoy.Emulation.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WITH_DEBUGGING</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;WITH_DEBUGGING</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CrystalBoy.Core.Memory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=324129bf98a8a1db, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\CrystalBoy.Core.Memory\CrystalBoy.Core.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Mappers\MemoryBankController3.cs" />
+    <Compile Include="Mappers\MemoryBankController1.cs" />
+    <Compile Include="Mappers\RomController.cs" />
+    <Compile Include="GameBoyMemoryBus.cs" />
+    <Compile Include="Interrupt.cs" />
+    <Compile Include="GameBoyKeys.cs" />
+    <Compile Include="Mapper.cs" />
+    <Compile Include="Port.cs" />
+    <Compile Include="Processor.cs" />
+    <Compile Include="Processor.Generated.cs">
+      <DependentUpon>Processor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessorStatus.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PortAccess.cs" />
+    <Compile Include="RenderMethod.cs" />
+    <Compile Include="VideoPortSnapshot.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
+      <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
+      <Name>CrystalBoy.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="OriginalDrawFrame.txt" />
+    <Content Include="Timings.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CrystalBoy.Emulation.snk" />
+    <Compile Include="GameBoyMemoryBus.Snapshot.cs" />
+    <Compile Include="LookupTables.cs" />
+    <Compile Include="GameBoyMemoryBus.Rendering.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Processor.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HardwareType.cs" />
+    <Compile Include="Mappers\MemoryBankController.cs" />
+    <Compile Include="Mappers\MemoryBankController5.cs" />
+    <Compile Include="GameBoyMemoryBus.Rom.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Debug.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Interrupts.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Joypad.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Timer.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Ports.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Video.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Memory.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameBoyMemoryBus.Timing.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RtcRegister.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

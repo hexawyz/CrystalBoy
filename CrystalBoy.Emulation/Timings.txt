@@ -1,0 +1,24 @@
+﻿The GB Main Clock runs at 4194304 Hz
+There are timers running at 4096 Hz, 16384 Hz, 65536 Hz and 262144 Hz.
+We run the emulator on a per frame basis, meaning that we execute 70224 cycles for each frame.
+The LCD refresh and the timers are not synchronized, meaning we have to handle timer values specifically for each frame.
+
+An emulated frame will always begin at line 0 and end after 70224 cycles or a bit more (depending on instruction cycle count).
+When LCD is disabled, LY will always be 0, and mode always 0, no LCD interruptions (VBI / STAT) will be raised.
+On LCD enable, the cycle counter is reset, and the LCD begins at line 0.
+At the beginning of each frame, the raster line counter (LY) is reset at 0.
+
+For reference only: Originally, emulated frames used to begin at VBlank, which made VBI handling easier.
+
+For each raster line: (144 total)
+Mode 2 will last 80 cycles
+Mode 3 will last 172 cycles
+Mode 0 will last 204 cycles (HBlank)
+Followed by vertical blank: (10 raster lines total)
+Mode 1 will last 4560 cycles (VBlank)
+
+For timer synchronization, we use a 4096 Hz reference timer.
+Each frame, we keep track of timer shift in cycles.
+4096 Hz means 1024 cycles between each tick.
+Meaning that between in each frame, 70224 % 1024 = 592 cycles are remaining.
+Once this timer is synchronized, we use its reference timing as a base for the GB programmable timer and the divider.

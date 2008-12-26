@@ -1,0 +1,350 @@
+﻿		#region ObjectData Structure
+
+		struct ObjectData
+		{
+			public int Left;
+			public int Right;
+			public int PixelData;
+			public int Palette;
+		}
+
+		ObjectData[] objectData = new ObjectData[10];
+
+		#endregion
+		
+		/// <summary>
+		/// Draws the current frame into a pixel buffer
+		/// </summary>
+		/// <param name="buffer">Destination pixel buffer</param>
+		/// <param name="stride">Buffer line stride</param>
+		/// <param name="videoRam">Source video data</param>
+		/// <param name="videoPortSnapshot">Initial snapshot of the video ports</param>
+		/// <param name="portAccesses"></param>
+		private unsafe void DrawFrame32(byte* buffer, int stride)
+		{
+			// WARNING: Very looooooooooong code :D
+			// I have to keep track of a lot of variables for this one-pass rendering
+			// Since on GBC the priorities between BG, WIN and OBJ can sometimes be weird, I don't think there is a better way of handling this.
+			// The code may lack some optimizations tough, but i try my best to keep the variable count the lower possible (taking in account the fact that MS JIT is designed to handle no more than 64 variables...)
+			// If you see some possible optimization, feel free to contribute.
+			// The code might be very long but it is still very well structured, so with a bit of knowledge on (C)GB hardware you should understand it easily
+			// In fact I think the function works pretty much like the real lcd controller on (C)GB... ;)
+			byte* bufferLine = buffer;
+			uint* bufferPixel;
+			int scx, scy, wx, wy;
+			int pi, data1, data2;
+			bool bgDraw, winDraw, winDraw2, objDraw, objDrawn, signedIndex;
+			uint** bgPalettes, objPalettes;
+			uint* tilePalette;
+			byte* bgMap, winMap,
+				bgTile, winTile;
+			int bgLineOffset, winLineOffset;
+			int bgTileIndex, pixelIndex;
+			byte* bgTiles;
+			int i, j;
+			int objHeight, objCount;
+			uint objColor = 0;
+
+			bgPalettes = this.backgroundPalettes32;
+			objPalettes = this.spritePalettes32;
+
+			fixed (ObjectData* objectData = this.objectData)
+			fixed (ushort* paletteIndexTable = ConversionTables.PaletteIndexTable,
+				flippedPaletteIndexTable = ConversionTables.FlippedPaletteIndexTable)
+			{
+				tilePalette = bgPalettes[0];
+
+				data1 = videoPortSnapshot.LCDC;
+				bgDraw = (data1 & 0x01) != 0;
+				bgMap = videoMemory + ((data1 & 0x08) != 0 ? 0x1C00 : 0x1800);
+				winDraw = (data1 & 0x20) != 0;
+				winMap = videoMemory + ((data1 & 0x40) != 0 ? 0x1C00 : 0x1800);
+				objDraw = (data1 & 0x02) != 0;
+				objHeight = (data1 & 0x04) != 0 ? 16 : 8;
+				signedIndex = (data1 & 0x10) == 0;
+				bgTiles = signedIndex ? videoMemory + 0x1000 : videoMemory;
+
+				scx = videoPortSnapshot.SCX;
+				scy = videoPortSnapshot.SCY;
+				wx = videoPortSnapshot.WX - 7;
+				wy = videoPortSnapshot.WY;
+				if (!colorMode)
+				{
+					data1 = videoPortSnapshot.BGP;
+					for (i = 0; i < 4; i++)
+					{
+						tilePalette[i] = ConversionTables.GrayPalette[data1 & 3];
+						data1 >>= 2;
+					}
+					data1 = videoPortSnapshot.OBP0;
+					for (j = 0; j < 4; j++)
+					{
+						objPalettes[0][j] = ConversionTables.GrayPalette[data1 & 3];
+						data1 >>= 2;
+					}
+					data1 = videoPortSnapshot.OBP1;
+					for (j = 0; j < 4; j++)
+					{
+						objPalettes[1][j] = ConversionTables.GrayPalette[data1 & 3];
+						data1 >>= 2;
+					}
+				}
+
+				pi = 0;
+
+				for (i = 0; i < 144; i++) // Loop on frame lines
+				{
+					#region Video Port Updates
+
+					data2 = i * 456; // Line clock
+
+					// Update ports before drawing the line
+					while (pi < videoPortAccessList.Count && videoPortAccessList[pi].Clock < data2)
+					{
+						switch (videoPortAccessList[pi].Port)
+						{
+							case Port.LCDC:
+								data1 = videoPortAccessList[pi].Value;
+								bgDraw = (data1 & 0x01) != 0;
+								bgMap = videoMemory + ((data1 & 0x08) != 0 ? 0x1C00 : 0x1800);
+								winDraw = (data1 & 0x20) != 0;
+								winMap = videoMemory + ((data1 & 0x40) != 0 ? 0x1C00 : 0x1800);
+								objDraw = (data1 & 0x02) != 0;
+								objHeight = (data1 & 0x04) != 0 ? 16 : 8;
+								signedIndex = (data1 & 0x10) == 0;
+								bgTiles = signedIndex ? videoMemory + 0x1000 : videoMemory;
+								break;
+							case Port.SCX: scx = videoPortAccessList[pi].Value; break;
+							case Port.SCY: scy = videoPortAccessList[pi].Value; break;
+							case Port.WX: wx = videoPortAccessList[pi].Value - 7; break;
+							case Port.BGP:
+								data1 = videoPortAccessList[pi].Value;
+								for (j = 0; j < 4; j++)
+								{
+									tilePalette[j] = ConversionTables.GrayPalette[data1 & 3];
+									data1 >>= 2;
+								}
+								break;
+							case Port.OBP0:
+								data1 = videoPortAccessList[pi].Value;
+								for (j = 0; j < 4; j++)
+								{
+									objPalettes[0][j] = ConversionTables.GrayPalette[data1 & 3];
+									data1 >>= 2;
+								}
+								break;
+							case Port.OBP1:
+								data1 = videoPortAccessList[pi].Value;
+								for (j = 0; j < 4; j++)
+								{
+									objPalettes[1][j] = ConversionTables.GrayPalette[data1 & 3];
+									data1 >>= 2;
+								}
+								break;
+						}
+
+						pi++;
+					}
+
+					#endregion
+
+					#region Object Attribute Memory Search
+
+					// Find valid sprites for the line, limited to 10 like on real GB
+					for (j = 0, objCount = 0; j < 40 && objCount < 10; j++) // Loop on OAM data
+					{
+						bgTile = objectAttributeMemory + j * 4; // Obtain a pointer to the object data
+
+						// First byte is vertical position and that's exactly what we want to compare :)
+						data1 = *bgTile - 16;
+						if (data1 <= i && data1 + objHeight > i) // Check that the sprite is drawn on the current line
+						{
+							// Initialize the object data according to what we want
+							data2 = bgTile[1]; // Second byte is the horizontal position, we store it somewhere
+							objectData[objCount].Left = data2 - 8;
+							objectData[objCount].Right = data2;
+							data2 = bgTile[3]; // Fourth byte contain flags that we'll examine
+							if (colorMode)
+								objectData[objCount].Palette = data2 & 0x7;
+							else
+								objectData[objCount].Palette = (data2 & 0x10) != 0 ? 1 : 0; // Set the palette index according to the flags
+							// Now we check the Y flip flag, as we'll use it to calculate the tile line offset
+							if ((data2 & 0x40) != 0)
+								data1 = 2 * (objHeight + data1 - i - 1);
+							else
+								data1 = 2 * (i - data1);
+							// Now that we have the line offset, we add to it the tile offset
+							if (objHeight == 16) // Depending on the sprite size we'll have to mask bit 0 of the tile index
+								data1 += 16 * (bgTile[2] & 0xFE); // Third byte is the tile index
+							else
+								data1 += 16 * bgTile[2]; // A tile is 16 bytes wide
+							// No all that is left is to fetch the tile data :)
+							if (colorMode && (data2 & 0x8) != 0)
+								bgTile = videoMemory + data1 + 0x2000; // Calculate the full tile line address for VRAM Bank 1
+							else
+								bgTile = videoMemory + data1; // Calculate the full tile line address for VRAM Bank 0
+							// Depending on the X flip flag, we will load the flipped pixel data or the regular one
+							if ((data2 & 0x20) != 0)
+								objectData[objCount].PixelData = flippedPaletteIndexTable[*bgTile] | (flippedPaletteIndexTable[*(bgTile + 1)] << 1);
+							else
+								objectData[objCount].PixelData = paletteIndexTable[*bgTile] | (paletteIndexTable[*(bgTile + 1)] << 1);
+							objCount++; // Increment the object counter
+						}
+					}
+
+					#endregion
+
+					#region Background and Window Fetch Initialization
+
+					// Initialize the background and window with new parameters
+					bgTileIndex = scx / 8;
+					pixelIndex = scx % 8;
+					data1 = ((scy + i) / 8); // Background Line Index
+					bgLineOffset = 2 * ((scy + i) % 8);
+					if (data1 >= 32) // Tile the background vertically
+						data1 -= 32;
+					bgTile = bgMap + 32 * data1 + bgTileIndex;
+					winTile = winMap + 32 * ((i - wy) / 8);
+					winLineOffset = 2 * ((i - wy) % 8);
+
+					winDraw2 = winDraw && i >= wy;
+
+					#endregion
+
+					// Adjust the current pixel to the current line
+					bufferPixel = (uint*)bufferLine;
+
+					// Do the actual drawing
+					for (j = 0; j < 160; j++) // Loop on line pixels
+					{
+						objDrawn = false; // Draw no object by default
+
+						if (objDraw && objCount > 0)
+						{
+							for (data2 = 0; data2 < objCount; data2++)
+							{
+								if (objectData[data2].Left <= j && objectData[data2].Right > j)
+								{
+									objColor = (uint)(objectData[data2].PixelData >> 2 * (j - objectData[data2].Left)) & 3;
+									if (objDrawn = objColor != 0)
+									{
+										objColor = objPalettes[objectData[data2].Palette][objColor];
+										break;
+									}
+								}
+							}
+						}
+						if (winDraw2 && j >= wx)
+						{
+							if (pixelIndex >= 8 || j == 0 || j == wx)
+							{
+								if (colorMode)
+								{
+									data2 = *(winTile + 0x2000);
+									tilePalette = bgPalettes[data2 & 0x7];
+									if ((data2 & 0x40) != 0)
+										data1 = 14 - winLineOffset;
+									else
+										data1 = winLineOffset;
+									if (signedIndex)
+										data1 += (sbyte)*winTile++ * 16;
+									else
+										data1 += *winTile++ * 16;
+									if ((data2 & 0x8) != 0)
+										data1 += 0x2000;
+									if ((data2 & 0x20) != 0)
+										data1 = flippedPaletteIndexTable[bgTiles[data1]] | (flippedPaletteIndexTable[bgTiles[data1 + 1]] << 1);
+									else
+										data1 = paletteIndexTable[bgTiles[data1]] | (paletteIndexTable[bgTiles[data1 + 1]] << 1);
+
+									objDrawn = objDrawn && ((data2 & 0x80) == 0);
+								}
+								else
+								{
+									if (signedIndex)
+										data1 = winLineOffset + (sbyte)*winTile++ * 16;
+									else
+										data1 = winLineOffset + *winTile++ * 16;
+
+									data1 = paletteIndexTable[bgTiles[data1]] | (paletteIndexTable[bgTiles[data1 + 1]] << 1);
+								}
+
+								if (j == 0 && wx < 0)
+								{
+									pixelIndex = -wx;
+									data1 >>= 2 * pixelIndex;
+								}
+								else
+									pixelIndex = 0;
+							}
+
+							if (objDrawn)
+								*bufferPixel++ = objColor;
+							else
+								*bufferPixel++ = tilePalette[data1 & 0x3];
+
+							data1 >>= 2;
+							pixelIndex++;
+						}
+						else if (bgDraw)
+						{
+							if (pixelIndex >= 8 || j == 0)
+							{
+								if (bgTileIndex++ >= 32) // Tile the background horizontally
+								{
+									bgTile -= 32;
+									bgTileIndex = 0;
+								}
+
+								if (colorMode)
+								{
+									data2 = *(bgTile + 0x2000);
+									tilePalette = bgPalettes[data2 & 0x7];
+									if ((data2 & 0x40) != 0)
+										data1 = 14 - bgLineOffset;
+									else
+										data1 = bgLineOffset;
+									if (signedIndex)
+										data1 += (sbyte)*bgTile++ * 16;
+									else
+										data1 += *bgTile++ * 16;
+									if ((data2 & 0x8) != 0)
+										data1 += 0x2000;
+									if ((data2 & 0x20) != 0)
+										data1 = flippedPaletteIndexTable[bgTiles[data1]] | (flippedPaletteIndexTable[bgTiles[data1 + 1]] << 1);
+									else
+										data1 = paletteIndexTable[bgTiles[data1]] | (paletteIndexTable[bgTiles[data1 + 1]] << 1);
+
+									objDrawn = objDrawn && ((data2 & 0x80) == 0);
+								}
+								else
+								{
+									if (signedIndex)
+										data1 = bgLineOffset + (sbyte)*bgTile++ * 16;
+									else
+										data1 = bgLineOffset + *bgTile++ * 16;
+									data1 = paletteIndexTable[bgTiles[data1]] | (paletteIndexTable[bgTiles[data1 + 1]] << 1);
+								}
+
+
+								if (j == 0 && pixelIndex > 0)
+									data1 >>= 2 * pixelIndex;
+								else
+									pixelIndex = 0;
+							}
+
+							if (objDrawn)
+								*bufferPixel++ = objColor;
+							else
+								*bufferPixel++ = tilePalette[data1 & 0x3];
+							data1 >>= 2;
+							pixelIndex++;
+						}
+						else
+							*bufferPixel++ = ConversionTables.GrayPalette[0];
+					}
+
+					bufferLine += stride;
+				}
+			}
+		}
