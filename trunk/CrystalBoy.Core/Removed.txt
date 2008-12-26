@@ -1,0 +1,93 @@
+﻿MemoryBlock.cs:
+
+#if WIN32 && PINVOKE // Calls the native CopyMemory function if possible
+		[CLSCompliant(false)]
+		public static void Copy(void* destination, void* source, uint length)
+		{
+			// Use native CopyMemory function if PINVOKE is allowed
+			NativeMethods.CopyMemory(destination, source, (UIntPtr)length);
+			Memory.Copy(destination, source, length);
+		}
+#else // Use a managed implementation of duff's device if only managed code is allowed
+		[CLSCompliant(false)]
+		public static void Copy(void* destination, void* source, uint length)
+		{
+			uint* dst = (uint*)destination,
+				src = (uint*)source;
+			uint n;
+
+			if (length == 0)
+				return;
+
+			length >>= 2;
+			n = (length + 7) / 8;
+
+			switch (length % 8)
+			{
+				case 0: *dst++ = *src++; goto case 7;
+				case 7: *dst++ = *src++; goto case 6;
+				case 6: *dst++ = *src++; goto case 5;
+				case 5: *dst++ = *src++; goto case 4;
+				case 4: *dst++ = *src++; goto case 3;
+				case 3: *dst++ = *src++; goto case 2;
+				case 2: *dst++ = *src++; goto case 1;
+				case 1: *dst++ = *src++; if (--n != 0) goto case 0; else break;
+			}
+		}
+#endif
+
+NativeMethods.cs:
+
+		#region Memory Manipulation Functions
+
+		[DllImport("kernel32", EntryPoint = "RtlMoveMemory")]
+		[SuppressUnmanagedCodeSecurity]
+		public static unsafe extern void MoveMemory(void* Destination, void* Source, UIntPtr Length);
+
+		[DllImport("kernel32", EntryPoint = "RtlMoveMemory")]
+		public static unsafe extern void CopyMemory(void* Destination, void* Source, UIntPtr Length);
+
+		#endregion
+
+FileUtility.cs:
+
+#if PINVOKE
+				fixed (byte* pBuffer = buffer)
+				{
+#endif
+				while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+				{
+#if PINVOKE
+					NativeMethods.CopyMemory(pMemory, pBuffer, (UIntPtr)bytesRead);
+#else
+					System.Runtime.InteropServices.Marshal.Copy(buffer, 0, (IntPtr)pMemory, bytesRead);
+#endif
+					pMemory += bytesRead;
+				}
+#if PINVOKE
+				}
+#endif
+
+
+FileUtility.cs:
+
+#if PINVOKE
+				fixed (byte* pBuffer = buffer)
+				{
+#endif
+				while (bytesLeft > 0)
+				{
+					if (bytesLeft < bytesToWrite)
+						bytesToWrite = bytesLeft;
+#if PINVOKE
+					NativeMethods.CopyMemory(pMemory, pBuffer, (UIntPtr)bytesToWrite);
+#else
+					System.Runtime.InteropServices.Marshal.Copy(buffer, 0, (IntPtr)pMemory, bytesToWrite);
+#endif
+					fileStream.Write(buffer, 0, bytesToWrite);
+					pMemory += bytesToWrite;
+					bytesLeft -= bytesToWrite;
+				}
+#if PINVOKE
+				}
+#endif

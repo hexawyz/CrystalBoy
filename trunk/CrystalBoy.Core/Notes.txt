@@ -1,0 +1,8 @@
+﻿CIL/MSIL allows memory copies / initializations directly via two opcodes: cpblk and initblk.
+Since these are not directly accessible in C#, a little netmodule (source in Memory.il) is used to provide memcpy and memset functionnality to the assembly.
+With the current build system, the netmodule cannot be embedded in the assembly, but this is still better than relying too much upon interop.
+All the core functions can be built without interop if needed, they'll just rely on CLR functionality instead. (useful for non Win32 environments)
+
+Concerning Memory.il, it should be possible to build it as a separate assembly (and as a separate project), and then merge it with CrystalBoy.Core in a single assembly by using IlMerge...
+But doing so would involve way too much hacking into the MSBuild system, so i leave it as is for now, event if i dislike the way it is ;)
+
