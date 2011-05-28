@@ -53,14 +53,8 @@ namespace CrystalBoy.Emulator
 
 			foreach (string pluginAssembly in Settings.Default.PluginAssemblies)
 			{
-				try
-				{
-					assemblyList.Add(Assembly.LoadFrom(pluginAssembly));
-				}
-				catch
-				{
-					throw;
-				}
+				try { assemblyList.Add(Assembly.LoadFrom(pluginAssembly)); }
+				catch (BadImageFormatException) { }
 			}
 
 			return assemblyList.ToArray();
@@ -171,24 +165,17 @@ namespace CrystalBoy.Emulator
 				renderMethod = null;
 			}
 
-			try
-			{
-				renderMethod = CreateRenderMethod(renderMethodType);
+			renderMethod = CreateRenderMethod(renderMethodType);
 
-				ToolStripMenuItem selectedMethodMenuItem = renderMethodMenuItemDictionary[renderMethodType];
+			ToolStripMenuItem selectedMethodMenuItem = renderMethodMenuItemDictionary[renderMethodType];
 
-				foreach (ToolStripMenuItem renderMethodMenuItem in renderMethodMenuItemDictionary.Values)
-					renderMethodMenuItem.Checked = renderMethodMenuItem == selectedMethodMenuItem;
+			foreach (ToolStripMenuItem renderMethodMenuItem in renderMethodMenuItemDictionary.Values)
+				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedMethodMenuItem;
 
-				// Store the FullName once we know the type of render method to use
-				Settings.Default.RenderMethod = renderMethodType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
+			// Store the FullName once we know the type of render method to use
+			Settings.Default.RenderMethod = renderMethodType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 
-				emulatedGameBoy.Bus.RenderMethod = renderMethod;
-			}
-			catch
-			{
-				throw;
-			}
+			emulatedGameBoy.Bus.RenderMethod = renderMethod;
 		}
 
 		private void InitializeRenderMethod()
@@ -199,6 +186,7 @@ namespace CrystalBoy.Emulator
 			if (renderMethodType != null)
 				SwitchRenderMethod(renderMethodType);
 			else // If simple reflexion failed, try using Name and FullName matches (there may be multiple matches in that case but it is better to avoid writing the full AssemblyQualifiedName in initial configurtaion files)
+			{
 				for (int i = 0; i < availableRenderMethods.Length; i++)
 				{
 					renderMethodType = availableRenderMethods[i];
@@ -209,6 +197,11 @@ namespace CrystalBoy.Emulator
 						return;
 					}
 				}
+
+				// If nothing was found, try using the first render method found, or throw an exception if nothing can be done
+				if (availableRenderMethods.Length > 0) SwitchRenderMethod(availableRenderMethods[0]);
+				else throw new InvalidOperationException();
+			}
 		}
 
 		#endregion
@@ -340,6 +333,12 @@ namespace CrystalBoy.Emulator
 			InitializeRenderMethod();
 			emulatedGameBoy.Bus.RenderMethod = renderMethod;
 			base.OnShown(e);
+		}
+
+		protected override void OnClosed(EventArgs e)
+		{
+			Settings.Default.Save();
+			base.OnClosed(e);
 		}
 
 		private void OnRomChanged(object sender, EventArgs e)
