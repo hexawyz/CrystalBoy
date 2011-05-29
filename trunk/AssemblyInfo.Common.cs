@@ -1,4 +1,4 @@
-ï»¿#region Copyright Notice
+#region Copyright Notice
 // This file is part of CrystalBoy.
 // Copyright (C) 2008 Fabien Barbier
 // 
@@ -18,16 +18,18 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("CrystalBoy.Emulation.ProcessorGenerator")]
-[assembly: AssemblyDescription("Generates the GB-Z80 Emulation code for CrystalBoy Emulator")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug")]
+#else
+[assembly: AssemblyConfiguration("Retail")]
+#endif
+[assembly: AssemblyCompany("GoldenCrystal")]
+[assembly: AssemblyProduct("CrystalBoy")]
+[assembly: AssemblyCopyright("Copyright © GoldenCrystal 2008-2011")]
 
-[assembly: CLSCompliant(true)]
+[assembly: SuppressIldasm]
 
-[assembly: ComVisible(false)]
-[assembly: Guid("b2e2a1db-e097-4533-8fd8-2c6c0999e5be")]
-
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]

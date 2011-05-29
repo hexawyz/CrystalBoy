@@ -31,17 +31,18 @@ namespace CrystalBoy.Emulator
 {
 	partial class MainForm : Form
 	{
-		static Assembly[] pluginAssemblies = LoadPluginAssemblies();
-		static Type[] availableRenderMethods = DetectRenderMethods();
-		static Dictionary<Type, string> renderMethodDitionary = BuildRenderMethodDictionary();
+		private static Assembly[] pluginAssemblies = LoadPluginAssemblies();
+		private static Type[] availableRenderMethods = DetectRenderMethods();
+		private static Dictionary<Type, string> renderMethodDitionary = BuildRenderMethodDictionary();
 
-		DebuggerForm debuggerForm;
-		TileViewerForm tileViewerForm;
-		MapViewerForm mapViewerForm;
-		RomInformationForm romInformationForm;
-		EmulatedGameBoy emulatedGameBoy;
-		RenderMethod renderMethod;
-		Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
+		private DebuggerForm debuggerForm;
+		private TileViewerForm tileViewerForm;
+		private MapViewerForm mapViewerForm;
+		private RomInformationForm romInformationForm;
+		private EmulatedGameBoy emulatedGameBoy;
+		private RenderMethod renderMethod;
+		private Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
+		private bool pausedForResizing;
 
 		#region Constructor and Initialization
 
@@ -101,6 +102,7 @@ namespace CrystalBoy.Emulator
 		{
 			InitializeComponent();
 			emulatedGameBoy = new EmulatedGameBoy();
+			emulatedGameBoy.EnableFramerateLimiter = Settings.Default.LimitSpeed;
 			emulatedGameBoy.RomChanged += OnRomChanged;
 			emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
 			emulatedGameBoy.NewFrame += OnNewFrame;
@@ -291,6 +293,10 @@ namespace CrystalBoy.Emulator
 			ClientSize = newSize;
 		}
 
+		protected override void OnResizeBegin(EventArgs e) { if (pausedForResizing = emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause(); }
+
+		protected override void OnResizeEnd(EventArgs e) { if (pausedForResizing) emulatedGameBoy.Run(); }
+
 		#endregion
 
 		#region Status Updates
@@ -309,19 +315,14 @@ namespace CrystalBoy.Emulator
 			resetToolStripMenuItem.Enabled = enable;
 		}
 
-		private void UpdateEmulationStatus()
-		{
-			emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus.ToString();
-		}
+		private void UpdateEmulationStatus() { emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus.ToString(); }
 
 		private void UpdateFrameRate()
 		{
 			double frameRate = emulatedGameBoy.FrameRate;
 
-			if (frameRate > 0)
-				frameRateToolStripStatusLabel.Text = "FPS: " + frameRate.ToString();
-			else
-				frameRateToolStripStatusLabel.Text = "FPS: -";
+			if (frameRate > 0) frameRateToolStripStatusLabel.Text = "FPS: " + frameRate.ToString();
+			else frameRateToolStripStatusLabel.Text = "FPS: -";
 		}
 
 		#endregion
@@ -341,25 +342,13 @@ namespace CrystalBoy.Emulator
 			base.OnClosed(e);
 		}
 
-		private void OnRomChanged(object sender, EventArgs e)
-		{
-			ResetEmulationMenuItems(emulatedGameBoy.RomLoaded);
-		}
+		private void OnRomChanged(object sender, EventArgs e) { ResetEmulationMenuItems(emulatedGameBoy.RomLoaded); }
 
-		private void OnEmulationStatusChanged(object sender, EventArgs e)
-		{
-			UpdateEmulationStatus();
-		}
+		private void OnEmulationStatusChanged(object sender, EventArgs e) { UpdateEmulationStatus(); }
 
-		private unsafe void OnNewFrame(object sender, EventArgs e)
-		{
-			UpdateFrameRate();
-		}
+		private unsafe void OnNewFrame(object sender, EventArgs e) { UpdateFrameRate(); }
 
-		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e)
-		{
-			renderMethod.Render();
-		}
+		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e) { renderMethod.Render(); }
 
 		#region Menus
 
@@ -397,20 +386,16 @@ namespace CrystalBoy.Emulator
 		private void emulationToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
 			pauseToolStripMenuItem.Checked = emulatedGameBoy.EmulationStatus == EmulationStatus.Paused;
+			limitSpeedToolStripMenuItem.Checked = emulatedGameBoy.EnableFramerateLimiter;
 		}
 
 		private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Paused)
-				emulatedGameBoy.Run();
-			else
-				emulatedGameBoy.Pause();
+			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Paused) emulatedGameBoy.Run();
+			else emulatedGameBoy.Pause();
 		}
 
-		private void resetToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			emulatedGameBoy.Reset();
-		}
+		private void resetToolStripMenuItem_Click(object sender, EventArgs e) { emulatedGameBoy.Reset(); }
 
 		#region Video
 
@@ -447,32 +432,17 @@ namespace CrystalBoy.Emulator
 				zoomMenuItem.Checked = zoomMenuItem == checkItem;
 		}
 
-		private void zoom100toolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetZoomFactor(1);
-		}
+		private void zoom100toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(1); }
 
-		private void zoom200toolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetZoomFactor(2);
-		}
+		private void zoom200toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(2); }
 
-		private void zoom300toolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetZoomFactor(3);
-		}
+		private void zoom300toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(3); }
 
-		private void zoom400toolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SetZoomFactor(4);
-		}
+		private void zoom400toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(4); }
 
 		#endregion
 
-		private void interpolationToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			renderMethod.Interpolation = !renderMethod.Interpolation;
-		}
+		private void interpolationToolStripMenuItem_Click(object sender, EventArgs e) { renderMethod.Interpolation = !renderMethod.Interpolation; }
 
 		#endregion
 
@@ -507,6 +477,12 @@ namespace CrystalBoy.Emulator
 		#endregion
 
 		#endregion
+
+		private void limitSpeedToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Settings.Default.LimitSpeed = 
+				emulatedGameBoy.EnableFramerateLimiter = limitSpeedToolStripMenuItem.Checked;
+		}
 
 		#endregion
 	}

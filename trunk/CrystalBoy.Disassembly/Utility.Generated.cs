@@ -278,7 +278,7 @@ namespace CrystalBoy.Disassembly
 			/* 0xFC */ OpcodeInfo.Invalid,
 			/* 0xFD */ OpcodeInfo.Invalid,
 			/* 0xFE */ new OpcodeInfo("CP A,${0:X2}", 1, Operation.Cp, Operand.A, Operand.Byte, 0, (Flags)240, (Flags)64, (Flags)0, 8, 0),
-			/* 0xFF */ new OpcodeInfo("RST $38", 0, Operation.Rst, Operand.Embedded, Operand.None, 56, (Flags)0, (Flags)0, (Flags)0, 16, 0)
+			/* 0xFF */ new OpcodeInfo("RST $38", 0, Operation.Rst, Operand.Embedded, Operand.None, 56, (Flags)0, (Flags)0, (Flags)0, 16, 0),
 		};
 
 		static readonly OpcodeInfo[] extendedOpcodeInfoArray = {
@@ -537,7 +537,7 @@ namespace CrystalBoy.Disassembly
 			/* 0xFC */ new OpcodeInfo("SET 7,H", 0, Operation.Set, Operand.Embedded, Operand.H, 7, (Flags)0, (Flags)0, (Flags)0, 8, 0),
 			/* 0xFD */ new OpcodeInfo("SET 7,L", 0, Operation.Set, Operand.Embedded, Operand.L, 7, (Flags)0, (Flags)0, (Flags)0, 8, 0),
 			/* 0xFE */ new OpcodeInfo("SET 7,(HL)", 0, Operation.Set, Operand.Embedded, Operand.MemoryHl, 7, (Flags)0, (Flags)0, (Flags)0, 16, 0),
-			/* 0xFF */ new OpcodeInfo("SET 7,A", 0, Operation.Set, Operand.Embedded, Operand.A, 7, (Flags)0, (Flags)0, (Flags)0, 8, 0)
+			/* 0xFF */ new OpcodeInfo("SET 7,A", 0, Operation.Set, Operand.Embedded, Operand.A, 7, (Flags)0, (Flags)0, (Flags)0, 8, 0),
 		};
 	}
 }

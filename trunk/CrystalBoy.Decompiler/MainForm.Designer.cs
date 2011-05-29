@@ -49,7 +49,7 @@ namespace CrystalBoy.Decompiler
 			System.Windows.Forms.ToolStripLabel gotoToolStripLabel;
 			this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-			this.disassemblyView = new CrystalBoy.Disassembly.DisassemblyView();
+			this.disassemblyView = new CrystalBoy.Disassembly.Windows.Forms.DisassemblyView();
 			this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -225,7 +225,7 @@ namespace CrystalBoy.Decompiler
 		private System.Windows.Forms.OpenFileDialog openFileDialog;
 		private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.ToolStripTextBox toolStripTextBox2;
-		private CrystalBoy.Disassembly.DisassemblyView disassemblyView;
+		private CrystalBoy.Disassembly.Windows.Forms.DisassemblyView disassemblyView;
 		private System.Windows.Forms.ToolStrip toolStrip1;
 		private System.Windows.Forms.ToolStripTextBox gotoToolStripTextBox;
 		private System.Windows.Forms.ToolStripButton gotoToolStripButton;

@@ -19,5 +19,8 @@
   &lt;string&gt;CrystalBoy.Emulation.Rendering.SlimDX.dll&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
+    <Setting Name="LimitSpeed" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

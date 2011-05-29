@@ -20,14 +20,14 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("CrystalBoy.Emulation.ProcessorGenerator")]
-[assembly: AssemblyDescription("Generates the GB-Z80 Emulation code for CrystalBoy Emulator")]
+[assembly: AssemblyTitle("CrystalBoy.Disassembly.Windows.Forms")]
+[assembly: AssemblyDescription("CrystalBoy Disassembly Utilities for Windows Forms")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: CLSCompliant(true)]
 
 [assembly: ComVisible(false)]
-[assembly: Guid("b2e2a1db-e097-4533-8fd8-2c6c0999e5be")]
+[assembly: Guid("25c28794-56b9-46c6-9be5-05792d6b11e8")]
 
 [assembly: AssemblyVersion("1.0.0.0")]

@@ -78,7 +78,7 @@ namespace CrystalBoy.Emulator
 			this.gotoLabel = new System.Windows.Forms.Label();
 			this.gotoTextBox = new System.Windows.Forms.TextBox();
 			this.gotoButton = new System.Windows.Forms.Button();
-			this.disassemblyView = new CrystalBoy.Disassembly.DisassemblyView();
+			this.disassemblyView = new CrystalBoy.Disassembly.Windows.Forms.DisassemblyView();
 			registersGroupBox = new System.Windows.Forms.GroupBox();
 			ieLabel = new System.Windows.Forms.Label();
 			ifLabel = new System.Windows.Forms.Label();
@@ -489,7 +489,7 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
-		private CrystalBoy.Disassembly.DisassemblyView disassemblyView;
+		private CrystalBoy.Disassembly.Windows.Forms.DisassemblyView disassemblyView;
 		private System.Windows.Forms.Label pcValueLabel;
 		private System.Windows.Forms.Label spValueLabel;
 		private System.Windows.Forms.Label hlValueLabel;

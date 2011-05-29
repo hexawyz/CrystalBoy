@@ -28,30 +28,28 @@ namespace CrystalBoy.Core
 		#region Static Members
 
 #if PINVOKE
-		static IntPtr hHeap = NativeMethods.GetProcessHeap();
+		private static IntPtr hHeap = NativeMethods.GetProcessHeap();
 #endif
 
 		#endregion
 
-		void* pMemory;
-		int length;
-		bool disposed;
+#if GCHANDLE
+		private byte[] buffer;
+		private GCHandle gcHandle;
+#endif
+		private void* memoryPointer;
+		private int length;
+		private bool disposed;
 
 		#region Constructors
 
-		public MemoryBlock(int length)
-		{
-			Alloc(length);
-		}
+		public MemoryBlock(int length) { Alloc(length); }
 
 		#endregion
 
 		#region Destructors
 
-		~MemoryBlock()
-		{
-			Dispose(false);
-		}
+		~MemoryBlock() { Dispose(false); }
 
 		private void Dispose(bool disposing)
 		{
@@ -72,41 +70,51 @@ namespace CrystalBoy.Core
 
 		#region Memory Management
 
-		void Alloc(int length)
+		private void Alloc(int length)
 		{
 #if WIN32 && PINVOKE
-			void* pMemory;
+			void* memoryPointer;
 
 			if (length < 0)
 				throw new ArgumentOutOfRangeException("length");
 
-			pMemory = NativeMethods.HeapAlloc(hHeap, NativeMethods.HEAP_GENERATE_EXCEPTIONS, (UIntPtr)length);
-			if (pMemory == (void*)NativeMethods.STATUS_NO_MEMORY)
+			memoryPointer = NativeMethods.HeapAlloc(hHeap, NativeMethods.HEAP_GENERATE_EXCEPTIONS, (UIntPtr)length);
+			if (memoryPointer == (void*)NativeMethods.STATUS_NO_MEMORY)
 				throw new OutOfMemoryException();
-			else if (pMemory == (void*)NativeMethods.STATUS_ACCESS_VIOLATION)
+			else if (memoryPointer == (void*)NativeMethods.STATUS_ACCESS_VIOLATION)
 				throw new AccessViolationException();
 			else
 			{
-				this.pMemory = pMemory;
+				this.memoryPointer = memoryPointer;
 				this.length = length;
 			}
+#elif GCHANDLE // This seems like a viable alternative method
+			this.buffer = new byte[length];
+			GC.Collect(); // Force a GC Collection, hoping it will pack the newly-allocated array together with other data in memory.
+			this.gcHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned); // Once pinned, the buffer will never move.
+			this.memoryPointer = gcHandle.AddrOfPinnedObject().ToPointer();
+			this.length = length;
 #else
-			this.pMemory = (void*)Marshal.AllocHGlobal(length);
+			this.memoryPointer = (void*)Marshal.AllocHGlobal(length);
 			this.length = length;
 #endif
 		}
 
 		void Free()
 		{
-			if (pMemory != null)
+			if (memoryPointer != null)
 			{
 #if WIN32 && PINVOKE
-				NativeMethods.HeapFree(hHeap, 0, pMemory);
+				NativeMethods.HeapFree(hHeap, 0, this.memoryPointer);
+#elif GCHANDLE
+				if (this.buffer != null) this.gcHandle.Free();
+
+				this.buffer = null;
 #else
-				Marshal.FreeHGlobal((IntPtr)pMemory);
+				Marshal.FreeHGlobal((IntPtr)this.memoryPointer);
 #endif
-				pMemory = null;
-				length = 0;
+				this.memoryPointer = null;
+				this.length = 0;
 			}
 		}
 
@@ -118,46 +126,28 @@ namespace CrystalBoy.Core
 			{
 				if (offset < 0 || offset > length)
 					throw new IndexOutOfRangeException();
-				return ((byte*)pMemory)[offset];
+				return ((byte*)memoryPointer)[offset];
 			}
 			set
 			{
 				if (offset < 0 || offset > length)
 					throw new IndexOutOfRangeException();
-				((byte*)pMemory)[offset] = value;
+				((byte*)memoryPointer)[offset] = value;
 			}
 		}
 
 		[CLSCompliant(false)]
-		public void* Pointer
-		{
-			get
-			{
-				return pMemory;
-			}
-		}
+		public void* Pointer { get { return memoryPointer; } }
 
-		public int Length
-		{
-			get
-			{
-				return length;
-			}
-		}
+		public int Length { get { return length; } }
 
-		public bool IsDisposed
-		{
-			get
-			{
-				return disposed;
-			}
-		}
+		public bool IsDisposed { get { return disposed; } }
 
 		#region Copy
 
 		public static void Copy(MemoryBlock destination, int destinationOffset, MemoryBlock source, int sourceOffset, int length)
 		{
-			if (destination.pMemory == null || source.pMemory == null)
+			if (destination.memoryPointer == null || source.memoryPointer == null)
 				throw new InvalidOperationException();
 			if (destinationOffset < 0)
 				throw new ArgumentOutOfRangeException("destinationOffset");
@@ -166,7 +156,7 @@ namespace CrystalBoy.Core
 			if (length < 0)
 				throw new ArgumentOutOfRangeException("length");
 
-			Memory.Copy((byte*)destination.pMemory + destinationOffset, (byte*)source.pMemory + sourceOffset, (uint)length);
+			Memory.Copy((byte*)destination.memoryPointer + destinationOffset, (byte*)source.memoryPointer + sourceOffset, (uint)length);
 		}
 
 		public static void Copy(IntPtr destination, IntPtr source, int length)
@@ -190,14 +180,14 @@ namespace CrystalBoy.Core
 
 		public static void Set(MemoryBlock destination, int destinationOffset, byte value, int length)
 		{
-			if (destination.pMemory == null)
+			if (destination.memoryPointer == null)
 				throw new InvalidOperationException();
 			if (destinationOffset < 0)
 				throw new ArgumentOutOfRangeException("destinationOffset");
 			if (length < 0)
 				throw new ArgumentOutOfRangeException("length");
 
-			Memory.Set((byte*)destination.pMemory + destinationOffset, value, (uint)length);
+			Memory.Set((byte*)destination.memoryPointer + destinationOffset, value, (uint)length);
 		}
 
 		public static void Set(IntPtr destination, byte value, int length)

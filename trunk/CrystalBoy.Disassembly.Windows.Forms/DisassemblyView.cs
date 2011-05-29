@@ -17,17 +17,14 @@
 #endregion
 
 using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Text;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using CrystalBoy.Core;
 
-namespace CrystalBoy.Disassembly
+namespace CrystalBoy.Disassembly.Windows.Forms
 {
 	[ToolboxBitmap(typeof(DisassemblyView))]
 	public partial class DisassemblyView : UserControl

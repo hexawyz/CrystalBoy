@@ -47,10 +47,11 @@ namespace CrystalBoy.Emulator
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-			System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
-			System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+			System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+			System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+			System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
 			this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,8 +60,10 @@ namespace CrystalBoy.Emulator
 			this.emulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.limitSpeedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.audioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.audioEnabledToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.muteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.videoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom100toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,12 +95,12 @@ namespace CrystalBoy.Emulator
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.frameRateToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.emulationStatusToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-			this.muteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-			toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
-			toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+			toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+			toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+			toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
 			this.mainMenuStrip.SuspendLayout();
 			this.toolStripContainer.BottomToolStripPanel.SuspendLayout();
 			this.toolStripContainer.TopToolStripPanel.SuspendLayout();
@@ -108,27 +111,27 @@ namespace CrystalBoy.Emulator
 			// toolStripMenuItem1
 			// 
 			toolStripMenuItem1.Name = "toolStripMenuItem1";
-			toolStripMenuItem1.Size = new System.Drawing.Size(185, 6);
-			// 
-			// toolStripMenuItem2
-			// 
-			toolStripMenuItem2.Name = "toolStripMenuItem2";
-			toolStripMenuItem2.Size = new System.Drawing.Size(149, 6);
+			toolStripMenuItem1.Size = new System.Drawing.Size(199, 6);
 			// 
 			// toolStripMenuItem3
 			// 
 			toolStripMenuItem3.Name = "toolStripMenuItem3";
-			toolStripMenuItem3.Size = new System.Drawing.Size(185, 6);
+			toolStripMenuItem3.Size = new System.Drawing.Size(149, 6);
+			// 
+			// toolStripMenuItem2
+			// 
+			toolStripMenuItem2.Name = "toolStripMenuItem2";
+			toolStripMenuItem2.Size = new System.Drawing.Size(199, 6);
+			// 
+			// toolStripMenuItem5
+			// 
+			toolStripMenuItem5.Name = "toolStripMenuItem5";
+			toolStripMenuItem5.Size = new System.Drawing.Size(153, 6);
 			// 
 			// toolStripMenuItem4
 			// 
 			toolStripMenuItem4.Name = "toolStripMenuItem4";
 			toolStripMenuItem4.Size = new System.Drawing.Size(149, 6);
-			// 
-			// toolStripMenuItem5
-			// 
-			toolStripMenuItem5.Name = "toolStripMenuItem5";
-			toolStripMenuItem5.Size = new System.Drawing.Size(149, 6);
 			// 
 			// mainMenuStrip
 			// 
@@ -149,10 +152,10 @@ namespace CrystalBoy.Emulator
             this.openToolStripMenuItem,
             toolStripMenuItem1,
             this.romInformationToolStripMenuItem,
-            toolStripMenuItem3,
+            toolStripMenuItem2,
             this.exitToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-			this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
 			this.fileToolStripMenuItem.Text = "&File";
 			this.fileToolStripMenuItem.ToolTipText = "The file menu";
 			// 
@@ -160,7 +163,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
 			this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.openToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+			this.openToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.openToolStripMenuItem.Text = "&Open";
 			this.openToolStripMenuItem.ToolTipText = "Open a Game Boy ROM";
 			this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
@@ -169,7 +172,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.romInformationToolStripMenuItem.Name = "romInformationToolStripMenuItem";
 			this.romInformationToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-			this.romInformationToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+			this.romInformationToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.romInformationToolStripMenuItem.Text = "&Rom information";
 			this.romInformationToolStripMenuItem.ToolTipText = "Show the ROM Information Window";
 			this.romInformationToolStripMenuItem.Click += new System.EventHandler(this.romInformationToolStripMenuItem_Click);
@@ -178,7 +181,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
 			this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+			this.exitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
 			this.exitToolStripMenuItem.Text = "E&xit";
 			this.exitToolStripMenuItem.ToolTipText = "Exit the application";
 			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
@@ -188,15 +191,17 @@ namespace CrystalBoy.Emulator
 			this.emulationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.pauseToolStripMenuItem,
             this.resetToolStripMenuItem,
-            toolStripMenuItem2,
+            toolStripMenuItem3,
+            this.limitSpeedToolStripMenuItem,
+            toolStripMenuItem4,
             this.audioToolStripMenuItem,
             this.videoToolStripMenuItem,
             this.hardwareToolStripMenuItem,
             this.joypadToolStripMenuItem,
-            toolStripMenuItem5,
+            toolStripMenuItem6,
             this.optionsToolStripMenuItem});
 			this.emulationToolStripMenuItem.Name = "emulationToolStripMenuItem";
-			this.emulationToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
+			this.emulationToolStripMenuItem.Size = new System.Drawing.Size(73, 20);
 			this.emulationToolStripMenuItem.Text = "&Emulation";
 			this.emulationToolStripMenuItem.ToolTipText = "Emulation options";
 			this.emulationToolStripMenuItem.DropDownOpening += new System.EventHandler(this.emulationToolStripMenuItem_DropDownOpening);
@@ -219,6 +224,16 @@ namespace CrystalBoy.Emulator
 			this.resetToolStripMenuItem.ToolTipText = "Reset the emulation";
 			this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
 			// 
+			// limitSpeedToolStripMenuItem
+			// 
+			this.limitSpeedToolStripMenuItem.Checked = true;
+			this.limitSpeedToolStripMenuItem.CheckOnClick = true;
+			this.limitSpeedToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.limitSpeedToolStripMenuItem.Name = "limitSpeedToolStripMenuItem";
+			this.limitSpeedToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.limitSpeedToolStripMenuItem.Text = "Limit &Speed";
+			this.limitSpeedToolStripMenuItem.Click += new System.EventHandler(this.limitSpeedToolStripMenuItem_Click);
+			// 
 			// audioToolStripMenuItem
 			// 
 			this.audioToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -234,12 +249,19 @@ namespace CrystalBoy.Emulator
 			this.audioEnabledToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.audioEnabledToolStripMenuItem.Text = "&Enabled";
 			// 
+			// muteToolStripMenuItem
+			// 
+			this.muteToolStripMenuItem.Name = "muteToolStripMenuItem";
+			this.muteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
+			this.muteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.muteToolStripMenuItem.Text = "&Mute";
+			// 
 			// videoToolStripMenuItem
 			// 
 			this.videoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zoomToolStripMenuItem,
             this.renderMethodToolStripMenuItem,
-            toolStripMenuItem4,
+            toolStripMenuItem5,
             this.interpolationToolStripMenuItem});
 			this.videoToolStripMenuItem.Name = "videoToolStripMenuItem";
 			this.videoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
@@ -255,14 +277,14 @@ namespace CrystalBoy.Emulator
             this.zoom300toolStripMenuItem,
             this.zoom400toolStripMenuItem});
 			this.zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
-			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
 			this.zoomToolStripMenuItem.Text = "Zoom";
 			this.zoomToolStripMenuItem.DropDownOpening += new System.EventHandler(this.zoomToolStripMenuItem_DropDownOpening);
 			// 
 			// zoom100toolStripMenuItem
 			// 
 			this.zoom100toolStripMenuItem.Name = "zoom100toolStripMenuItem";
-			this.zoom100toolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoom100toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.zoom100toolStripMenuItem.Text = "Zoom 100%";
 			this.zoom100toolStripMenuItem.ToolTipText = "Zoom to 100%";
 			this.zoom100toolStripMenuItem.Click += new System.EventHandler(this.zoom100toolStripMenuItem_Click);
@@ -270,7 +292,7 @@ namespace CrystalBoy.Emulator
 			// zoom200toolStripMenuItem
 			// 
 			this.zoom200toolStripMenuItem.Name = "zoom200toolStripMenuItem";
-			this.zoom200toolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoom200toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.zoom200toolStripMenuItem.Text = "Zoom 200%";
 			this.zoom200toolStripMenuItem.ToolTipText = "Zoom to 200%";
 			this.zoom200toolStripMenuItem.Click += new System.EventHandler(this.zoom200toolStripMenuItem_Click);
@@ -278,7 +300,7 @@ namespace CrystalBoy.Emulator
 			// zoom300toolStripMenuItem
 			// 
 			this.zoom300toolStripMenuItem.Name = "zoom300toolStripMenuItem";
-			this.zoom300toolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoom300toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.zoom300toolStripMenuItem.Text = "Zoom 300%";
 			this.zoom300toolStripMenuItem.ToolTipText = "Zoom to 300%";
 			this.zoom300toolStripMenuItem.Click += new System.EventHandler(this.zoom300toolStripMenuItem_Click);
@@ -286,7 +308,7 @@ namespace CrystalBoy.Emulator
 			// zoom400toolStripMenuItem
 			// 
 			this.zoom400toolStripMenuItem.Name = "zoom400toolStripMenuItem";
-			this.zoom400toolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.zoom400toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
 			this.zoom400toolStripMenuItem.Text = "Zoom 400%";
 			this.zoom400toolStripMenuItem.ToolTipText = "Zoom to 400%";
 			this.zoom400toolStripMenuItem.Click += new System.EventHandler(this.zoom400toolStripMenuItem_Click);
@@ -294,13 +316,13 @@ namespace CrystalBoy.Emulator
 			// renderMethodToolStripMenuItem
 			// 
 			this.renderMethodToolStripMenuItem.Name = "renderMethodToolStripMenuItem";
-			this.renderMethodToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.renderMethodToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
 			this.renderMethodToolStripMenuItem.Text = "Render Method";
 			// 
 			// interpolationToolStripMenuItem
 			// 
 			this.interpolationToolStripMenuItem.Name = "interpolationToolStripMenuItem";
-			this.interpolationToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.interpolationToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
 			this.interpolationToolStripMenuItem.Text = "&Interpolation";
 			this.interpolationToolStripMenuItem.Click += new System.EventHandler(this.interpolationToolStripMenuItem_Click);
 			// 
@@ -321,42 +343,42 @@ namespace CrystalBoy.Emulator
 			// gameBoyToolStripMenuItem
 			// 
 			this.gameBoyToolStripMenuItem.Name = "gameBoyToolStripMenuItem";
-			this.gameBoyToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.gameBoyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
 			this.gameBoyToolStripMenuItem.Text = "&Game Boy";
 			this.gameBoyToolStripMenuItem.ToolTipText = "Emulate Game Boy Hardware";
 			// 
 			// gameBoyPocketToolStripMenuItem
 			// 
 			this.gameBoyPocketToolStripMenuItem.Name = "gameBoyPocketToolStripMenuItem";
-			this.gameBoyPocketToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.gameBoyPocketToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
 			this.gameBoyPocketToolStripMenuItem.Text = "Game Boy &Pocket";
 			this.gameBoyPocketToolStripMenuItem.ToolTipText = "Emulate Pocket Game Boy Hardware";
 			// 
 			// gameBoyColorToolStripMenuItem
 			// 
 			this.gameBoyColorToolStripMenuItem.Name = "gameBoyColorToolStripMenuItem";
-			this.gameBoyColorToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.gameBoyColorToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
 			this.gameBoyColorToolStripMenuItem.Text = "Game Boy &Color";
 			this.gameBoyColorToolStripMenuItem.ToolTipText = "Emulate Color Game Boy Hardware";
 			// 
 			// gameBoyAdvanceToolStripMenuItem
 			// 
 			this.gameBoyAdvanceToolStripMenuItem.Name = "gameBoyAdvanceToolStripMenuItem";
-			this.gameBoyAdvanceToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.gameBoyAdvanceToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
 			this.gameBoyAdvanceToolStripMenuItem.Text = "Game Boy Advance";
 			this.gameBoyAdvanceToolStripMenuItem.ToolTipText = "Emulate Game Boy Advance Hardware";
 			// 
 			// superGameBoyToolStripMenuItem
 			// 
 			this.superGameBoyToolStripMenuItem.Name = "superGameBoyToolStripMenuItem";
-			this.superGameBoyToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.superGameBoyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
 			this.superGameBoyToolStripMenuItem.Text = "&Super Game Boy";
 			this.superGameBoyToolStripMenuItem.ToolTipText = "Emulate Super Game Boy Hardware";
 			// 
 			// superGameBoy2ToolStripMenuItem
 			// 
 			this.superGameBoy2ToolStripMenuItem.Name = "superGameBoy2ToolStripMenuItem";
-			this.superGameBoy2ToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+			this.superGameBoy2ToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
 			this.superGameBoy2ToolStripMenuItem.Text = "Super Game Boy &2";
 			this.superGameBoy2ToolStripMenuItem.ToolTipText = "Emulate Super Game Boy 2 Hardware";
 			// 
@@ -381,7 +403,7 @@ namespace CrystalBoy.Emulator
             this.mapViewerToolStripMenuItem,
             this.oamViewerToolStripMenuItem});
 			this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
 			this.toolsToolStripMenuItem.Text = "&Tools";
 			this.toolsToolStripMenuItem.ToolTipText = "Tools for developers";
 			// 
@@ -389,7 +411,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.debuggerToolStripMenuItem.Name = "debuggerToolStripMenuItem";
 			this.debuggerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-			this.debuggerToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+			this.debuggerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
 			this.debuggerToolStripMenuItem.Text = "&Debugger";
 			this.debuggerToolStripMenuItem.ToolTipText = "Show the Debugger Window";
 			this.debuggerToolStripMenuItem.Click += new System.EventHandler(this.debuggerToolStripMenuItem_Click);
@@ -397,14 +419,14 @@ namespace CrystalBoy.Emulator
 			// memoryViewerToolStripMenuItem
 			// 
 			this.memoryViewerToolStripMenuItem.Name = "memoryViewerToolStripMenuItem";
-			this.memoryViewerToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+			this.memoryViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
 			this.memoryViewerToolStripMenuItem.Text = "&Memory Viewer";
 			this.memoryViewerToolStripMenuItem.ToolTipText = "Show the Memory Viewer Window";
 			// 
 			// tileViewerToolStripMenuItem
 			// 
 			this.tileViewerToolStripMenuItem.Name = "tileViewerToolStripMenuItem";
-			this.tileViewerToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+			this.tileViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
 			this.tileViewerToolStripMenuItem.Text = "&Tile Viewer";
 			this.tileViewerToolStripMenuItem.ToolTipText = "Show the Tile Viewer Window";
 			this.tileViewerToolStripMenuItem.Click += new System.EventHandler(this.tileViewerToolStripMenuItem_Click);
@@ -412,7 +434,7 @@ namespace CrystalBoy.Emulator
 			// mapViewerToolStripMenuItem
 			// 
 			this.mapViewerToolStripMenuItem.Name = "mapViewerToolStripMenuItem";
-			this.mapViewerToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+			this.mapViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
 			this.mapViewerToolStripMenuItem.Text = "&Map Viewer";
 			this.mapViewerToolStripMenuItem.ToolTipText = "Show the Map Viewer Window";
 			this.mapViewerToolStripMenuItem.Click += new System.EventHandler(this.mapViewerToolStripMenuItem_Click);
@@ -420,7 +442,7 @@ namespace CrystalBoy.Emulator
 			// oamViewerToolStripMenuItem
 			// 
 			this.oamViewerToolStripMenuItem.Name = "oamViewerToolStripMenuItem";
-			this.oamViewerToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+			this.oamViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
 			this.oamViewerToolStripMenuItem.Text = "&OAM Viewer";
 			this.oamViewerToolStripMenuItem.ToolTipText = "Show the OAM Viewer Window";
 			// 
@@ -429,13 +451,13 @@ namespace CrystalBoy.Emulator
 			this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem});
 			this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-			this.helpToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+			this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
 			this.helpToolStripMenuItem.Text = "&Help";
 			// 
 			// aboutToolStripMenuItem
 			// 
 			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.aboutToolStripMenuItem.Text = "&About";
 			// 
 			// openFileDialog
@@ -498,12 +520,10 @@ namespace CrystalBoy.Emulator
 			this.emulationStatusToolStripStatusLabel.Size = new System.Drawing.Size(50, 17);
 			this.emulationStatusToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// muteToolStripMenuItem
+			// toolStripMenuItem6
 			// 
-			this.muteToolStripMenuItem.Name = "muteToolStripMenuItem";
-			this.muteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
-			this.muteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.muteToolStripMenuItem.Text = "&Mute";
+			toolStripMenuItem6.Name = "toolStripMenuItem6";
+			toolStripMenuItem6.Size = new System.Drawing.Size(149, 6);
 			// 
 			// MainForm
 			// 
@@ -572,6 +592,7 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripMenuItem audioToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem audioEnabledToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem muteToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem limitSpeedToolStripMenuItem;
 	}
 }
 

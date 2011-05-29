@@ -1,0 +1,68 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="$(SolutionDir)CrystalBoy.Disassembly.OpcodeTableGenerator\$(OutDir)OpcodeTableGenerator.dll" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="CrystalBoy.Disassembly" #>
+<#@ import namespace="CrystalBoy.Disassembly.OpcodeTableGenerator" #>
+<#@ output extension=".cs" #>
+#region Copyright Notice
+// This file is part of CrystalBoy.
+// Copyright (C) 2008 Fabien Barbier
+// 
+// CrystalBoy is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// CrystalBoy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#endregion
+
+using System;
+
+namespace CrystalBoy.Disassembly
+{
+	partial class Utility
+	{
+<#
+OpcodeInfo[] opcodes = new OpcodeInfo[256];
+OpcodeInfo[]extendedOpcodes = new OpcodeInfo[256];
+
+for (int i = 0; i <= 255; i++)
+{
+	opcodes[i] = Utility.GetOpcodeInfo((byte)i);
+	extendedOpcodes[i] = Utility.GetExtendedOpcodeInfo((byte)i);
+}
+#>
+		static readonly OpcodeInfo[] opcodeInfoArray = {
+<# for (int i = 0; i <= 255; i++)
+{
+	#>			<# WriteOpcodeInfo(i, opcodes[i]); #>,
+<#
+}
+#>		};
+
+		static readonly OpcodeInfo[] extendedOpcodeInfoArray = {
+<# for (int i = 0; i <= 255; i++) { #>			<# WriteOpcodeInfo(i, extendedOpcodes[i]); #>,
+<# } #>
+		};
+	}
+}
+
+<#+
+private void WriteOpcodeInfo(int i, OpcodeInfo opcodeInfo)
+{
+#>/* 0x<#= i.ToString("X2", CultureInfo.InvariantCulture) #> */ <#= string.IsNullOrEmpty(opcodeInfo.FormatString) ?
+		"OpcodeInfo.Invalid" :
+		string.Format(
+			CultureInfo.InvariantCulture,
+			"new OpcodeInfo(\"{1}\", {2}, Operation.{3}, Operand.{4}, Operand.{5}, {6}, (Flags){7:D}, (Flags){8:D}, (Flags){9:D}, {10}, {11})",
+			i, opcodeInfo.FormatString, opcodeInfo.ExtraByteCount, opcodeInfo.Operation, opcodeInfo.FirstOperand, opcodeInfo.SecondOperand, opcodeInfo.EmbeddedValue, opcodeInfo.AffectedFlags, opcodeInfo.SetFlags, opcodeInfo.ClearFlags, opcodeInfo.BaseCycleCount, opcodeInfo.ConditionalCycleCount
+		)
+#><#+
+}
+#>
