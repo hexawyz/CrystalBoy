@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>CrystalBoy.Emulation.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -65,6 +65,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AssemblyInfo.Common.cs">
+      <Link>Properties\AssemblyInfo.Common.cs</Link>
+    </Compile>
     <Compile Include="Mappers\MemoryBankController3.cs" />
     <Compile Include="Mappers\MemoryBankController1.cs" />
     <Compile Include="Mappers\RomController.cs" />
@@ -94,7 +97,6 @@
     <Content Include="Timings.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CrystalBoy.Emulation.snk" />
     <Compile Include="GameBoyMemoryBus.Snapshot.cs" />
     <Compile Include="LookupTables.cs" />
     <Compile Include="GameBoyMemoryBus.Rendering.cs">
@@ -151,6 +153,11 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\CrystalBoy.snk">
+      <Link>CrystalBoy.snk</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

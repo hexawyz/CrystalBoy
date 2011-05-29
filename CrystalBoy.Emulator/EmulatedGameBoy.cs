@@ -28,8 +28,11 @@ namespace CrystalBoy.Emulator
 	{
 		GameBoyMemoryBus bus;
 		EmulationStatus emulationStatus;
-		int[] tickCounts;
+		Stopwatch frameStopwatch;
+		Stopwatch frameRateStopwatch;
+		long[] tickCounts;
 		int tickIndex;
+		bool enableFramerateLimiter;
 
 		public event EventHandler RomChanged;
 		public event EventHandler Paused;
@@ -40,19 +43,15 @@ namespace CrystalBoy.Emulator
 		public EmulatedGameBoy()
 		{
 			bus = new GameBoyMemoryBus();
-			tickCounts = new int[60];
+			tickCounts = new long[60];
+			frameStopwatch = new Stopwatch();
+			frameRateStopwatch = new Stopwatch();
 			Application.Idle += OnApplicationIdle;
 		}
 
-		public void Dispose()
-		{
-			bus.Dispose();
-		}
+		public void Dispose() { bus.Dispose(); }
 
-		public void Reset()
-		{
-			bus.Reset();
-		}
+		public void Reset() { bus.Reset(); }
 
 		public void LoadRom(MemoryBlock rom)
 		{
@@ -63,37 +62,13 @@ namespace CrystalBoy.Emulator
 			OnRomChanged(EventArgs.Empty);
 		}
 
-		public RomInformation RomInformation
-		{
-			get
-			{
-				return bus.RomInformation;
-			}
-		}
+		public RomInformation RomInformation { get { return bus.RomInformation; } }
 
-		public bool RomLoaded
-		{
-			get
-			{
-				return bus.RomLoaded;
-			}
-		}
+		public bool RomLoaded { get { return bus.RomLoaded; } }
 
-		public GameBoyMemoryBus Bus
-		{
-			get
-			{
-				return bus;
-			}
-		}
+		public GameBoyMemoryBus Bus { get { return bus; } }
 
-		public Processor Processor
-		{
-			get
-			{
-				return bus.Processor;
-			}
-		}
+		public Processor Processor { get { return bus.Processor; } }
 
 		public EmulationStatus EmulationStatus
 		{
@@ -115,7 +90,7 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				int delta;
+				long delta;
 
 				if (emulationStatus == EmulationStatus.Running)
 				{
@@ -138,7 +113,7 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				int delta;
+				long delta;
 
 				if (emulationStatus == EmulationStatus.Running)
 				{
@@ -148,7 +123,7 @@ namespace CrystalBoy.Emulator
 						delta = tickCounts[tickIndex - 1] - tickCounts[tickIndex];
 
 					if (delta > 0)
-						return 1000 * tickCounts.Length / delta;
+						return (int)(1000 * tickCounts.Length / delta);
 					else
 						return 0;
 				}
@@ -156,6 +131,8 @@ namespace CrystalBoy.Emulator
 					return 0;
 			}
 		}
+
+		public bool EnableFramerateLimiter { get { return enableFramerateLimiter; } set { enableFramerateLimiter = value; } }
 
 		public void Step()
 		{
@@ -191,17 +168,22 @@ namespace CrystalBoy.Emulator
 
 		private void ResetCounter()
 		{
-			int tickCount = Environment.TickCount;
-
 			for (int i = 0; i < tickCounts.Length; i++)
-				tickCounts[i] = tickCount;
+				tickCounts[i] = 0;
 
 			tickIndex = 0;
+
+			frameRateStopwatch.Reset();
+			frameRateStopwatch.Start();
+			frameStopwatch.Reset();
+			frameStopwatch.Start();
 		}
 
 		private void Pause(bool breakpoint)
 		{
 			EmulationStatus = EmulationStatus.Paused;
+
+			frameRateStopwatch.Stop();
 
 			if (breakpoint)
 				OnBreak(EventArgs.Empty);
@@ -221,15 +203,9 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		public void NotifyPressedKeys(GameBoyKeys pressedKeys)
-		{
-			bus.NotifyPressedKeys(pressedKeys);
-		}
+		public void NotifyPressedKeys(GameBoyKeys pressedKeys) { bus.NotifyPressedKeys(pressedKeys); }
 
-		public void NotifyReleasedKeys(GameBoyKeys releasedKeys)
-		{
-			bus.NotifyReleasedKeys(releasedKeys);
-		}
+		public void NotifyReleasedKeys(GameBoyKeys releasedKeys) { bus.NotifyReleasedKeys(releasedKeys); }
 
 		private void RunFrameInternal()
 		{
@@ -240,15 +216,12 @@ namespace CrystalBoy.Emulator
 				OnNewFrame(EventArgs.Empty);
 			else
 				Pause(true);
-			tickCounts[tickIndex++] = Environment.TickCount;
+			tickCounts[tickIndex++] = frameRateStopwatch.ElapsedMilliseconds;
 			if (tickIndex >= tickCounts.Length)
 				tickIndex = 0;
 		}
 
-		private bool IsKeyDown(Keys vKey)
-		{
-			return (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0;
-		}
+		private bool IsKeyDown(Keys vKey) { return (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0; }
 
 		private GameBoyKeys ReadKeys()
 		{
@@ -284,8 +257,24 @@ namespace CrystalBoy.Emulator
 			while (emulationStatus == EmulationStatus.Running &&
 				!NativeMethods.PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
 			{
+				if (enableFramerateLimiter)
+				{
+					long timer = frameStopwatch.ElapsedMilliseconds;
+
+					if (timer < 17) // Exact timing for one frame at 60fps is 16⅔ ms
+					{
+						// Conversion from long to int is safe since the value is less than 17.
+						// Sleep is a really bad tool for precise timing, but it will play its role when needed.
+						System.Threading.Thread.Sleep(16 - (int)timer);
+
+						// Do some active wait, even though this is bad…
+						while (frameStopwatch.Elapsed.TotalMilliseconds < (1000 / 60)) ;
+					}
+				}
+
+				frameStopwatch.Reset();
+				frameStopwatch.Start();
 				RunFrameInternal();
-				System.Threading.Thread.Sleep(10);
 			}
 #else
 #error Render loop cannot work without P/Invoke

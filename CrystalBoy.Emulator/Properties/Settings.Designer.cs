@@ -75,5 +75,17 @@ namespace CrystalBoy.Emulator.Properties {
                 this["PluginAssemblies"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool LimitSpeed {
+            get {
+                return ((bool)(this["LimitSpeed"]));
+            }
+            set {
+                this["LimitSpeed"] = value;
+            }
+        }
     }
 }
