@@ -40,11 +40,9 @@ namespace CrystalBoy.Emulation
 			this.bus = bus;
 		}
 
-		/// <summary>
-		/// Resets the Mapper
-		/// </summary>
+		/// <summary>Resets the Mapper</summary>
 		/// <remarks>
-		/// The default Reset implementation do the following operations
+		/// The default Reset implementation performs the following operations
 		/// <list type="bullet">
 		/// <item>
 		/// <description>Caches the RAM pointer, which can change on each reset (only if the requested RAM grows)</description>
@@ -73,47 +71,23 @@ namespace CrystalBoy.Emulation
 			SetPortValue(0);
 		}
 
-		/// <summary>
-		/// Gets the GameBoyMemoryBus associated with this Mapper
-		/// </summary>
-		protected GameBoyMemoryBus Bus
-		{
-			get
-			{
-				return bus;
-			}
-		}
+		/// <summary>Gets the GameBoyMemoryBus associated with this Mapper</summary>
+		protected GameBoyMemoryBus Bus { get { return bus; } }
 
-		/// <summary>
-		/// Gets the RAM Size requested by the mapper.
-		/// </summary>
+		/// <summary>Gets the RAM Size requested by the mapper.</summary>
 		/// <remarks>
 		/// The default implementation returns the ram size provided by the ROM information.
 		/// If need to allocate more RAM for other purposes (memory mapped IO for example), override this propertie to request the proper amount of memory.
 		/// </remarks>
-		public virtual int RamSize
-		{
-			get
-			{
-				return Bus.RomInformation.RamSize;
-			}
-		}
+		public virtual int RamSize { get { return Bus.RomInformation.RamSize; } }
 
-		/// <summary>
-		/// Gets the size of the RAM to save.
-		/// </summary>
+		/// <summary>Gets the size of the RAM to save.</summary>
 		/// <remarks>
 		/// The default implementation returns the value returned by RamSize.
 		/// If you requested more memory than what need to be saved, if battery is supported, just return the correct amount here.
 		/// The first RAM banks will always be saved first, so it is better to put your custom data in the last RAM banks.
 		/// </remarks>
-		public virtual int SavedRamSize
-		{
-			get
-			{
-				return RamSize;
-			}
-		}
+		public virtual int SavedRamSize { get { return RamSize; } }
 
 		/// <summary>
 		/// Gets or sets a value indicating wether the Mapper handles RAM Writes.
@@ -124,10 +98,7 @@ namespace CrystalBoy.Emulation
 		/// </remarks>
 		public bool HandlesRamWrites
 		{
-			get
-			{
-				return handlesRamWrites;
-			}
+			get { return handlesRamWrites; }
 			set
 			{
 				if (value != handlesRamWrites)
@@ -138,88 +109,50 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-		/// <summary>
-		/// Gets a pointer to the allocated RAM.
-		/// </summary>
+		/// <summary>Gets a pointer to the allocated RAM.</summary>
 		[CLSCompliant(false)]
-		protected unsafe byte* Ram
-		{
-			get
-			{
-				return ram;
-			}
-		}
+		protected unsafe byte* Ram { get { return ram; } }
 
 		#region Bank Management Functions
 
-		/// <summary>
-		/// Maps a ROM bank into the upper or lower ROM area.
-		/// </summary>
+		/// <summary>Maps a ROM bank into the upper or lower ROM area.</summary>
 		/// <param name="upper">True for the upper ROM area, false for the lower one.</param>
 		/// <param name="bankIndex">Index of the ROM bank to map.</param>
-		protected void MapRomBank(bool upper, int bankIndex)
-		{
-			bus.MapExternalRomBank(upper, bankIndex);
-		}
+		protected void MapRomBank(bool upper, int bankIndex) { bus.MapExternalRomBank(upper, bankIndex); }
 
-		/// <summary>
-		/// Maps a custom port into the RAM area.
-		/// </summary>
+		/// <summary>Maps a custom port into the RAM area.</summary>
 		/// <remarks>
 		/// The port is handled internally by the GameBoyMemoryBus object associated with the Mapper.
 		/// In the current implementation, it uses a 256 byte memory containing only one value, repeated all over the RAM area.
 		/// If you wish to change the value assigned to this memory, you can do so by using the SetPortValue method.
 		/// </remarks>
-		protected void MapPort()
-		{
-			bus.MapExternalPort();
-		}
+		protected void MapPort() { bus.MapExternalPort(); }
 
-		/// <summary>
-		/// Sets the value assigned to the custom port memory.
-		/// </summary>
+		/// <summary>Sets the value assigned to the custom port memory.</summary>
 		/// <param name="value">Value to assign</param>
-		/// 
-		protected void SetPortValue(byte value)
-		{
-			bus.SetPortValue(value);
-		}
+		protected void SetPortValue(byte value) { bus.SetPortValue(value); }
 
-		/// <summary>
-		/// Maps a RAM bank into the RAM area.
-		/// </summary>
+		/// <summary>Maps a RAM bank into the RAM area.</summary>
 		/// <param name="bankIndex">Index of the RAM bank to map</param>
-		protected void MapRamBank(int bankIndex)
-		{
-			bus.MapExternalRamBank(bankIndex);
-		}
+		protected void MapRamBank(int bankIndex) { bus.MapExternalRamBank(bankIndex); }
 
-		/// <summary>
-		/// Unmaps RAM from the RAM area.
-		/// </summary>
+		/// <summary>Unmaps RAM from the RAM area.</summary>
 		/// <remarks>
 		/// By unmapping the RAM, you ensure that every unhandled read or write to the area will access an useless memory.
 		/// Thus, unless you implement your own version of HandleRamWrite, writes will never affect the real RAM.
 		/// This can be used by mappers that supports RAM enabling and disabling.
 		/// </remarks>
-		protected void UnmapRam()
-		{
-			bus.UnmapExternalRam();
-		}
+		protected void UnmapRam() { bus.UnmapExternalRam(); }
 
 		#endregion
 
-		/// <summary>
-		/// Handles a ROM write.
-		/// </summary>
+		/// <summary>Handles a ROM write.</summary>
 		/// <param name="offsetLow">Less significant byte of the write offset</param>
 		/// <param name="offsetHigh">Most significant byte of the write offset</param>
 		/// <param name="value">Value written</param>
 		public abstract void HandleRomWrite(byte offsetLow, byte offsetHigh, byte value);
 
-		/// <summary>
-		/// Handles a RAM write.
-		/// </summary>
+		/// <summary>Handles a RAM write.</summary>
 		/// <param name="offsetLow">Less significant byte of the write offset</param>
 		/// <param name="offsetHigh">Most significant byte of the write offset</param>
 		/// <param name="value">Value written</param>
@@ -227,8 +160,6 @@ namespace CrystalBoy.Emulation
 		/// The default implementation of HandleRamWrite does nothing.
 		/// If you impelement your own version, do not bother calling the base implementation (the one in Mapper) because it is useless.
 		/// </remarks>
-		public virtual void HandleRamWrite(byte offsetLow, byte offsetHigh, byte value)
-		{
-		}
+		public virtual void HandleRamWrite(byte offsetLow, byte offsetHigh, byte value) { }
 	}
 }

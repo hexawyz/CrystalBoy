@@ -134,7 +134,11 @@ for (int i = 0; i <= 255; i++)
 			opcodeInfo = Utility.GetExtendedOpcodeInfo((byte)j);
 #>
 								case /* 0xCB */ 0x<#= j.ToString("X2") #>: /* <#= GetOpcodeString(opcodeInfo) #> */
-<# WriteOpcodeStub(opcodeInfo); #>
+<#
+			PushIndent("\t\t\t\t\t\t\t\t\t");
+			WriteOpcodeStub(opcodeInfo);
+			PopIndent();
+#>
 									break;
 <#
 		}
@@ -151,7 +155,11 @@ for (int i = 0; i <= 255; i++)
 		{
 #>
 						case 0x<#= i.ToString("X2") #>: /* <#= GetOpcodeString(opcodeInfo) #> */
-<# WriteOpcodeStub(opcodeInfo); #>
+<#
+			PushIndent("\t\t\t\t\t\t\t");
+			WriteOpcodeStub(opcodeInfo);
+			PopIndent();
+#>
 							break;
 <#
 		}

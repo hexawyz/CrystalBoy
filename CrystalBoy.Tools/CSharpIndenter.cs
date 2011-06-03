@@ -24,36 +24,43 @@ namespace CrystalBoy.Tools
 {
 	public static class CSharpIndenter
 	{
-		/// <summary>
-		/// Indent simple C# Source Code
-		/// </summary>
+		/// <summary>Indent simple C# Source Code</summary>
 		/// <param name="input">C# Source Code to indent</param>
 		/// <returns>Indented C# Source Code</returns>
 		public static string IndentSource(string input)
 		{
-			StringBuilder output = new StringBuilder();
-			string[] lines = input.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-			Stack<int> indentationLevelStack = new Stack<int>();
-			int currentIndentationLevel = 0,
-				nextIndentationLevel = 0;
+			var output = new StringBuilder();
+
+			IndentSource(input, output);
+
+			return output.ToString();
+		}
+
+		/// <summary>Indent simple C# Source Code</summary>
+		/// <param name="input">C# Source Code to indent</param>
+		/// <returns>Indented C# Source Code</returns>
+		public static void IndentSource(string input, StringBuilder output)
+		{
+			var lines = input.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+			var indentationLevelStack = new Stack<int>();
+			int currentIndentationLevel = 0;
+			int	nextIndentationLevel = 0;
 			bool unindentAfter = false;
 
 			for (int i = 0; i < lines.Length; i++)
 			{
 				string line = lines[i];
 
-				if (line != null && line.Length > 0)
-					line = line.Trim();
+				if (line != null && line.Length > 0) line = line.Trim();
 
 				currentIndentationLevel = nextIndentationLevel;
 
 				if (line != null && line.Length > 0)
 				{
-					char c1 = line[0],
-						c2 = line[line.Length - 1];
+					char c1 = line[0];
+					char c2 = line[line.Length - 1];
 
-					if (c1 == '#')
-						currentIndentationLevel = 0;
+					if (c1 == '#') currentIndentationLevel = 0;
 					else if (c2 == '{')
 					{
 						if (unindentAfter)
@@ -89,16 +96,12 @@ namespace CrystalBoy.Tools
 						nextIndentationLevel = currentIndentationLevel - 1;
 						unindentAfter = false;
 					}
-					else
-						nextIndentationLevel = currentIndentationLevel;
+					else nextIndentationLevel = currentIndentationLevel;
 					output.Append('\t', currentIndentationLevel);
 					output.AppendLine(line);
 				}
-				else
-					output.AppendLine();
+				else output.AppendLine();
 			}
-
-			return output.ToString();
 		}
 	}
 }
