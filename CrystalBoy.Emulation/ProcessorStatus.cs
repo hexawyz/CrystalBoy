@@ -24,6 +24,7 @@ namespace CrystalBoy.Emulation
 	{
 		Running,
 		Halted,
-		Stopped
+		Stopped,
+		Crashed
 	}
 }

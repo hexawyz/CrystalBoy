@@ -78,7 +78,9 @@
     <Compile Include="Port.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="Processor.Generated.cs">
-      <DependentUpon>Processor.cs</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Processor.Generated.tt</DependentUpon>
     </Compile>
     <Compile Include="ProcessorStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -158,6 +160,13 @@
     <None Include="..\CrystalBoy.snk">
       <Link>CrystalBoy.snk</Link>
     </None>
+    <None Include="Processor.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Processor.Generated.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

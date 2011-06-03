@@ -1,0 +1,1018 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="$(SolutionDir)CrystalBoy.Disassembly\$(OutDir)CrystalBoy.Disassembly.dll" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="CrystalBoy.Disassembly" #>
+<#@ output extension=".cs" #>
+<# InitializeTemplateDictionary(); #>
+#region Copyright Notice
+// This file is part of CrystalBoy.
+// Copyright (C) 2008 Fabien Barbier
+// 
+// CrystalBoy is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// CrystalBoy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#endregion
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CrystalBoy.Emulation
+{
+	partial class Processor
+	{
+		public bool Emulate(bool finishFrame)
+		{
+			// Register variables, cloned here for efficiency (maybe it's an error, but it is easy to remove if needed)
+			byte a, b, c, d, e, h, l, opcode;
+			ushort sp, pc;
+			bool zeroFlag, negationFlag, halfCarryFlag, carryFlag, ime;
+
+			// Temporary result variable
+			int temp;
+
+			// Last instruction cycle count
+			int cycleCount;
+
+			// Temporary variables used internally for bus indirect operations
+			byte __temp8;
+			ushort __temp16, __tempHL;
+
+			// Quickly exit the routine if the CPU crashed
+			if (status == ProcessorStatus.Crashed) return true;
+
+			// Clone the register values into local variables
+			a = A; b = B; c = C; d = D; e = E; h = H; l = L;
+			sp = SP; pc = PC;
+
+			// And clone the flags too (I probably need to change that…)
+			zeroFlag = ZeroFlag;
+			negationFlag = NegationFlag;
+			halfCarryFlag = HalfCarryFlag;
+			carryFlag = CarryFlag;
+			ime = InterruptMasterEnable;
+
+			// Initialize the count at 0 to please the compiler :(
+			cycleCount = 0;
+
+			try
+			{
+				do
+				{
+					// Check for pending interrupts
+					if (ime && (temp = bus.EnabledInterrupts & bus.RequestedInterrupts) != 0)
+					{
+						// Push PC on the stack
+						bus.WriteByte(--sp, (byte)(pc >> 8));
+						bus.WriteByte(--sp, (byte)pc);
+						// Disable interrupts
+						ime = false;
+						// Set PC to new value acording to requested interrupts
+						if ((temp & 0x01) != 0)
+						{
+							bus.InterruptHandled(0x01);
+							pc = 0x0040;
+						}
+						else if ((temp & 0x02) != 0)
+						{
+							bus.InterruptHandled(0x02);
+							pc = 0x0048;
+						}
+						else if ((temp & 0x04) != 0)
+						{
+							bus.InterruptHandled(0x04);
+							pc = 0x0050;
+						}
+						else if ((temp & 0x08) != 0)
+						{
+							bus.InterruptHandled(0x08);
+							pc = 0x0058;
+						}
+						else if ((temp & 0x10) != 0)
+						{
+							bus.InterruptHandled(0x10);
+							pc = 0x0060;
+						}
+						cycleCount = 20; // I don't know the exact interrupt timing but I read somewhere it is 20, so instead of 4 i put 20 here...
+						goto HandleBreakpoints;
+					}
+
+					opcode = bus[pc];
+
+					if (!skipPcIncrement) pc++;
+					else skipPcIncrement = false;
+
+					switch (opcode)
+					{
+<#
+for (int i = 0; i <= 255; i++)
+{
+	OpcodeInfo opcodeInfo;
+	
+	if (i == 0xCB)
+	{
+#>
+						case 0xCB: /* Extended opcodes */
+							opcode = bus[pc++];
+
+							switch (opcode)
+							{
+<#
+		for (int j = 0; j <= 255; j++)
+		{
+			opcodeInfo = Utility.GetExtendedOpcodeInfo((byte)j);
+#>
+								case /* 0xCB */ 0x<#= j.ToString("X2") #>: /* <#= GetOpcodeString(opcodeInfo) #> */
+<# WriteOpcodeStub(opcodeInfo); #>
+									break;
+<#
+		}
+#>
+							}
+							break;
+<#
+	}
+	else
+	{
+		opcodeInfo = Utility.GetOpcodeInfo((byte)i);
+		
+		if (opcodeInfo.Operation != Operation.Invalid)
+		{
+#>
+						case 0x<#= i.ToString("X2") #>: /* <#= GetOpcodeString(opcodeInfo) #> */
+<# WriteOpcodeStub(opcodeInfo); #>
+							break;
+<#
+		}
+	}
+}
+#>
+						/* Invalid Opcodes */
+<#
+for (int i = 0; i < 255; i++)
+{
+	OpcodeInfo opcodeInfo;
+	
+	opcodeInfo = Utility.GetOpcodeInfo((byte)i);
+	
+	if (i != 0xCB && opcodeInfo.Operation == Operation.Invalid)
+	{
+#>
+						case 0x<#= i.ToString("X2") #>:
+<#
+	}
+}
+#>
+							status = ProcessorStatus.Crashed;
+							pc--; // Revert changes to PC
+							return true;
+					}
+
+					if (enableInterruptDelay != 0 && --enableInterruptDelay == 0) ime = true;
+					
+				HandleBreakpoints:
+#if WITH_DEBUGGING
+					// Handle breakpoints after running at least one instruction
+					if (bus.BreakpointCount > 0) // Check for breakpoints only if there are some
+						if (bus.IsBreakPoint(pc))
+							return false; // Break when a breakpoint is encountered
+#else
+					;
+#endif
+				} while (bus.AddCycles(cycleCount) && finishFrame);
+
+				return finishFrame; // Emulated with success
+			}
+			finally
+			{
+				// Save the local register values
+				A = a; B = b; C = c; D = d; E = e; H = h; L = l;
+				SP = sp; PC = pc;
+
+				ZeroFlag = zeroFlag;
+				NegationFlag = negationFlag;
+				HalfCarryFlag = halfCarryFlag;
+				CarryFlag = carryFlag;
+				InterruptMasterEnable = ime;
+			}
+		}
+	}
+}
+<#+
+
+private delegate void Template(string op1, string op2);
+
+private Dictionary<string, Template> templateDictionary;
+
+private void InitializeTemplateDictionary()
+{
+	if (templateDictionary != null) return;
+
+	var dictionary = new Dictionary<string, Template>();
+	
+	var methods = this.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance);
+	
+	foreach (var method in methods)
+		if (method.Name.EndsWith("_Template"))
+			dictionary.Add(method.Name.Substring(0, method.Name.Length - 9), Delegate.CreateDelegate(typeof(Template), this, method) as Template);
+	
+	templateDictionary = dictionary;
+}
+
+private void CallTemplate(string templateName, string op1, string op2)
+{
+	Template template;
+
+	if (templateDictionary.TryGetValue(templateName, out template))
+		template(op1, op2);
+}
+
+private static string GetOpcodeString(OpcodeInfo opcodeInfo)
+{
+	return opcodeInfo.FormatString.Replace("${0:X2}", "N").Replace("${0:X4}", "N").Replace("{0:X2}", "00+N");
+}
+
+private void WriteOpcodeStub(OpcodeInfo opcodeInfo)
+{
+	string operand1, operand2;
+
+	if (opcodeInfo.Operation == Operation.Ld && opcodeInfo.SecondOperand == Operand.Sp)
+	{
+		CallTemplate("LdSp", null, null);
+		return;
+	}
+	else
+	{
+		// Only load the first operand for arithmetic and logical operations (Also for PUSH)
+		if (opcodeInfo.Operation == Operation.Inc ||
+			opcodeInfo.Operation == Operation.Dec ||
+			opcodeInfo.Operation == Operation.Add ||
+			opcodeInfo.Operation == Operation.Adc ||
+			opcodeInfo.Operation == Operation.Sub ||
+			opcodeInfo.Operation == Operation.Sbc ||
+			opcodeInfo.Operation == Operation.And ||
+			opcodeInfo.Operation == Operation.Xor ||
+			opcodeInfo.Operation == Operation.Or ||
+			opcodeInfo.Operation == Operation.Cp ||
+			opcodeInfo.Operation == Operation.Rlc ||
+			opcodeInfo.Operation == Operation.Rrc ||
+			opcodeInfo.Operation == Operation.Rl ||
+			opcodeInfo.Operation == Operation.Rr ||
+			opcodeInfo.Operation == Operation.Sla ||
+			opcodeInfo.Operation == Operation.Sra ||
+			opcodeInfo.Operation == Operation.Swap ||
+			opcodeInfo.Operation == Operation.Srl ||
+			opcodeInfo.Operation == Operation.Push ||
+			opcodeInfo.Operation == Operation.Jr ||
+			opcodeInfo.Operation == Operation.Jp ||
+			opcodeInfo.Operation == Operation.Call)
+		{
+			operand1 = GetOperandLoadStub(opcodeInfo.FirstOperand);
+			if (operand1 != null && operand1.Length > 0)
+			{
+#>
+<#= operand1 #>
+<#+
+			}
+		}
+
+		operand2 = GetOperandLoadStub(opcodeInfo.SecondOperand);
+		if (operand2 != null && operand2.Length > 0)
+			{
+#>
+<#= operand2 #>
+<#+
+			}
+
+		operand1 = GetOperandString(opcodeInfo.FirstOperand, opcodeInfo.EmbeddedValue);
+		operand2 = GetOperandString(opcodeInfo.SecondOperand, opcodeInfo.EmbeddedValue);
+
+		if (opcodeInfo.Operation == Operation.Add)
+		{
+			if (opcodeInfo.FirstOperand == Operand.Hl || opcodeInfo.FirstOperand == Operand.Sp)
+				CallTemplate("Add16", operand1, operand2);
+			else
+				CallTemplate("Add8", operand1, operand2);
+		}
+		else if (opcodeInfo.Operation == Operation.Inc)
+		{
+			if (opcodeInfo.FirstOperand == Operand.Bc ||
+				opcodeInfo.FirstOperand == Operand.De ||
+				opcodeInfo.FirstOperand == Operand.Hl ||
+				opcodeInfo.FirstOperand == Operand.Sp)
+				CallTemplate("Inc16", operand1, operand2);
+			else
+				CallTemplate("Inc8", operand1, operand2);
+		}
+		else if (opcodeInfo.Operation == Operation.Dec)
+		{
+			if (opcodeInfo.FirstOperand == Operand.Bc ||
+				opcodeInfo.FirstOperand == Operand.De ||
+				opcodeInfo.FirstOperand == Operand.Hl ||
+				opcodeInfo.FirstOperand == Operand.Sp)
+				CallTemplate("Dec16", operand1, operand2);
+			else
+				CallTemplate("Dec8", operand1, operand2);
+		}
+		else if ((opcodeInfo.Operation == Operation.Jr ||
+			opcodeInfo.Operation == Operation.Jp ||
+			opcodeInfo.Operation == Operation.Call) &&
+			opcodeInfo.SecondOperand != Operand.None ||
+			opcodeInfo.Operation == Operation.Ret &&
+			opcodeInfo.FirstOperand != Operand.None)
+		{
+#>
+if (<#= operand1 #>)
+{
+	<#+ CallTemplate(opcodeInfo.Operation.ToString(), operand2, null); #>
+	cycleCount = <#= opcodeInfo.BaseCycleCount + opcodeInfo.ConditionalCycleCount #>;
+}
+else cycleCount = <#= opcodeInfo.BaseCycleCount #>;
+<#+
+			return;
+		}
+		else if (opcodeInfo.Operation == Operation.Ldi || opcodeInfo.Operation == Operation.Ldd)
+			CallTemplate("Ld", operand1, operand2);
+		else if (opcodeInfo.Operation == Operation.Ld && opcodeInfo.SecondOperand == Operand.StackRelative)
+			CallTemplate("LdAddS", operand1, operand2);
+		else
+			CallTemplate(opcodeInfo.Operation.ToString(), operand1, operand2);
+
+		if (opcodeInfo.Operation == Operation.Set
+			|| opcodeInfo.Operation == Operation.Res)
+		{
+			operand2 = GetOperandStoreStub(opcodeInfo.SecondOperand);
+			if (operand2 != null && operand2.Length > 0)
+			{
+#>
+<#= operand2 #>
+<#+
+			}
+		}
+		else if (opcodeInfo.Operation != Operation.Push)
+		{
+			operand1 = GetOperandStoreStub(opcodeInfo.FirstOperand);
+			if (operand1 != null && operand1.Length > 0)
+			{
+#>
+<#= operand1 #>
+<#+
+			}
+		}
+
+		if (opcodeInfo.Operation == Operation.Ldi)
+		{
+#>
+if (++l == 0) h++;
+<#+
+		}
+		else if (opcodeInfo.Operation == Operation.Ldd)
+		{
+#>
+if (l-- == 0) h--;
+<#+
+		}
+	}
+
+	WriteFixedFlags(opcodeInfo.AffectedFlags & opcodeInfo.SetFlags, true);
+	WriteFixedFlags(opcodeInfo.AffectedFlags & opcodeInfo.ClearFlags, false);
+	if (opcodeInfo.Operation != Operation.Halt)
+	{
+#>
+cycleCount = <#= opcodeInfo.BaseCycleCount #>;
+<#+
+	}
+}
+		
+private void WriteFixedFlags(Flags flags, bool isSet)
+{
+	string flagValue = isSet ? "true" : "false";
+
+	if ((flags & Flags.Zero) != 0)
+	{
+#>
+zeroFlag = <#= flagValue #>;
+<#+
+	}
+	if ((flags & Flags.Negation) != 0)
+	{
+#>
+negationFlag = <#= flagValue #>;
+<#+
+	}
+	if ((flags & Flags.HalfCarry) != 0)
+	{
+#>
+halfCarryFlag = <#= flagValue #>;
+<#+
+	}
+	if ((flags & Flags.Carry) != 0)
+	{
+#>
+carryFlag = <#= flagValue #>;
+<#+
+	}
+}
+		
+private static string GetOperandString(Operand operand, byte embeddedValue)
+{
+	switch (operand)
+	{
+		case Operand.A: return "a";
+		case Operand.B: return "b";
+		case Operand.C: return "c";
+		case Operand.D: return "d";
+		case Operand.E: return "e";
+		case Operand.H: return "h";
+		case Operand.L: return "l";
+
+		case Operand.Af: return "__temp16";
+		case Operand.Bc: return "__temp16";
+		case Operand.De: return "__temp16";
+		case Operand.Hl: return "__tempHL";
+		case Operand.Sp: return "sp";
+
+		case Operand.Embedded: return embeddedValue.ToString();
+
+		// Memory operations are 8 bit most of the time
+		case Operand.Memory:
+		case Operand.MemoryBc:
+		case Operand.MemoryDe:
+		case Operand.MemoryHl:
+		case Operand.BytePort:
+		case Operand.RegisterPort:
+		case Operand.Byte: return "__temp8";
+
+		// Some operands have to be extended to 16 bits for easier manipulation
+		case Operand.SByte:
+		case Operand.Word: return "__temp16";
+		case Operand.StackRelative: return "sp";
+
+		case Operand.NotZero: return "!zeroFlag";
+		case Operand.Zero: return "zeroFlag";
+		case Operand.NotCarry: return "!carryFlag";
+		case Operand.Carry: return "carryFlag";
+
+		default: return null;
+	}
+}
+
+private static string GetOperandLoadStub(Operand operand)
+{
+	switch (operand)
+	{
+		case Operand.Af: return "__temp16 = (ushort)((a << 8) | (zeroFlag ? 0x80 : 0) | (negationFlag ? 0x40 : 0) | (halfCarryFlag ? 0x20 : 0) | (carryFlag ? 0x10 : 0));";
+		case Operand.Bc: return "__temp16 = (ushort)((b << 8) | c);";
+		case Operand.De: return "__temp16 = (ushort)((d << 8) | e);";
+		case Operand.Hl: return "__tempHL = (ushort)((h << 8) | l);";
+
+		case Operand.Memory: return "__temp8 = bus.ReadByte(bus.ReadByte(pc++), bus.ReadByte(pc++));";
+		case Operand.MemoryBc: return "__temp8 = bus.ReadByte(c, b);";
+		case Operand.MemoryDe: return "__temp8 = bus.ReadByte(e, d);";
+		case Operand.MemoryHl: return "__temp8 = bus.ReadByte(l, h);";
+		case Operand.BytePort: return "__temp8 = bus.ReadPort(bus.ReadByte(pc++));";
+		case Operand.RegisterPort: return "__temp8 = bus.ReadPort(c);";
+		case Operand.Byte: return "__temp8 = bus.ReadByte(pc++);";
+
+		case Operand.SByte: return "__temp16 = (ushort)(sbyte)bus.ReadByte(pc++);";
+		case Operand.Word: return "__temp16 = (ushort)(bus.ReadByte(pc++) | (bus.ReadByte(pc++) << 8));";
+
+		default: return null;
+	}
+}
+
+private static string GetOperandStoreStub(Operand operand)
+{
+	switch (operand)
+	{
+		case Operand.Af: return "a = (byte)(__temp16 >> 8); zeroFlag = (__temp16 & 0x80) != 0; negationFlag = (__temp16 & 0x40) != 0; halfCarryFlag = (__temp16 & 0x20) != 0; carryFlag = (__temp16 & 0x10) != 0;";
+		case Operand.Bc: return "b = (byte)(__temp16 >> 8); c = (byte)(__temp16);";
+		case Operand.De: return "d = (byte)(__temp16 >> 8); e = (byte)(__temp16);";
+		case Operand.Hl: return "h = (byte)(__tempHL >> 8); l = (byte)(__tempHL);";
+
+		case Operand.Memory: return "bus.WriteByte(bus.ReadByte(pc++), bus.ReadByte(pc++), __temp8);";
+		case Operand.MemoryBc: return "bus.WriteByte(c, b, __temp8);";
+		case Operand.MemoryDe: return "bus.WriteByte(e, d, __temp8);";
+		case Operand.MemoryHl: return "bus.WriteByte(l, h, __temp8);";
+		case Operand.BytePort: return "bus.WritePort(bus.ReadByte(pc++), __temp8);";
+		case Operand.RegisterPort: return "bus.WritePort(c, __temp8);";
+
+		default: return null;
+	}
+}
+
+#region Templates
+
+private void Adc_Template(string operand1, string operand2)
+{
+#>
+if (carryFlag)
+{
+	temp = <#= operand1 #> + <#= operand2 #> + 1;
+	halfCarryFlag = (<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xE;
+}
+else
+{
+	temp = <#= operand1 #> + <#= operand2 #>;
+	halfCarryFlag = (<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xF;
+}
+carryFlag = temp > 0xFF;
+<#= operand1 #> = (byte)temp;
+zeroFlag = <#= operand1 #> == 0;
+<#+
+}
+
+private void Add16_Template(string operand1, string operand2)
+{
+#>
+temp = <#= operand1 #> + <#= operand2 #>;
+halfCarryFlag = (<#= operand1 #> & 0xFFF) + (<#= operand2 #> & 0xFFF) > 0xFFF;
+carryFlag = temp > 0xFFFF;
+<#= operand1 #> = (ushort)temp;
+<#+
+}
+
+private void Add8_Template(string operand1, string operand2)
+{
+#>
+temp = <#= operand1 #> + <#= operand2 #>;
+carryFlag = temp > 0xFF;
+halfCarryFlag = (<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xF;
+<#= operand1 #> = (byte)temp;
+zeroFlag = <#= operand1 #> == 0;
+<#+
+}
+
+private void And_Template(string operand1, string operand2)
+{
+	if (operand1 == operand2)
+	{
+#>
+zeroFlag = <#= operand1 #> == 0;
+<#+
+	}
+	else
+	{
+#>
+<#= operand1 #> &= <#= operand2 #>;
+zeroFlag = <#= operand1 #> == 0;
+<#+
+	}
+}
+
+private void Bit_Template(string operand1, string operand2)
+{
+#>
+zeroFlag = (<#= operand2 #> & (1 << <#= operand1 #>)) == 0;
+<#+
+}
+
+private void Call_Template(string operand1, string operand2)
+{
+#>
+bus[--sp] = (byte)(pc >> 8);
+bus[--sp] = (byte)pc;
+pc = <#= operand1 #>;
+<#+
+}
+
+private void Ccf_Template(string operand1, string operand2)
+{
+#>
+carryFlag = !carryFlag;
+<#+
+}
+
+private void Cp_Template(string operand1, string operand2)
+{
+	if (operand1 == operand2)
+	{
+#>
+halfCarryFlag = false;
+carryFlag = false;
+zeroFlag = true;
+<#+
+	}
+	else
+	{
+#>
+halfCarryFlag = (<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF);
+carryFlag = <#= operand1 #> < <#= operand2 #>;
+zeroFlag = <#= operand1 #> == <#= operand2 #>;
+<#+
+	}
+}
+
+private void Cpl_Template(string operand1, string operand2)
+{
+#>
+a = (byte)~a;
+<#+
+}
+
+private void Daa_Template(string operand1, string operand2)
+{
+#>
+if (!negationFlag)
+{
+	if (halfCarryFlag || (a & 0x0F) > 0x09) a += 0x06;
+	if (carryFlag = (carryFlag || a > 0x99)) a += 0x60;
+}
+else
+{
+	if (halfCarryFlag) a -= 0x06;
+	if (carryFlag) a -= 0x60;
+}
+zeroFlag = a == 0;
+<#+
+}
+
+private void Dec16_Template(string operand1, string operand2)
+{
+#>
+<#= operand1 #>--;
+<#+
+}
+
+private void Dec8_Template(string operand1, string operand2)
+{
+#>
+<#= operand1 #>--;
+zeroFlag = <#= operand1 #> == 0;
+halfCarryFlag = (<#= operand1 #> ^ 0xF) == 0;
+<#+
+}
+
+private void Di_Template(string operand1, string operand2)
+{
+#>
+ime = false;
+<#+
+}
+
+private void Ei_Template(string operand1, string operand2)
+{
+#>
+// Will enable interrupts one instruction later, or directly after this one if EI has been repeated.
+if (enableInterruptDelay == 0) enableInterruptDelay = 2;
+<#+
+}
+
+private void Halt_Template(string operand1, string operand2)
+{
+#>
+if (enableInterruptDelay > 0) pc--; // Case where HALT directly follows EI
+// Still need a better emulation of the HALT opcode, but this one will work for now
+else if (ime || bus.EnabledInterrupts != 0)
+{
+	if ((bus.EnabledInterrupts & bus.RequestedInterrupts) == 0)
+	{
+		status = ProcessorStatus.Halted;
+		cycleCount = bus.WaitForInterrupts();
+		if (cycleCount < 0) return false;
+		if ((cycleCount & 0x3) != 0) cycleCount += 4 - (cycleCount & 0x3); // Keep the cycle count as a multiple of 4
+		status = ProcessorStatus.Running;
+	}
+	else cycleCount = 4;
+}
+<#+
+}
+
+private void Inc16_Template(string operand1, string operand2)
+{
+#>
+<#= operand1 #>++;
+<#+
+}
+
+private void Inc8_Template(string operand1, string operand2)
+{
+#>
+<#= operand1 #>++;
+zeroFlag = <#= operand1 #> == 0;
+halfCarryFlag = (<#= operand1 #> & 0xF) == 0;
+<#+
+}
+
+private void Jp_Template(string operand1, string operand2)
+{
+#>
+pc = <#= operand1 #>;
+<#+
+}
+
+private void Jr_Template(string operand1, string operand2)
+{
+#>
+pc += <#= operand1 #>;
+<#+
+}
+
+private void Ld_Template(string operand1, string operand2)
+{
+	if (operand1 != operand2)
+	{
+#>
+<#= operand1 #> = <#= operand2 #>;
+<#+
+	}
+}
+
+private void LdAddS_Template(string operand1, string operand2)
+{
+#>
+temp = (short)(sbyte)bus[pc++] & 0xFFFF; // Sign extension to 16 bits
+halfCarryFlag = (temp & 0xFFF) + (<#= operand2 #> & 0xFFF) > 0xFFF;
+temp += <#= operand2 #>;
+carryFlag = temp > 0xFFFF;
+<#= operand1 #> = (ushort)temp;
+<#+
+}
+
+private void LdSp_Template(string operand1, string operand2)
+{
+#>
+__temp16 = (ushort)(bus[pc++] | (bus[pc++] << 8));
+bus[__temp16++] = (byte)(sp);
+bus[__temp16] = (byte)(sp >> 8);
+<#+
+}
+
+private void Or_Template(string operand1, string operand2)
+{
+	if (operand1 == operand2)
+	{
+#>
+zeroFlag = <#= operand1 #> == 0;
+<#+
+	}
+	else
+	{
+#>
+<#= operand1 #> |= <#= operand2 #>;
+zeroFlag = <#= operand1 #> == 0;
+<#+
+	}
+}
+
+private void Pop_Template(string operand1, string operand2)
+{
+#>
+<#= operand1 #> = (ushort)(bus[sp++] | (bus[sp++] << 8));
+<#+
+}
+
+private void Push_Template(string operand1, string operand2)
+{
+#>
+bus[--sp] = (byte)(<#= operand1 #> >> 8);
+bus[--sp] = (byte)<#= operand1 #>;
+<#+
+}
+
+private void Res_Template(string operand1, string operand2)
+{
+#>
+unchecked { <#= operand2 #> &= (byte)(~(1 << <#= operand1 #>)); };
+<#+
+}
+
+private void Ret_Template(string operand1, string operand2)
+{
+#>
+pc = (ushort)(bus[sp++] | (bus[sp++] << 8));
+<#+
+}
+
+private void Reti_Template(string operand1, string operand2)
+{
+#>
+pc = (ushort)(bus[sp++] | (bus[sp++] << 8));
+ime = true;
+<#+
+}
+
+private void Rl_Template(string operand1, string operand2)
+{
+#>
+temp = carryFlag ? (<#= operand1 #> << 1) | 0x01 : <#= operand1 #> << 1;
+carryFlag = (<#= operand1 #> & 0x80) != 0;
+zeroFlag = (<#= operand1 #> = (byte)temp) == 0;
+<#+
+}
+
+private void Rla_Template(string operand1, string operand2)
+{
+#>
+temp = carryFlag ? (a << 1) | 0x01 : a << 1;
+carryFlag = (a & 0x80) != 0;
+a = (byte)temp;
+<#+
+}
+
+private void Rlc_Template(string operand1, string operand2)
+{
+#>
+carryFlag = (<#= operand1 #> & 0x80) != 0;
+zeroFlag = (<#= operand1 #> = carryFlag ? (byte)((<#= operand1 #> << 1) | 0x01) : (byte)(<#= operand1 #> << 1)) == 0;
+<#+
+}
+
+private void Rlca_Template(string operand1, string operand2)
+{
+#>
+carryFlag = (a & 0x80) != 0;
+a = carryFlag ? (byte)((a << 1) | 0x01) : a = (byte)(a << 1);
+<#+
+}
+
+private void Rr_Template(string operand1, string operand2)
+{
+#>
+temp = carryFlag ? (<#= operand1 #> >> 1) | 0x80 : <#= operand1 #> >> 1;
+carryFlag = (<#= operand1 #> & 0x01) != 0;
+zeroFlag = (<#= operand1 #> = (byte)temp) == 0;
+<#+
+}
+
+private void Rra_Template(string operand1, string operand2)
+{
+#>
+temp = carryFlag ? (a >> 1) | 0x80 : a >> 1;
+carryFlag = (a & 0x01) != 0;
+a = (byte)temp;
+<#+
+}
+
+private void Rrc_Template(string operand1, string operand2)
+{
+#>
+carryFlag = (<#= operand1 #> & 0x01) != 0;
+zeroFlag = (<#= operand1 #> = carryFlag ? (byte)((<#= operand1 #> >> 1) | 0x80) : (byte)(<#= operand1 #> >> 1)) == 0;
+<#+
+}
+
+private void Rrca_Template(string operand1, string operand2)
+{
+#>
+carryFlag = (a & 0x01) != 0;
+a = carryFlag ? (byte)((a >> 1) | 0x80) : (byte)(a >> 1);
+<#+
+}
+
+private void Rst_Template(string operand1, string operand2)
+{
+#>
+bus[--sp] = (byte)(pc >> 8);
+bus[--sp] = (byte)pc;
+pc = <#= operand1 #>;
+<#+
+}
+
+private void Sbc_Template(string operand1, string operand2)
+{
+	if (operand1 == operand2)
+	{
+#>
+if (carryFlag)
+{
+	halfCarryFlag = true;
+	//carryFlag = true;
+	<#= operand1 #> = 0xFF;
+	zeroFlag = false;
+}
+else
+{
+	halfCarryFlag = false;
+	//carryFlag = false;
+	<#= operand1 #> = 0;
+	zeroFlag = true;
+}
+<#+
+	}
+	else
+	{
+#>
+if (carryFlag)
+{
+	halfCarryFlag = (<#= operand1 #> & 0xF) - (<#= operand2 #> & 0xF) < 1;
+	carryFlag = <#= operand1 #> - <#= operand2 #> < 1;
+	zeroFlag = (<#= operand1 #> = (byte)(<#= operand1 #> - <#= operand2 #> - 1)) == 0;
+}
+else
+{
+	halfCarryFlag = (<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF);
+	carryFlag = <#= operand1 #> < <#= operand2 #>;
+	zeroFlag = (<#= operand1 #> -= <#= operand2 #>) == 0;
+}
+<#+
+	}
+}
+
+private void Scf_Template(string operand1, string operand2) { }
+
+private void Set_Template(string operand1, string operand2)
+{
+#>
+<#= operand2 #> |= (byte)(1 << <#= operand1 #>);
+<#+
+}
+
+private void Sla_Template(string operand1, string operand2)
+{
+#>
+carryFlag = (<#= operand1 #> & 0x80) != 0;
+<#= operand1 #> = (byte)(<#= operand1 #> << 1);
+zeroFlag = <#= operand1 #> == 0;
+<#+
+}
+
+private void Sra_Template(string operand1, string operand2)
+{
+#>
+carryFlag = (<#= operand1 #> & 0x01) != 0;
+<#= operand1 #> = (byte)((sbyte)<#= operand1 #> >> 1);
+zeroFlag = <#= operand1 #> == 0;
+<#+
+}
+
+private void Srl_Template(string operand1, string operand2)
+{
+#>
+carryFlag = (<#= operand1 #> & 0x01) != 0;
+<#= operand1 #> = (byte)(<#= operand1 #> >> 1);
+zeroFlag = <#= operand1 #> == 0;
+<#+
+}
+
+private void Stop_Template(string operand1, string operand2)
+{
+#>
+status = ProcessorStatus.Stopped;
+cycleCount = bus.HandleProcessorStop();
+if (cycleCount < 0)
+	return false;
+status = ProcessorStatus.Running;
+<#+
+}
+
+private void Sub_Template(string operand1, string operand2)
+{
+	if (operand1 == operand2)
+	{
+#>
+halfCarryFlag = false;
+carryFlag = false;
+<#= operand1 #> = 0;
+zeroFlag = true;
+<#+
+	}
+	else
+	{
+#>
+halfCarryFlag = (<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF);
+carryFlag = <#= operand1 #> < <#= operand2 #>;
+zeroFlag = (<#= operand1 #> -= <#= operand2 #>) == 0;
+<#+
+	}
+}
+
+private void Swap_Template(string operand1, string operand2)
+{
+#>
+<#= operand1 #> = (byte)((<#= operand1 #> >> 4) | (<#= operand1 #> << 4));
+zeroFlag = <#= operand1 #> == 0;
+<#+
+}
+
+private void Xor_Template(string operand1, string operand2)
+{
+	if (operand1 == operand2)
+	{
+#>
+<#= operand1 #> = 0;
+zeroFlag = true;
+<#+
+	}
+	else
+	{
+#>
+<#= operand1 #> ^= <#= operand2 #>;
+zeroFlag = <#= operand1 #> == 0;
+<#+
+	}
+}
+
+#endregion
+#>

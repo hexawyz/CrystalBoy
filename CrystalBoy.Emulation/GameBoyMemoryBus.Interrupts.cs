@@ -36,7 +36,7 @@ namespace CrystalBoy.Emulation
 		{
 			int vbi, stat, timer;
 
-			if (lcdEnabled)
+			if (lcdEnabled && (EnabledInterrupts & 0x3) != 0)
 			{
 				vbi = FrameDuration - VerticalBlankDuration;
 				if (cycleCount > vbi)
@@ -52,38 +52,20 @@ namespace CrystalBoy.Emulation
 				stat = int.MaxValue;
 			}
 
-			if (timerEnabled)
-				timer = timerInterruptCycle;
-			else
-				timer = int.MaxValue;
+			timer = timerEnabled && (EnabledInterrupts & 0x4) != 0 ? timerInterruptCycle : int.MaxValue;
 
 			vbi = Math.Min(vbi, Math.Min(stat, timer));
 
-			if (vbi == int.MaxValue)
-				return -1;
-			else
-				return vbi - cycleCount;
+			return vbi == int.MaxValue ? -1 : vbi - cycleCount;
 		}
 
-		public void InterruptRequest(Interrupt interrupt)
-		{
-			requestedInterrupts |= (byte)interrupt;
-		}
+		public void InterruptRequest(Interrupt interrupt) { requestedInterrupts |= (byte)interrupt; }
 
-		public void InterruptRequest(byte interrupt)
-		{
-			requestedInterrupts |= interrupt;
-		}
+		public void InterruptRequest(byte interrupt) { requestedInterrupts |= interrupt; }
 
-		public void InterruptHandled(Interrupt interrupt)
-		{
-			requestedInterrupts &= (byte)~interrupt;
-		}
+		public void InterruptHandled(Interrupt interrupt) { requestedInterrupts &= (byte)~interrupt; }
 
-		public void InterruptHandled(byte interrupt)
-		{
-			requestedInterrupts &= (byte)~interrupt;
-		}
+		public void InterruptHandled(byte interrupt) { requestedInterrupts &= (byte)~interrupt; }
 
 		public byte RequestedInterrupts
 		{
@@ -110,19 +92,10 @@ namespace CrystalBoy.Emulation
 
 				return requestedInterrupts;
 			}
-			set
-			{
-				requestedInterrupts = (byte)(value & 0x1F);
-			}
+			set { requestedInterrupts = (byte)(value & 0x1F); }
 		}
 
-		public unsafe byte EnabledInterrupts
-		{
-			get
-			{
-				return portMemory[0xFF];
-			}
-		}
+		public unsafe byte EnabledInterrupts { get { return portMemory[0xFF]; } }
 
 		#endregion
 	}

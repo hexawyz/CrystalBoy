@@ -19,8 +19,10 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.IO;
 using SlimDX;
 using SlimDX.Direct3D9;
+using System.Runtime.InteropServices;
 
 namespace CrystalBoy.Emulation.Rendering.SlimDX
 {
@@ -34,6 +36,9 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 		VertexBuffer vertexBuffer;
 		DataStream dataStream;
 		TextureFilter textureFilter;
+		byte[] temporaryBuffer;
+		GCHandle temporaryBufferHandle;
+		bool temporaryBufferLocked;
 
 		public Direct3D9RenderMethod(Control renderObject)
 			: base(renderObject)
@@ -47,6 +52,7 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 			ResetRenderStates();
 			ResetTextureFilter();
 			renderObject.SizeChanged += (sender, e) => ResetDevice();
+			temporaryBuffer = new byte[4 * 160 * 144];
 		}
 
 		public override void Dispose()
@@ -87,9 +93,12 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 			presentParameters.BackBufferWidth = 0;
 			presentParameters.BackBufferHeight = 0;
 
+			if (RenderObject.FindForm().WindowState == FormWindowState.Minimized) return false;
+
 			if (device.Reset(presentParameters).IsSuccess)
 			{
 				CreateTexture();
+				RefillTexture();
 				CreateVertexBuffer();
 				ResetRenderStates();
 				ResetTextureFilter();
@@ -97,6 +106,28 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 				return true;
 			}
 			else return false;
+		}
+
+		private void RefillTexture()
+		{
+			try
+			{
+				var dataRectangle = texture.LockRectangle(0, LockFlags.Discard);
+
+				int rowLength = 160 * 4;
+				int skip = dataRectangle.Pitch - rowLength;
+
+				for (int i = 0; i < temporaryBuffer.Length; i += rowLength)
+				{
+					dataRectangle.Data.Write(temporaryBuffer, i, rowLength);
+					dataRectangle.Data.Seek(skip, System.IO.SeekOrigin.Current);
+				}
+
+				dataRectangle.Data.Dispose();
+
+				texture.UnlockRectangle(0);
+			}
+			catch (Direct3D9Exception) { }
 		}
 
 		private void DisposeDevice()
@@ -157,22 +188,42 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 
 		public override unsafe void* LockBuffer(out int stride)
 		{
-			var dataRectangle = texture.LockRectangle(0, LockFlags.Discard);
+			if (texture != null && device.TestCooperativeLevel().IsSuccess)
+			{
+				var dataRectangle = texture.LockRectangle(0, LockFlags.Discard);
 
-			dataStream = dataRectangle.Data;
+				dataStream = dataRectangle.Data;
 
-			stride = dataRectangle.Pitch;
+				stride = dataRectangle.Pitch;
 
-			return dataStream.DataPointer.ToPointer();
+				return dataStream.DataPointer.ToPointer();
+			}
+			else
+			{
+				if (!temporaryBufferLocked)
+				{
+					temporaryBufferHandle = GCHandle.Alloc(temporaryBuffer, GCHandleType.Pinned);
+					temporaryBufferLocked = true;
+				}
+
+				stride = 160 * 4;
+
+				return temporaryBufferHandle.AddrOfPinnedObject().ToPointer();
+			}
 		}
 
 		public override void UnlockBuffer()
 		{
-			if (dataStream != null)
+			if (temporaryBufferLocked)
+			{
+				temporaryBufferHandle.Free();
+				temporaryBufferLocked = false;
+			}
+			else if (dataStream != null)
 			{
 				dataStream.Dispose();
 				dataStream = null;
-				texture.UnlockRectangle(0);
+				if (device != null && device.TestCooperativeLevel().IsSuccess) texture.UnlockRectangle(0);
 			}
 		}
 
