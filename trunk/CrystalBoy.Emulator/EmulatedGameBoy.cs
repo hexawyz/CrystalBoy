@@ -138,8 +138,6 @@ namespace CrystalBoy.Emulator
 		{
 			if (EmulationStatus == EmulationStatus.Paused)
 			{
-				if (Processor.Status != ProcessorStatus.Running)
-					Processor.Status = ProcessorStatus.Running;
 				Processor.Emulate(false);
 				OnBreak(EventArgs.Empty);
 			}
@@ -193,14 +191,8 @@ namespace CrystalBoy.Emulator
 
 		public GameBoyKeys PressedKeys
 		{
-			get
-			{
-				return bus.PressedKeys;
-			}
-			set
-			{
-				bus.PressedKeys = value;
-			}
+			get { return bus.PressedKeys; }
+			set { bus.PressedKeys = value; }
 		}
 
 		public void NotifyPressedKeys(GameBoyKeys pressedKeys) { bus.NotifyPressedKeys(pressedKeys); }
@@ -209,8 +201,6 @@ namespace CrystalBoy.Emulator
 
 		private void RunFrameInternal()
 		{
-			if (Processor.Status != ProcessorStatus.Running)
-				Processor.Status = ProcessorStatus.Running;
 			bus.PressedKeys = ReadKeys();
 			if (Processor.Emulate(true))
 				OnNewFrame(EventArgs.Empty);

@@ -102,6 +102,8 @@ namespace CrystalBoy.Emulation
 				externalRamBlock = new MemoryBlock(mapper.RamSize);
 			}
 
+			unsafe { Memory.Set((void*)videoMemory, 0, (uint)videoMemoryBlock.Length); }
+
 			videoRamBank = 0;
 			workRamBank = 1;
 
@@ -172,73 +174,25 @@ namespace CrystalBoy.Emulation
 
 		#region Memory Blocks
 
-		public MemoryBlock ExternalRom
-		{
-			get
-			{
-				return externalRomBlock;
-			}
-		}
+		public MemoryBlock ExternalRom { get { return externalRomBlock; } }
 
-		public MemoryBlock ExternalRam
-		{
-			get
-			{
-				return externalRamBlock;
-			}
-		}
+		public MemoryBlock ExternalRam { get { return externalRamBlock; } }
 
-		public MemoryBlock VideoRam
-		{
-			get
-			{
-				return videoMemoryBlock;
-			}
-		}
+		public MemoryBlock VideoRam { get { return videoMemoryBlock; } }
 
-		public MemoryBlock WorkRam
-		{
-			get
-			{
-				return workMemoryBlock;
-			}
-		}
+		public MemoryBlock WorkRam { get { return workMemoryBlock; } }
 
-		public MemoryBlock PaletteMemory
-		{
-			get
-			{
-				return paletteMemoryBlock;
-			}
-		}
+		public MemoryBlock PaletteMemory { get { return paletteMemoryBlock; } }
 
-		public MemoryBlock ObjectAttributeMemory
-		{
-			get
-			{
-				return objectAttributeMemoryBlock;
-			}
-		}
+		public MemoryBlock ObjectAttributeMemory { get { return objectAttributeMemoryBlock; } }
 
 		#endregion 
 
 		#region Memory Banks
 
-		public int VideoRamBank
-		{
-			get
-			{
-				return videoRamBank;
-			}
-		}
+		public int VideoRamBank { get { return videoRamBank; } }
 
-		public int WorkRamBank
-		{
-			get
-			{
-				return workRamBank;
-			}
-		}
+		public int WorkRamBank { get { return workRamBank; } }
 
 		#endregion
 
@@ -247,24 +201,15 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public MemoryType GetMapping(ushort offset)
 		{
-			if (offset < 0x8000)
-				return MemoryType.ExternalRom;
-			else if (offset < 0xA000)
-				return MemoryType.VideoRam;
-			else if (offset < 0xC000)
-				return MemoryType.ExternalRam;
-			else if (offset < 0xFE00)
-				return MemoryType.WorkRam;
-			else if (offset < 0xFEA0)
-				return MemoryType.Oam;
-			else if (offset < 0xFF00)
-				return MemoryType.Unknown;
-			else if (offset < 0xFF80)
-				return MemoryType.IoPorts;
-			else if (offset < 0xFFFF)
-				return MemoryType.HighRam;
-			else
-				return MemoryType.InterruptEnableRegister;
+			if (offset < 0x8000) return MemoryType.ExternalRom;
+			else if (offset < 0xA000) return MemoryType.VideoRam;
+			else if (offset < 0xC000) return MemoryType.ExternalRam;
+			else if (offset < 0xFE00) return MemoryType.WorkRam;
+			else if (offset < 0xFEA0) return MemoryType.Oam;
+			else if (offset < 0xFF00) return MemoryType.Unknown;
+			else if (offset < 0xFF80) return MemoryType.IoPorts;
+			else if (offset < 0xFFFF) return MemoryType.HighRam;
+			else return MemoryType.InterruptEnableRegister;
 		}
 
 		[CLSCompliant(false)]
@@ -279,8 +224,7 @@ namespace CrystalBoy.Emulation
 					bank = lowerRomBank;
 					return MemoryType.ExternalRom;
 				}
-				else
-					return MemoryType.Unknown;
+				else return MemoryType.Unknown;
 			}
 			else if (offset < 0x8000)
 			{
@@ -289,8 +233,7 @@ namespace CrystalBoy.Emulation
 					bank = upperRombank;
 					return MemoryType.ExternalRom;
 				}
-				else
-					return MemoryType.Unknown;
+				else return MemoryType.Unknown;
 			}
 			else if (offset < 0xA000)
 			{
@@ -304,8 +247,7 @@ namespace CrystalBoy.Emulation
 					bank = ramBank;
 					return MemoryType.ExternalRam;
 				}
-				else
-					return MemoryType.Unknown;
+				else return MemoryType.Unknown;
 			}
 			else if (offset < 0xD000)
 				return MemoryType.WorkRam;
@@ -321,16 +263,11 @@ namespace CrystalBoy.Emulation
 				bank = workRamBank;
 				return MemoryType.WorkRam;
 			}
-			else if (offset < 0xFEA0)
-				return MemoryType.Oam;
-			else if (offset < 0xFF00)
-				return MemoryType.Unknown;
-			else if (offset < 0xFF80)
-				return MemoryType.IoPorts;
-			else if (offset < 0xFFFF)
-				return MemoryType.HighRam;
-			else
-				return MemoryType.InterruptEnableRegister;
+			else if (offset < 0xFEA0) return MemoryType.Oam;
+			else if (offset < 0xFF00) return MemoryType.Unknown;
+			else if (offset < 0xFF80) return MemoryType.IoPorts;
+			else if (offset < 0xFFFF) return MemoryType.HighRam;
+			else return MemoryType.InterruptEnableRegister;
 		}
 
 		#endregion
@@ -340,43 +277,25 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public byte this[ushort offset]
 		{
-			get
-			{
-				return ReadByte(offset);
-			}
-			set
-			{
-				WriteByte(offset, value);
-			}
+			get { return ReadByte(offset); }
+			set { WriteByte(offset, value); }
 		}
 
 		public byte this[byte offsetLow, byte offsetHigh]
 		{
-			get
-			{
-				return ReadByte(offsetLow, offsetHigh);
-			}
-			set
-			{
-				WriteByte(offsetLow, offsetHigh, value);
-			}
+			get { return ReadByte(offsetLow, offsetHigh); }
+			set { WriteByte(offsetLow, offsetHigh, value); }
 		}
 
 		[CLSCompliant(false)]
 		public unsafe byte ReadByte(ushort offset)
 		{
-			if (offset < 0xFF00)
-				return segmentArray[offset >> 8][offset & 0xFF];
-			else
-				return ReadPort((byte)offset);
+			return offset < 0xFF00 ? segmentArray[offset >> 8][offset & 0xFF] : ReadPort((byte)offset);
 		}
 
 		public unsafe byte ReadByte(byte offsetLow, byte offsetHigh)
 		{
-			if (offsetHigh < 0xFF)
-				return segmentArray[offsetHigh][offsetLow];
-			else
-				return ReadPort(offsetLow);
+			return offsetHigh < 0xFF ? segmentArray[offsetHigh][offsetLow] : ReadPort(offsetLow);
 		}
 
 		[CLSCompliant(false)]
@@ -384,26 +303,19 @@ namespace CrystalBoy.Emulation
 		{
 			MemoryWriteHandler handler = segmentWriteHandlerArray[offset >> 8];
 
-			if (handler != null)
-				handler((byte)offset, (byte)(offset >> 8), value);
-			else
-				segmentArray[offset >> 8][offset & 0xFF] = value;
+			if (handler != null) handler((byte)offset, (byte)(offset >> 8), value);
+			else segmentArray[offset >> 8][offset & 0xFF] = value;
 		}
 
 		public unsafe void WriteByte(byte offsetLow, byte offsetHigh, byte value)
 		{
 			MemoryWriteHandler handler = segmentWriteHandlerArray[offsetHigh];
 
-			if (handler != null)
-				handler(offsetLow, offsetHigh, value);
-			else
-				segmentArray[offsetHigh][offsetLow] = value;
+			if (handler != null) handler(offsetLow, offsetHigh, value);
+			else segmentArray[offsetHigh][offsetLow] = value;
 		}
 
-		private void WritePort(byte offsetLow, byte offsetHigh, byte value)
-		{
-			WritePort(offsetLow, value);
-		}
+		private void WritePort(byte offsetLow, byte offsetHigh, byte value) { WritePort(offsetLow, value); }
 
 		#region DMA
 
@@ -417,15 +329,9 @@ namespace CrystalBoy.Emulation
 
 			while (fullLength > 0)
 			{
-				int max;
+				int max = 256 - (dl > sl ? dl : sl);
 
-				if (dl > sl)
-					max = 256 - dl;
-				else
-					max = 256 - sl;
-
-				if (fullLength < max)
-					max = fullLength;
+				if (fullLength < max) max = fullLength;
 
 				unsafe { Memory.Copy(segmentArray[dh] + dl, segmentArray[sh] + sl, (uint)max); }
 
@@ -575,7 +481,7 @@ namespace CrystalBoy.Emulation
 
 		internal unsafe void SetPortValue(byte value)
 		{
-			Memory.Set(externalPortMemory, 0, 256);
+			Memory.Set(externalPortMemory, value, 256);
 		}
 
 		#endregion

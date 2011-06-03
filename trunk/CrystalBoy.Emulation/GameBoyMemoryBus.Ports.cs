@@ -64,6 +64,8 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.TMA, 0);
 			WritePort(Port.TAC, 0);
 
+			WritePort(Port.IF, 0x00);
+
 			WritePort(Port.NR10, 0x80);
 			WritePort(Port.NR11, 0xBF);
 			WritePort(Port.NR12, 0xF3);
@@ -95,6 +97,12 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.WX, 0x00);
 			WritePort(Port.IE, 0x00);
 
+			WritePort(Port.U6C, 0xFE);
+			WritePort(Port.U72, 0x00);
+			WritePort(Port.U73, 0x00);
+			WritePort(Port.U74, 0x00);
+			WritePort(Port.U75, 0x8F);
+
 			videoPortAccessList.Clear();
 			audioPortAccessList.Clear();
 
@@ -105,15 +113,9 @@ namespace CrystalBoy.Emulation
 
 		#region Port I/O
 
-		public byte ReadPort(Port port)
-		{
-			return ReadPort((byte)port);
-		}
+		public byte ReadPort(Port port) { return ReadPort((byte)port); }
 
-		public void WritePort(Port port, byte value)
-		{
-			WritePort((byte)port, value);
-		}
+		public void WritePort(Port port, byte value) { WritePort((byte)port, value); }
 
 		public unsafe void WritePort(byte port, byte value)
 		{
@@ -136,7 +138,7 @@ namespace CrystalBoy.Emulation
 					// Check the timer enable bit
 					if ((value & 0x4) != 0)
 					{
-						switch (value & 0x2)
+						switch (value & 0x3)
 						{
 							case 0: EnableTimer(1024); break;
 							case 1: EnableTimer(16); break;
@@ -144,16 +146,14 @@ namespace CrystalBoy.Emulation
 							case 3: EnableTimer(256); break;
 						}
 					}
-					else
-						DisableTimer();
+					else DisableTimer();
 					portMemory[0x07] = value;
 					break;
 				case 0x0F: // IF
 					requestedInterrupts = (byte)(value & 0x1F);
 					break;
 				case 0x4D: // KEY1
-					if (colorMode)
-						prepareSpeedSwitch = (value & 0x1) != 0;
+					if (colorMode) prepareSpeedSwitch = (value & 0x1) != 0;
 					break;
 				case 0x4F: // VBK
 					value &= 0x1;
@@ -162,6 +162,9 @@ namespace CrystalBoy.Emulation
 						videoRamBank = value;
 						MapVideoRamBank();
 					}
+					break;
+				case 0x6C: // Undocumented port 0x6C
+					portMemory[0x6C] = (byte)(0xFE | value & 0x01);
 					break;
 				case 0x70: // SVBK
 					value &= 0x7;
@@ -172,6 +175,12 @@ namespace CrystalBoy.Emulation
 						workRamBank = value;
 						MapWorkRamBank();
 					}
+					break;
+				case 0x75: // Undocumented port 0x75
+					portMemory[0x75] = (byte)(0x8F | value);
+					break;
+				case 0xFF: // IE
+					portMemory[0xFF] = (byte)(value & 0x1F);
 					break;
 				// Video Ports
 				case 0x41: // STAT
@@ -294,7 +303,7 @@ namespace CrystalBoy.Emulation
 				case 0x05: // TIMA
 					return GetTimerValue();
 				case 0x0F: // IF
-					return requestedInterrupts;
+					return RequestedInterrupts;
 				case 0x41: // STAT
 					if (!lcdEnabled)
 						return (byte)(portMemory[0x41] & 0x78);
@@ -351,8 +360,22 @@ namespace CrystalBoy.Emulation
 						return (byte)obpIndex;
 				case 0x6B: // OBPD
 					return paletteMemory[0x40 | obpIndex];
+				case 0x6C: // Undocumented port 0x6C
+					return colorMode ?
+						(byte)(0xFE | portMemory[0x6C] & 0x01) :
+						(byte)0xFF;
 				case 0x70: // SVBK
 					return (byte)workRamBank;
+				case 0x75: // Undocumented port 0x75
+					return (byte)(0x8F | portMemory[0x75]);
+				case 0x76: // Undocumented port 0x76
+				case 0x77: // Undocumented port 0x77
+					return 0;
+				case 0x72: // Undocumented port 0x72
+				case 0x73: // Undocumented port 0x73
+					return portMemory[port];
+				case 0x74: // Undocumented port 0x74
+					return colorMode ? portMemory[0x74] : (byte)0xFF;
 				default:
 					return portMemory[port];
 			}

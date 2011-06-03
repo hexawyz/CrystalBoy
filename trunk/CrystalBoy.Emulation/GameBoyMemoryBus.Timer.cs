@@ -81,7 +81,7 @@ namespace CrystalBoy.Emulation
 			int reference;
 
 			// Read timer modulo and reset the timer
-			timerBaseValue = ReadPort(0x06); // TMA
+			unsafe { timerBaseValue = portMemory[0x06]; } // TMA
 			// Calculate the reference timer cycle
 			reference = cycleCount + referenceTimerShift;
 			// Use this to calculate the programmable timer cycle according to the requested resolution
@@ -137,10 +137,9 @@ namespace CrystalBoy.Emulation
 		private byte GetTimerValue()
 		{
 			// Calculate the timer value if the timer is enabled, or return the base value otherwise
-			if (timerEnabled)
-				return (byte)(timerBaseValue + (cycleCount - timerBaseCycle) / timerResolution);
-			else
-				return timerBaseValue;
+			return timerEnabled ?
+				(byte)(timerBaseValue + (cycleCount - timerBaseCycle) / timerResolution) :
+				timerBaseValue;
 		}
 
 		#endregion

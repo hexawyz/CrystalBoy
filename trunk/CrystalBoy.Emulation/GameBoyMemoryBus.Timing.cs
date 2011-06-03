@@ -40,21 +40,9 @@ namespace CrystalBoy.Emulation
 
 		#region Properties
 
-		public bool DoubleSpeed
-		{
-			get
-			{
-				return doubleSpeed;
-			}
-		}
+		public bool DoubleSpeed { get { return doubleSpeed; } }
 
-		public bool PrepareSpeedSwitch
-		{
-			get
-			{
-				return prepareSpeedSwitch;
-			}
-		}
+		public bool PrepareSpeedSwitch { get { return prepareSpeedSwitch; } }
 
 		#endregion
 
@@ -71,20 +59,11 @@ namespace CrystalBoy.Emulation
 
 		#region Timing
 
-		public int CycleCount
-		{
-			get
-			{
-				return cycleCount;
-			}
-		}
+		public int CycleCount { get { return cycleCount; } }
 
 		public bool AddCycles(int count)
 		{
-			if (doubleSpeed)
-				cycleCount += count >> 1;
-			else
-				cycleCount += count;
+			cycleCount += doubleSpeed ? count >> 1 : count;
 
 			if (hdmaActive && lcdEnabled && cycleCount >= hdmaNextCycle)
 				HandleHdma(count < 20);

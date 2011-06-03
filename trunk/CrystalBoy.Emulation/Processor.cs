@@ -27,13 +27,12 @@ namespace CrystalBoy.Emulation
 		byte a, b, c, d, e, f, h, l;
 		ushort sp, pc;
 		bool ime;
+		byte enableInterruptDelay;
+		bool skipPcIncrement;
 		GameBoyMemoryBus bus;
 		ProcessorStatus status;
 
-		internal Processor(GameBoyMemoryBus bus)
-		{
-			this.bus = bus;
-		}
+		internal Processor(GameBoyMemoryBus bus) { this.bus = bus; }
 
 		internal void Reset()
 		{
@@ -53,27 +52,13 @@ namespace CrystalBoy.Emulation
 			HL = 0x014D;
 			SP = 0xFFFE;
 			PC = 0x0100;
+
+			status = ProcessorStatus.Running;
 		}
 
-		public GameBoyMemoryBus Bus
-		{
-			get
-			{
-				return bus;
-			}
-		}
+		public GameBoyMemoryBus Bus { get { return bus; } }
 
-		public ProcessorStatus Status
-		{
-			get
-			{
-				return status;
-			}
-			set
-			{
-				status = value;
-			}
-		}
+		public ProcessorStatus Status { get { return status; } }
 
 		#region 8 bit Registers
 
@@ -93,10 +78,7 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public ushort AF
 		{
-			get
-			{
-				return (ushort)((a << 8) | f);
-			}
+			get { return (ushort)((a << 8) | f); }
 			set
 			{
 				a = (byte)(value >> 8);
@@ -107,10 +89,7 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public ushort BC
 		{
-			get
-			{
-				return (ushort)((b << 8) | c);
-			}
+			get { return (ushort)((b << 8) | c); }
 			set
 			{
 				b = (byte)(value >> 8);
@@ -121,10 +100,7 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public ushort DE
 		{
-			get
-			{
-				return (ushort)((d << 8) | e);
-			}
+			get { return (ushort)((d << 8) | e); }
 			set
 			{
 				d = (byte)(value >> 8);
@@ -135,10 +111,7 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public ushort HL
 		{
-			get
-			{
-				return (ushort)((h << 8) | l);
-			}
+			get { return (ushort)((h << 8) | l); }
 			set
 			{
 				h = (byte)(value >> 8);
@@ -149,27 +122,15 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public ushort SP
 		{
-			get
-			{
-				return sp;
-			}
-			set
-			{
-				sp = value;
-			}
+			get { return sp; }
+			set { sp = value; }
 		}
 
 		[CLSCompliant(false)]
 		public ushort PC
 		{
-			get
-			{
-				return pc;
-			}
-			set
-			{
-				pc = value;
-			}
+			get { return pc; }
+			set { pc = value; }
 		}
 
 		#endregion
@@ -178,55 +139,37 @@ namespace CrystalBoy.Emulation
 
 		public bool ZeroFlag
 		{
-			get
-			{
-				return (f & 0x80) != 0;
-			}
+			get { return (f & 0x80) != 0; }
 			set
 			{
-				if (value)
-					f |= 0x80;
-				else
-					f &= 0x70;
+				if (value) f |= 0x80;
+				else f &= 0x70;
 			}
 		}
 
 		public bool NegationFlag
 		{
-			get
-			{
-				return (f & 0x40) != 0;
-			}
+			get { return (f & 0x40) != 0; }
 			set
 			{
-				if (value)
-					f |= 0x40;
-				else
-					f &= 0xB0;
+				if (value) f |= 0x40;
+				else f &= 0xB0;
 			}
 		}
 
 		public bool HalfCarryFlag
 		{
-			get
-			{
-				return (f & 0x20) != 0;
-			}
+			get { return (f & 0x20) != 0; }
 			set
 			{
-				if (value)
-					f |= 0x20;
-				else
-					f &= 0xD0;
+				if (value) f |= 0x20;
+				else f &= 0xD0;
 			}
 		}
 
 		public bool CarryFlag
 		{
-			get
-			{
-				return (f & 0x10) != 0;
-			}
+			get { return (f & 0x10) != 0; }
 			set
 			{
 				if (value)
@@ -236,17 +179,10 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-
 		public bool InterruptMasterEnable
 		{
-			get
-			{
-				return ime;
-			}
-			set
-			{
-				ime = value;
-			}
+			get { return ime; }
+			set { ime = value; }
 		}
 
 		#endregion
