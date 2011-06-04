@@ -28,6 +28,7 @@ namespace CrystalBoy.Emulation
 		#region Variables
 
 		HardwareType hardwareType;
+		bool colorHardware;
 		bool colorMode;
 
 		#endregion
@@ -121,7 +122,8 @@ namespace CrystalBoy.Emulation
 
 		private void Initialize()
 		{
-			hardwareType = HardwareType.GameBoyColor;
+			HardwareType = HardwareType.GameBoyColor;
+
 			InitializeProcessor();
 			InitializeTiming();
 			InitializeTimer();
@@ -153,8 +155,14 @@ namespace CrystalBoy.Emulation
 		partial void ResetDebug();
 
 		// The main reset function calls all module reset functions
-		public void Reset()
+		public void Reset() { Reset(hardwareType); }
+
+		// The main reset function calls all module reset functions
+		public void Reset(HardwareType hardwareType)
 		{
+			// From now on, the hardware type can only be chanegd after a "hard" reset of the emulated machine
+			HardwareType = hardwareType;
+			
 			ResetProcessor();
 			ResetTiming();
 			ResetTimer();
@@ -174,25 +182,23 @@ namespace CrystalBoy.Emulation
 
 		public HardwareType HardwareType
 		{
-			get
+			get { return hardwareType; }
+			private set
 			{
-				return hardwareType;
-			}
-			set
-			{
-				if (!Enum.IsDefined(typeof(HardwareType), value))
+				// We don't really care about the exact hardware type here, as long as it's a value defined in the code.
+				if (!Enum.IsDefined(typeof(HardwareType), hardwareType))
 					throw new ArgumentOutOfRangeException("value");
-				hardwareType = value;
+
+				// Once the value has been checked, we can safely update the internal information
+				this.hardwareType = value;
+				// This information should be more convenient provided as a flag
+				this.colorHardware = value >= HardwareType.GameBoyColor;
 			}
 		}
 
-		public bool ColorMode
-		{
-			get
-			{
-				return colorMode;
-			}
-		}
+		public bool ColorHardware { get { return colorHardware; } }
+
+		public bool ColorMode { get { return colorMode; } }
 
 		#endregion
 	}

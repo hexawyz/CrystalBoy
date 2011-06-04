@@ -156,7 +156,7 @@ namespace CrystalBoy.Core
 			if (length < 0)
 				throw new ArgumentOutOfRangeException("length");
 
-			Memory.Copy((byte*)destination.memoryPointer + destinationOffset, (byte*)source.memoryPointer + sourceOffset, (uint)length);
+			Memory.Copy((byte*)destination.memoryPointer + destinationOffset, (byte*)source.memoryPointer + sourceOffset, length);
 		}
 
 		public static void Copy(IntPtr destination, IntPtr source, int length)
@@ -164,15 +164,14 @@ namespace CrystalBoy.Core
 			if (length < 0)
 				throw new ArgumentOutOfRangeException("length");
 
-			Memory.Copy((void*)destination, (void*)source, (uint)length);
+			Memory.Copy((void*)destination, (void*)source, length);
 		}
 
 		[CLSCompliant(false)]
-		public static void Copy(void* destination, void* source, uint length)
-		{
-			// Call a custom MSIL method based on cpblk opcode...
-			Memory.Copy(destination, source, length);
-		}
+		public static void Copy(void* destination, void* source, int length) { Memory.Copy(destination, source, length); }
+
+		[CLSCompliant(false)]
+		public static void Copy(void* destination, void* source, uint length) { Memory.Copy(destination, source, length); }
 
 		#endregion
 
@@ -199,11 +198,10 @@ namespace CrystalBoy.Core
 		}
 
 		[CLSCompliant(false)]
-		public static void Set(void* destination, byte value, uint length)
-		{
-			// Call a custom MSIL method based on initblk opcode...
-			Memory.Set(destination, value, length);
-		}
+		public static void Set(void* destination, byte value, int length) { Memory.Set(destination, value, length); }
+
+		[CLSCompliant(false)]
+		public static void Set(void* destination, byte value, uint length) { Memory.Set(destination, value, length); }
 
 		#endregion
 	}

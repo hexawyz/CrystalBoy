@@ -102,7 +102,7 @@ namespace CrystalBoy.Emulation
 				externalRamBlock = new MemoryBlock(mapper.RamSize);
 			}
 
-			unsafe { Memory.Set((void*)videoMemory, 0, (uint)videoMemoryBlock.Length); }
+			unsafe { MemoryBlock.Set((void*)videoMemory, 0, (uint)videoMemoryBlock.Length); }
 
 			videoRamBank = 0;
 			workRamBank = 1;
@@ -333,7 +333,7 @@ namespace CrystalBoy.Emulation
 
 				if (fullLength < max) max = fullLength;
 
-				unsafe { Memory.Copy(segmentArray[dh] + dl, segmentArray[sh] + sl, (uint)max); }
+				unsafe { MemoryBlock.Copy(segmentArray[dh] + dl, segmentArray[sh] + sl, max); }
 
 				fullLength -= max;
 				sl += max;
@@ -370,7 +370,7 @@ namespace CrystalBoy.Emulation
 
 					length = 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow);
 
-					Memory.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
+					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
 
 					if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
 					if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
@@ -378,20 +378,20 @@ namespace CrystalBoy.Emulation
 
 					length = Math.Min(16 - length, 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow));
 
-					Memory.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
+					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
 
 					if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
 					if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
 					if ((remaining -= length) != 0)
 					{
-						Memory.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, remaining);
+						MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, remaining);
 						hdmaCurrentDestinationLow += (byte)remaining;
 						hdmaCurrentSourceLow += (byte)remaining;
 					}
 				}
 				else
 				{
-					Memory.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, 16);
+					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, 16);
 
 					if ((hdmaCurrentDestinationLow += 16 )== 0) hdmaCurrentDestinationHigh++;
 					if ((hdmaCurrentSourceLow += 16) == 0) hdmaCurrentSourceHigh++;
@@ -429,7 +429,11 @@ namespace CrystalBoy.Emulation
 
 		internal unsafe void MapExternalRomBank(bool upper, int bankIndex)
 		{
-			byte* offset = (byte*)externalRomBlock.Pointer + bankIndex * 0x4000;
+			int offset = bankIndex * 0x4000;
+
+			if (ExternalRom.Length < offset + 0x4000) throw new InvalidOperationException("Unhandled ROM mapping case");
+
+			byte* source = (byte*)externalRomBlock.Pointer + offset;
 			byte** segment;
 
 			if (!upper)
@@ -443,8 +447,8 @@ namespace CrystalBoy.Emulation
 				upperRombank = bankIndex;
 			}
 
-			for (int i = 0x40; i != 0; i--, offset += 256)
-				*segment++ = offset;
+			for (int i = 0x40; i != 0; i--, source += 256)
+				*segment++ = source;
 		}
 
 		#endregion
@@ -461,10 +465,10 @@ namespace CrystalBoy.Emulation
 
 		internal unsafe void MapExternalRamBank(int bankIndex)
 		{
-			byte* offset = (byte*)externalRamBlock.Pointer + bankIndex * 0x2000;
+			byte* source = (byte*)externalRamBlock.Pointer + bankIndex * 0x2000;
 
-			for (int i = 0xA0; i < 0xC0; i++, offset += 256)
-				segmentArray[i] = offset;
+			for (int i = 0xA0; i < 0xC0; i++, source += 256)
+				segmentArray[i] = source;
 
 			ramBank = bankIndex;
 		}
@@ -481,7 +485,7 @@ namespace CrystalBoy.Emulation
 
 		internal unsafe void SetPortValue(byte value)
 		{
-			Memory.Set(externalPortMemory, value, 256);
+			MemoryBlock.Set(externalPortMemory, value, 256);
 		}
 
 		#endregion
@@ -504,24 +508,24 @@ namespace CrystalBoy.Emulation
 
 		private unsafe void MapStaticWorkRamBank()
 		{
-			byte* offset = (byte*)workMemoryBlock.Pointer;
+			byte* source = (byte*)workMemoryBlock.Pointer;
 
-			for (int i = 0xC0; i < 0xD0; i++, offset += 256)
+			for (int i = 0xC0; i < 0xD0; i++, source += 256)
 			{
-				segmentArray[i] = offset;
-				segmentArray[i + 0x20] = offset;
+				segmentArray[i] = source;
+				segmentArray[i + 0x20] = source;
 			}
 		}
 
 		private unsafe void MapWorkRamBank()
 		{
-			byte* offset = (byte*)workMemoryBlock.Pointer + workRamBank * 0x1000;
+			byte* source = (byte*)workMemoryBlock.Pointer + workRamBank * 0x1000;
 
-			for (int i = 0xD0; i < 0xE0; i++, offset += 256)
+			for (int i = 0xD0; i < 0xE0; i++, source += 256)
 			{
-				segmentArray[i] = offset;
+				segmentArray[i] = source;
 				if (i <= 0xDE) // Echo memory
-					segmentArray[i + 0x20] = offset;
+					segmentArray[i + 0x20] = source;
 			}
 		}
 

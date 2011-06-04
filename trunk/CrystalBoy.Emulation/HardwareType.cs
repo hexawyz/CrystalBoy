@@ -22,13 +22,13 @@ using System.Text;
 
 namespace CrystalBoy.Emulation
 {
-	public enum HardwareType
+	public enum HardwareType : byte
 	{
-		GameBoy,
-		GameBoyPocket,
-		SuperGameBoy,
-		GameBoyColor,
-		SuperGameBoy2,
-		GameBoyAdvance
+		GameBoy = 0,
+		GameBoyPocket = 1,
+		SuperGameBoy = 2,
+		GameBoyColor = 3,
+		SuperGameBoy2 = 4,
+		GameBoyAdvance = 5
 	}
 }

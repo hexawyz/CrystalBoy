@@ -67,10 +67,8 @@ namespace CrystalBoy.Core
 			{
 				byte c = pMemory[0x134 + i];
 
-				if (c == 0)
-					break;
-				else
-					name += (char)c;
+				if (c == 0) break;
+				else name += (char)c;
 			}
 
 			// Read the licensee code

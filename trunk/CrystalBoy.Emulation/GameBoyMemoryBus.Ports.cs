@@ -37,6 +37,7 @@ namespace CrystalBoy.Emulation
 
 		int bgpIndex, obpIndex;
 		bool bgpInc, obpInc;
+		bool paletteLocked;
 
 		byte hdmaSourceHigh, hdmaSourceLow, hdmaDestinationHigh, hdmaDestinationLow;
 		// For Horizontal Blank DMA
@@ -103,7 +104,7 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.WX, 0x00);
 			WritePort(Port.IE, 0x00);
 
-			WritePort(Port.U6C, 0xFE);
+			WritePort(Port.PLCK, 0xFE);
 			WritePort(Port.U72, 0x00);
 			WritePort(Port.U73, 0x00);
 			WritePort(Port.U74, 0x00);
@@ -170,9 +171,6 @@ namespace CrystalBoy.Emulation
 						MapVideoRamBank();
 					}
 					break;
-				case 0x6C: // Undocumented port 0x6C
-					portMemory[0x6C] = (byte)(0xFE | value & 0x01);
-					break;
 				case 0x70: // SVBK
 					value &= 0x7;
 					if (value == 0)
@@ -210,8 +208,20 @@ namespace CrystalBoy.Emulation
 					portMemory[0x45] = value;
 					break;
 				case 0x46: // DMA
-					if (value <= 0xF1)
-						Memory.Copy(objectAttributeMemory, segmentArray[value], 0xA0);
+					if (value <= 0xF1) MemoryBlock.Copy(objectAttributeMemory, segmentArray[value], 0xA0);
+					break;
+				// Undocumented port used for controllingLCD operating mode
+				case 0x4C: // LCDM
+					if (colorHardware)
+					{
+						// This port will be set at boot time with the value of the compatibility byte in the ROM header
+					}
+					break;
+				case 0x50: // BLCK
+					// Disables the boot ROM when 0x01 is written, and never re-enable it again.
+					if ((value & 0x1) != 0)
+					{
+					}
 					break;
 				case 0x51: // HDMA1
 					hdmaSourceHigh = value;
@@ -249,6 +259,15 @@ namespace CrystalBoy.Emulation
 						}
 						else
 							HandleDma(hdmaDestinationHigh, hdmaDestinationLow, hdmaSourceHigh, hdmaSourceLow, (byte)(value & 0x7F));
+					}
+					break;
+				// Undocumented port used for palette data locking
+				case 0x6C: // PLCK
+					if (colorHardware)
+					{
+						// Information from the GBC BIOS disassembly suggests than more than being a R/W register,
+						// The R/W bit would control the palette data locking… (But this seems to be a bit more complicated)
+						portMemory[0x6C] = (byte)(0xFE | value & 0x01);
 					}
 					break;
 				// Tracked video ports

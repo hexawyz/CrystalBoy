@@ -236,7 +236,7 @@ namespace CrystalBoy.Emulation
 			uint* bufferPixel;
 			int scx, scy, wx, wy;
 			int pi, ppi, data1, data2;
-			bool bgDraw, winDraw, winDraw2, objDraw, objDrawn, signedIndex;
+			bool bgPriority, winDraw, winDraw2, objDraw, objDrawn, signedIndex;
 			uint** bgPalettes, objPalettes;
 			uint* tilePalette;
 			byte* bgMap, winMap,
@@ -258,7 +258,7 @@ namespace CrystalBoy.Emulation
 				tilePalette = bgPalettes[0];
 
 				data1 = videoStatusSnapshot.LCDC;
-				bgDraw = (data1 & 0x01) != 0;
+				bgPriority = (data1 & 0x01) != 0;
 				bgMap = videoMemory + ((data1 & 0x08) != 0 ? 0x1C00 : 0x1800);
 				winDraw = (data1 & 0x20) != 0;
 				winMap = videoMemory + ((data1 & 0x40) != 0 ? 0x1C00 : 0x1800);
@@ -288,7 +288,7 @@ namespace CrystalBoy.Emulation
 						{
 							case Port.LCDC:
 								data1 = videoPortAccessList[pi].Value;
-								bgDraw = (data1 & 0x01) != 0;
+								bgPriority = (data1 & 0x01) != 0;
 								bgMap = videoMemory + ((data1 & 0x08) != 0 ? 0x1C00 : 0x1800);
 								winDraw = (data1 & 0x20) != 0;
 								winMap = videoMemory + ((data1 & 0x40) != 0 ? 0x1C00 : 0x1800);
@@ -439,7 +439,7 @@ namespace CrystalBoy.Emulation
 							data1 >>= 2;
 							pixelIndex++;
 						}
-						else if (bgDraw)
+						else
 						{
 							if (pixelIndex >= 8 || j == 0)
 							{
@@ -481,8 +481,6 @@ namespace CrystalBoy.Emulation
 							data1 >>= 2;
 							pixelIndex++;
 						}
-						else
-							*bufferPixel++ = LookupTables.ColorLookupTable32[0x7FFF];
 					}
 
 					bufferLine += stride;

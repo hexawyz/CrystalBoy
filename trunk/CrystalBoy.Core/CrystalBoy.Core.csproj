@@ -58,10 +58,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CrystalBoy.Core.Memory, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\CrystalBoy.Core.Memory\CrystalBoy.Core.Memory.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -72,6 +68,7 @@
     </Compile>
     <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="MakerDictionary.cs" />
+    <Compile Include="Memory.cs" />
     <Compile Include="RomType.cs" />
     <Compile Include="MemoryUtility.cs" />
     <Compile Include="IDebuggable.cs" />
