@@ -20,7 +20,7 @@ using System;
 
 namespace CrystalBoy.Emulation
 {
-	public struct PaletteAccess
+	internal struct PaletteAccess
 	{
 		public PaletteAccess(int clock, byte offset, byte value)
 		{

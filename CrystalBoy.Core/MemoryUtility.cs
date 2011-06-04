@@ -103,7 +103,7 @@ namespace CrystalBoy.Core
 			{
 				while ((bytesRead = stream.Read(buffer, 0, bytesToRead)) > 0)
 				{
-					Memory.Copy(pMemory, pBuffer, (uint)bytesRead);
+					MemoryBlock.Copy(pMemory, pBuffer, bytesRead);
 					pMemory += bytesRead;
 					length -= bytesRead;
 					if (length < bytesToRead)

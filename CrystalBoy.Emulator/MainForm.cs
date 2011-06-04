@@ -55,6 +55,7 @@ namespace CrystalBoy.Emulator
 			foreach (string pluginAssembly in Settings.Default.PluginAssemblies)
 			{
 				try { assemblyList.Add(Assembly.LoadFrom(pluginAssembly)); }
+				catch (FileNotFoundException) { }
 				catch (BadImageFormatException) { }
 			}
 

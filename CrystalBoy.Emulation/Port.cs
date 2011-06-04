@@ -67,6 +67,7 @@ namespace CrystalBoy.Emulation
 		WX = 0x4B,
 		KEY1 = 0x4D,
 		VBK = 0x4F,
+		BLCK = 0x50, // Boot ROM Lock register
 		HDMA1 = 0x51,
 		HDMA2 = 0x52,
 		HDMA3 = 0x53,
@@ -77,7 +78,7 @@ namespace CrystalBoy.Emulation
 		BGPD = 0x69,
 		OBPI = 0x6A,
 		OBPD = 0x6B,
-		U6C = 0x6C,
+		PLCK = 0x6C, // Palette Lock Register ? (Seems to be more complex than just that :( )
 		SVBK = 0x70,
 		U72 = 0x72,
 		U73 = 0x73,

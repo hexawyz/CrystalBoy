@@ -23,7 +23,7 @@ using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
-	public class VideoStatusSnapshot
+	internal class VideoStatusSnapshot
 	{
 		private GameBoyMemoryBus bus;
 		private MemoryBlock paletteMemoryBlock;
@@ -50,7 +50,7 @@ namespace CrystalBoy.Emulation
 			}
 			else unsafe
 			{
-				Memory.Copy((void*)paletteMemory, bus.PaletteMemory.Pointer, (uint)bus.PaletteMemory.Length);
+				MemoryBlock.Copy((void*)paletteMemory, bus.PaletteMemory.Pointer, bus.PaletteMemory.Length);
 			}
 		}
 
@@ -62,6 +62,7 @@ namespace CrystalBoy.Emulation
 		public byte BGP;
 		public byte OBP0;
 		public byte OBP1;
+
 		public unsafe readonly byte* paletteMemory;
 	}
 }
