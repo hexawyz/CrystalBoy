@@ -27,9 +27,13 @@ namespace CrystalBoy.Emulation
 		#region Variables
 
 		// Snapshot of the video ports, used for frame rendering
-		VideoPortSnapshot videoPortSnapshot;
-		// Recorded video and audio port accesses, used for video and audio frame rendering
-		List<PortAccess> videoPortAccessList, audioPortAccessList;
+		VideoStatusSnapshot videoStatusSnapshot;
+		// Recorded video port accesses, used for video frame rendering
+		List<PortAccess> videoPortAccessList;
+		// Recorded color palette accesses for CGB mode only. (No need to simulate BGPI/BGPD and OPBI/OBPD during rendering)
+		List<PaletteAccess> paletteAccessList;
+		// Recorded audio port accesses, used for audio frame rendering
+		List<PortAccess> audioPortAccessList;
 
 		int bgpIndex, obpIndex;
 		bool bgpInc, obpInc;
@@ -46,7 +50,9 @@ namespace CrystalBoy.Emulation
 
 		partial void InitializePorts()
 		{
+			this.videoStatusSnapshot = new VideoStatusSnapshot(this);
 			this.videoPortAccessList = new List<PortAccess>();
+			this.paletteAccessList = new List<PaletteAccess>();
 			this.audioPortAccessList = new List<PortAccess>();
 		}
 
@@ -104,9 +110,10 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.U75, 0x8F);
 
 			videoPortAccessList.Clear();
+			paletteAccessList.Clear();
 			audioPortAccessList.Clear();
 
-			videoPortSnapshot = new VideoPortSnapshot(this);
+			videoStatusSnapshot.Capture();
 		}
 
 		#endregion
@@ -255,22 +262,36 @@ namespace CrystalBoy.Emulation
 					break;
 				// Only in cgb mode
 				case 0x68: // BGPI
-					bgpInc = (value & 0x80) != 0;
-					bgpIndex = value & 0x3F;
+					if (colorMode)
+					{
+						bgpInc = (value & 0x80) != 0;
+						bgpIndex = value & 0x3F;
+					}
 					break;
 				case 0x69: // BGPD
-					paletteMemory[bgpIndex] = value;
-					if (bgpInc)
-						bgpIndex = (bgpIndex + 1) & 0x3F;
+					if (colorMode)
+					{
+						paletteMemory[bgpIndex] = value;
+						paletteAccessList.Add(new PaletteAccess(cycleCount, (byte)bgpIndex, value));
+						if (bgpInc)
+							bgpIndex = (bgpIndex + 1) & 0x3F;
+					}
 					break;
 				case 0x6A: // OBPI
-					obpInc = (value & 0x80) != 0;
-					obpIndex = value & 0x3F;
+					if (colorMode)
+					{
+						obpInc = (value & 0x80) != 0;
+						obpIndex = value & 0x3F;
+					}
 					break;
 				case 0x6B: // OBPD
-					paletteMemory[0x40 | obpIndex] = value;
-					if (obpInc)
-						obpIndex = (obpIndex + 1) & 0x3F;
+					if (colorMode)
+					{
+						paletteMemory[0x40 | obpIndex] = value;
+						paletteAccessList.Add(new PaletteAccess(cycleCount, (byte)(0x40 | obpIndex), value));
+						if (obpInc)
+							obpIndex = (obpIndex + 1) & 0x3F;
+					}
 					break;
 				// Always
 				case 0x40: // LCDC
@@ -342,24 +363,15 @@ namespace CrystalBoy.Emulation
 				case 0x54: // HDMA4
 					return hdmaSourceLow;
 				case 0x55: // HDMA5
-					if (hdmaActive)
-						return hdmaCurrentLength;
-					else
-						return 0xFF;
+					return hdmaActive ? hdmaCurrentLength : (byte)0xFF;
 				case 0x68: // BGPI
-					if (bgpInc)
-						return (byte)(0x80 | bgpIndex);
-					else
-						return (byte)bgpIndex;
+					return colorMode ? bgpInc ? (byte)(0x80 | bgpIndex) : (byte)bgpIndex : (byte)0xFF;
 				case 0x69: // BGPD
-					return paletteMemory[bgpIndex];
+					return colorMode ? paletteMemory[bgpIndex] : (byte)0xFF;
 				case 0x6A: // OBPI
-					if (obpInc)
-						return (byte)(0x80 | obpIndex);
-					else
-						return (byte)obpIndex;
+					return colorMode ? obpInc ? (byte)(0x80 | obpIndex) : (byte)obpIndex : (byte)0xFF;
 				case 0x6B: // OBPD
-					return paletteMemory[0x40 | obpIndex];
+					return colorMode ? paletteMemory[0x40 | obpIndex] : (byte)0xFF;
 				case 0x6C: // Undocumented port 0x6C
 					return colorMode ?
 						(byte)(0xFE | portMemory[0x6C] & 0x01) :

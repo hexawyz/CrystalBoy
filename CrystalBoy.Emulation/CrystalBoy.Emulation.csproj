@@ -75,6 +75,7 @@
     <Compile Include="Interrupt.cs" />
     <Compile Include="GameBoyKeys.cs" />
     <Compile Include="Mapper.cs" />
+    <Compile Include="PaletteAccess.cs" />
     <Compile Include="Port.cs" />
     <Compile Include="Processor.cs" />
     <Compile Include="Processor.Generated.cs">
@@ -86,7 +87,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PortAccess.cs" />
     <Compile Include="RenderMethod.cs" />
-    <Compile Include="VideoPortSnapshot.cs" />
+    <Compile Include="VideoStatusSnapshot.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">

@@ -105,10 +105,11 @@ namespace CrystalBoy.Emulation
 			UpdateVideoStatusInterrupt();
 			// Now set the timer to the first horizontal line (this is a bit of a hack but it should work perfectly :p)
 			cycleCount = 0;
-			// Clear the video port access list
+			// Clear the video access lists
 			videoPortAccessList.Clear();
+			paletteAccessList.Clear();
 			// Create a new snapshot of the video ports
-			videoPortSnapshot = new VideoPortSnapshot(this);
+			videoStatusSnapshot.Capture();
 		}
 
 		public void UpdateVideoStatusInterrupt()

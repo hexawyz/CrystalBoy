@@ -35,9 +35,9 @@ namespace CrystalBoy.Emulation
 		public bool Emulate(bool finishFrame)
 		{
 			// Register variables, cloned here for efficiency (maybe it's an error, but it is easy to remove if needed)
-			byte a, b, c, d, e, h, l, opcode;
+			byte a, f, b, c, d, e, h, l, opcode;
 			ushort sp, pc;
-			bool zeroFlag, negationFlag, halfCarryFlag, carryFlag, ime;
+			bool ime;
 
 			// Temporary result variable
 			int temp;
@@ -53,14 +53,9 @@ namespace CrystalBoy.Emulation
 			if (status == ProcessorStatus.Crashed) return true;
 
 			// Clone the register values into local variables
-			a = A; b = B; c = C; d = D; e = E; h = H; l = L;
+			a = A; f = F; b = B; c = C; d = D; e = E; h = H; l = L;
 			sp = SP; pc = PC;
 
-			// And clone the flags too (I probably need to change that…)
-			zeroFlag = ZeroFlag;
-			negationFlag = NegationFlag;
-			halfCarryFlag = HalfCarryFlag;
-			carryFlag = CarryFlag;
 			ime = InterruptMasterEnable;
 
 			// Initialize the count at 0 to please the compiler :(
@@ -205,13 +200,9 @@ for (int i = 0; i < 255; i++)
 			finally
 			{
 				// Save the local register values
-				A = a; B = b; C = c; D = d; E = e; H = h; L = l;
+				A = a; F = f; B = b; C = c; D = d; E = e; H = h; L = l;
 				SP = sp; PC = pc;
 
-				ZeroFlag = zeroFlag;
-				NegationFlag = negationFlag;
-				HalfCarryFlag = halfCarryFlag;
-				CarryFlag = carryFlag;
 				InterruptMasterEnable = ime;
 			}
 		}
@@ -307,31 +298,32 @@ private void WriteOpcodeStub(OpcodeInfo opcodeInfo)
 		operand2 = GetOperandString(opcodeInfo.SecondOperand, opcodeInfo.EmbeddedValue);
 
 		if (opcodeInfo.Operation == Operation.Add)
-		{
-			if (opcodeInfo.FirstOperand == Operand.Hl || opcodeInfo.FirstOperand == Operand.Sp)
-				CallTemplate("Add16", operand1, operand2);
-			else
-				CallTemplate("Add8", operand1, operand2);
-		}
+			CallTemplate(opcodeInfo.FirstOperand == Operand.Sp ? "AddS" : opcodeInfo.FirstOperand == Operand.Hl ? "Add16" : "Add8", operand1, operand2);
 		else if (opcodeInfo.Operation == Operation.Inc)
 		{
-			if (opcodeInfo.FirstOperand == Operand.Bc ||
+			CallTemplate
+			(
+				opcodeInfo.FirstOperand == Operand.Bc ||
 				opcodeInfo.FirstOperand == Operand.De ||
 				opcodeInfo.FirstOperand == Operand.Hl ||
-				opcodeInfo.FirstOperand == Operand.Sp)
-				CallTemplate("Inc16", operand1, operand2);
-			else
-				CallTemplate("Inc8", operand1, operand2);
+				opcodeInfo.FirstOperand == Operand.Sp ?
+					"Inc16" :
+					"Inc8",
+				operand1, operand2
+			);
 		}
 		else if (opcodeInfo.Operation == Operation.Dec)
 		{
-			if (opcodeInfo.FirstOperand == Operand.Bc ||
+			CallTemplate
+			(
+				opcodeInfo.FirstOperand == Operand.Bc ||
 				opcodeInfo.FirstOperand == Operand.De ||
 				opcodeInfo.FirstOperand == Operand.Hl ||
-				opcodeInfo.FirstOperand == Operand.Sp)
-				CallTemplate("Dec16", operand1, operand2);
-			else
-				CallTemplate("Dec8", operand1, operand2);
+				opcodeInfo.FirstOperand == Operand.Sp ?
+					"Dec16" :
+					"Dec8",
+				operand1, operand2
+			);
 		}
 		else if ((opcodeInfo.Operation == Operation.Jr ||
 			opcodeInfo.Operation == Operation.Jp ||
@@ -393,8 +385,8 @@ if (l-- == 0) h--;
 		}
 	}
 
-	WriteFixedFlags(opcodeInfo.AffectedFlags & opcodeInfo.SetFlags, true);
-	WriteFixedFlags(opcodeInfo.AffectedFlags & opcodeInfo.ClearFlags, false);
+	WriteFixedFlags(opcodeInfo.AffectedFlags & opcodeInfo.SetFlags, opcodeInfo.AffectedFlags & opcodeInfo.ClearFlags);
+
 	if (opcodeInfo.Operation != Operation.Halt)
 	{
 #>
@@ -403,32 +395,28 @@ cycleCount = <#= opcodeInfo.BaseCycleCount #>;
 	}
 }
 		
-private void WriteFixedFlags(Flags flags, bool isSet)
+private void WriteFixedFlags(Flags setFlags, Flags clearFlags)
 {
-	string flagValue = isSet ? "true" : "false";
+	if ((setFlags | clearFlags) == 0) return;
 
-	if ((flags & Flags.Zero) != 0)
+	System.Diagnostics.Debug.Assert((setFlags & clearFlags) == 0);
+
+	if ((byte)clearFlags == 0)
 	{
 #>
-zeroFlag = <#= flagValue #>;
+f |= 0x<#= ((int)setFlags).ToString("X2") #>;
 <#+
 	}
-	if ((flags & Flags.Negation) != 0)
+	else if ((byte)setFlags == 0)
 	{
 #>
-negationFlag = <#= flagValue #>;
+f &= 0x<#= ((~(int)clearFlags) & 0xF0).ToString("X2") #>;
 <#+
 	}
-	if ((flags & Flags.HalfCarry) != 0)
+	else
 	{
 #>
-halfCarryFlag = <#= flagValue #>;
-<#+
-	}
-	if ((flags & Flags.Carry) != 0)
-	{
-#>
-carryFlag = <#= flagValue #>;
+f = (byte)(f & 0x<#= ((~(int)clearFlags & 0xF0)).ToString("X2") #> | 0x<#= ((byte)setFlags).ToString("X2") #>);
 <#+
 	}
 }
@@ -467,10 +455,10 @@ private static string GetOperandString(Operand operand, byte embeddedValue)
 		case Operand.Word: return "__temp16";
 		case Operand.StackRelative: return "sp";
 
-		case Operand.NotZero: return "!zeroFlag";
-		case Operand.Zero: return "zeroFlag";
-		case Operand.NotCarry: return "!carryFlag";
-		case Operand.Carry: return "carryFlag";
+		case Operand.NotZero: return "((f & ZFlag) == 0)";
+		case Operand.Zero: return "((f & ZFlag) != 0)";
+		case Operand.NotCarry: return "((f & CFlag) == 0)";
+		case Operand.Carry: return "((f & CFlag) != 0)";
 
 		default: return null;
 	}
@@ -480,21 +468,21 @@ private static string GetOperandLoadStub(Operand operand)
 {
 	switch (operand)
 	{
-		case Operand.Af: return "__temp16 = (ushort)((a << 8) | (zeroFlag ? 0x80 : 0) | (negationFlag ? 0x40 : 0) | (halfCarryFlag ? 0x20 : 0) | (carryFlag ? 0x10 : 0));";
+		case Operand.Af: return "__temp16 = (ushort)((a << 8) | f);";
 		case Operand.Bc: return "__temp16 = (ushort)((b << 8) | c);";
 		case Operand.De: return "__temp16 = (ushort)((d << 8) | e);";
 		case Operand.Hl: return "__tempHL = (ushort)((h << 8) | l);";
 
-		case Operand.Memory: return "__temp8 = bus.ReadByte(bus.ReadByte(pc++), bus.ReadByte(pc++));";
-		case Operand.MemoryBc: return "__temp8 = bus.ReadByte(c, b);";
-		case Operand.MemoryDe: return "__temp8 = bus.ReadByte(e, d);";
-		case Operand.MemoryHl: return "__temp8 = bus.ReadByte(l, h);";
-		case Operand.BytePort: return "__temp8 = bus.ReadPort(bus.ReadByte(pc++));";
+		case Operand.Memory: return "__temp8 = bus[bus[pc++], bus[pc++]];";
+		case Operand.MemoryBc: return "__temp8 = bus[c, b];";
+		case Operand.MemoryDe: return "__temp8 = bus[e, d];";
+		case Operand.MemoryHl: return "__temp8 = bus[l, h];";
+		case Operand.BytePort: return "__temp8 = bus.ReadPort(bus[pc++]);";
 		case Operand.RegisterPort: return "__temp8 = bus.ReadPort(c);";
-		case Operand.Byte: return "__temp8 = bus.ReadByte(pc++);";
+		case Operand.Byte: return "__temp8 = bus[pc++];";
 
-		case Operand.SByte: return "__temp16 = (ushort)(sbyte)bus.ReadByte(pc++);";
-		case Operand.Word: return "__temp16 = (ushort)(bus.ReadByte(pc++) | (bus.ReadByte(pc++) << 8));";
+		case Operand.SByte: return "__temp16 = (ushort)(sbyte)bus[pc++];";
+		case Operand.Word: return "__temp16 = (ushort)(bus[pc++] | (bus[pc++] << 8));";
 
 		default: return null;
 	}
@@ -504,16 +492,16 @@ private static string GetOperandStoreStub(Operand operand)
 {
 	switch (operand)
 	{
-		case Operand.Af: return "a = (byte)(__temp16 >> 8); zeroFlag = (__temp16 & 0x80) != 0; negationFlag = (__temp16 & 0x40) != 0; halfCarryFlag = (__temp16 & 0x20) != 0; carryFlag = (__temp16 & 0x10) != 0;";
+		case Operand.Af: return "a = (byte)(__temp16 >> 8); f = (byte)(__temp16 & 0x0F0);";
 		case Operand.Bc: return "b = (byte)(__temp16 >> 8); c = (byte)(__temp16);";
 		case Operand.De: return "d = (byte)(__temp16 >> 8); e = (byte)(__temp16);";
 		case Operand.Hl: return "h = (byte)(__tempHL >> 8); l = (byte)(__tempHL);";
 
-		case Operand.Memory: return "bus.WriteByte(bus.ReadByte(pc++), bus.ReadByte(pc++), __temp8);";
-		case Operand.MemoryBc: return "bus.WriteByte(c, b, __temp8);";
-		case Operand.MemoryDe: return "bus.WriteByte(e, d, __temp8);";
-		case Operand.MemoryHl: return "bus.WriteByte(l, h, __temp8);";
-		case Operand.BytePort: return "bus.WritePort(bus.ReadByte(pc++), __temp8);";
+		case Operand.Memory: return "bus[bus[pc++], bus[pc++]] = __temp8;";
+		case Operand.MemoryBc: return "bus[c, b] = __temp8;";
+		case Operand.MemoryDe: return "bus[e, d] = __temp8;";
+		case Operand.MemoryHl: return "bus[l, h] = __temp8;";
+		case Operand.BytePort: return "bus.WritePort(bus[pc++], __temp8);";
 		case Operand.RegisterPort: return "bus.WritePort(c, __temp8);";
 
 		default: return null;
@@ -525,19 +513,16 @@ private static string GetOperandStoreStub(Operand operand)
 private void Adc_Template(string operand1, string operand2)
 {
 #>
-if (carryFlag)
+if ((f & CFlag) != 0)
 {
 	temp = <#= operand1 #> + <#= operand2 #> + 1;
-	halfCarryFlag = (<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xE;
+	f = (byte)(((<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xE ? HFlag : 0) | (temp > 0xFF ? CFlag : 0) | ((<#= operand1 #> = (byte)temp) == 0 ? ZFlag : 0));
 }
 else
 {
 	temp = <#= operand1 #> + <#= operand2 #>;
-	halfCarryFlag = (<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xF;
+	f = (byte)(((<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xF ? HFlag : 0) | (temp > 0xFF ? CFlag : 0) | ((<#= operand1 #> = (byte)temp) == 0 ? ZFlag : 0));
 }
-carryFlag = temp > 0xFF;
-<#= operand1 #> = (byte)temp;
-zeroFlag = <#= operand1 #> == 0;
 <#+
 }
 
@@ -545,8 +530,16 @@ private void Add16_Template(string operand1, string operand2)
 {
 #>
 temp = <#= operand1 #> + <#= operand2 #>;
-halfCarryFlag = (<#= operand1 #> & 0xFFF) + (<#= operand2 #> & 0xFFF) > 0xFFF;
-carryFlag = temp > 0xFFFF;
+f = (byte)(f & 0x80 | ((<#= operand1 #> & 0xFFF) + (<#= operand2 #> & 0xFFF) > 0xFFF ? HFlag : 0) | (temp > 0xFFFF ? CFlag : 0));
+<#= operand1 #> = (ushort)temp;
+<#+
+}
+
+private void AddS_Template(string operand1, string operand2)
+{
+#>
+temp = <#= operand1 #> + <#= operand2 #>;
+f = (byte)((((<#= operand1 #> ^ <#= operand2 #> ^ temp) & 0x10) != 0 ? HFlag : 0) | (((<#= operand1 #> ^ <#= operand2 #> ^ temp) & 0x100) != 0 ? CFlag : 0));
 <#= operand1 #> = (ushort)temp;
 <#+
 }
@@ -555,10 +548,7 @@ private void Add8_Template(string operand1, string operand2)
 {
 #>
 temp = <#= operand1 #> + <#= operand2 #>;
-carryFlag = temp > 0xFF;
-halfCarryFlag = (<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xF;
-<#= operand1 #> = (byte)temp;
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)(((<#= operand1 #> & 0xF) + (<#= operand2 #> & 0xF) > 0xF ? HFlag : 0) | (temp > 0xFF ? CFlag : 0) | ((<#= operand1 #> = (byte)temp) == 0 ? ZFlag : 0));
 <#+
 }
 
@@ -567,14 +557,13 @@ private void And_Template(string operand1, string operand2)
 	if (operand1 == operand2)
 	{
 #>
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)(<#= operand1 #> == 0 ? f | ZFlag : f & NotZFlag);
 <#+
 	}
 	else
 	{
 #>
-<#= operand1 #> &= <#= operand2 #>;
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)((<#= operand1 #> &= <#= operand2 #>) == 0 ? f | ZFlag : f & NotZFlag);
 <#+
 	}
 }
@@ -582,7 +571,7 @@ zeroFlag = <#= operand1 #> == 0;
 private void Bit_Template(string operand1, string operand2)
 {
 #>
-zeroFlag = (<#= operand2 #> & (1 << <#= operand1 #>)) == 0;
+f = (byte)((<#= operand2 #> & 0x<#= (1 << int.Parse(operand1)).ToString("X2") #>) == 0 ? f | ZFlag : f & NotZFlag);
 <#+
 }
 
@@ -598,7 +587,7 @@ pc = <#= operand1 #>;
 private void Ccf_Template(string operand1, string operand2)
 {
 #>
-carryFlag = !carryFlag;
+f ^= CFlag;
 <#+
 }
 
@@ -607,17 +596,13 @@ private void Cp_Template(string operand1, string operand2)
 	if (operand1 == operand2)
 	{
 #>
-halfCarryFlag = false;
-carryFlag = false;
-zeroFlag = true;
+f = 0xC0;
 <#+
 	}
 	else
 	{
 #>
-halfCarryFlag = (<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF);
-carryFlag = <#= operand1 #> < <#= operand2 #>;
-zeroFlag = <#= operand1 #> == <#= operand2 #>;
+f = (byte)(((<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF) ? HFlag : 0) | (<#= operand1 #> < <#= operand2 #> ? CFlag : 0) | NFlag | (<#= operand1 #> == <#= operand2 #> ? ZFlag : 0));
 <#+
 	}
 }
@@ -632,17 +617,21 @@ a = (byte)~a;
 private void Daa_Template(string operand1, string operand2)
 {
 #>
-if (!negationFlag)
+if ((f & NFlag) != 0)
 {
-	if (halfCarryFlag || (a & 0x0F) > 0x09) a += 0x06;
-	if (carryFlag = (carryFlag || a > 0x99)) a += 0x60;
+	if ((f & HFlag) != 0) a -= 0x06;
+	if ((f & CFlag) != 0) a -= 0x60;
 }
 else
 {
-	if (halfCarryFlag) a -= 0x06;
-	if (carryFlag) a -= 0x60;
+	if ((f & CFlag) != 0 || a > 0x99)
+	{
+		a += (f & HFlag) != 0 || (a & 0x0F) > 0x09 ? (byte)0x66 : (byte)0x60;
+		f |= CFlag;
+	}
+	else if ((f & HFlag) != 0 || (a & 0x0F) > 0x09) a += 0x06;
 }
-zeroFlag = a == 0;
+f = (byte)(a == 0 ? f | ZFlag : f & NotZFlag);
 <#+
 }
 
@@ -657,8 +646,7 @@ private void Dec8_Template(string operand1, string operand2)
 {
 #>
 <#= operand1 #>--;
-zeroFlag = <#= operand1 #> == 0;
-halfCarryFlag = (<#= operand1 #> ^ 0xF) == 0;
+f = (byte)(f & CFlag | (<#= operand1 #> != 0 ? (<#= operand1 #> & 0xF) != 0xF ? 0 : HFlag : ZFlag) | NFlag);
 <#+
 }
 
@@ -708,8 +696,7 @@ private void Inc8_Template(string operand1, string operand2)
 {
 #>
 <#= operand1 #>++;
-zeroFlag = <#= operand1 #> == 0;
-halfCarryFlag = (<#= operand1 #> & 0xF) == 0;
+f = (byte)(f & CFlag | (<#= operand1 #> != 0 ? (<#= operand1 #> & 0xF) == 0 ? HFlag : 0 : ZFlag | HFlag));
 <#+
 }
 
@@ -740,10 +727,9 @@ private void Ld_Template(string operand1, string operand2)
 private void LdAddS_Template(string operand1, string operand2)
 {
 #>
-temp = (short)(sbyte)bus[pc++] & 0xFFFF; // Sign extension to 16 bits
-halfCarryFlag = (temp & 0xFFF) + (<#= operand2 #> & 0xFFF) > 0xFFF;
-temp += <#= operand2 #>;
-carryFlag = temp > 0xFFFF;
+__temp16 = (ushort)(sbyte)bus[pc++];
+temp = <#= operand2 #> + __temp16;
+f = (byte)((((<#= operand2 #> ^ __temp16 ^ temp) & 0x10) != 0 ? HFlag : 0) | (((<#= operand2 #> ^ __temp16 ^ temp) & 0x100) != 0 ? CFlag : 0));
 <#= operand1 #> = (ushort)temp;
 <#+
 }
@@ -762,14 +748,13 @@ private void Or_Template(string operand1, string operand2)
 	if (operand1 == operand2)
 	{
 #>
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)(<#= operand1 #> == 0 ? f | ZFlag : f & NotZFlag);
 <#+
 	}
 	else
 	{
 #>
-<#= operand1 #> |= <#= operand2 #>;
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)((<#= operand1 #> |= <#= operand2 #>) == 0 ? f | ZFlag : f & NotZFlag);
 <#+
 	}
 }
@@ -792,7 +777,7 @@ bus[--sp] = (byte)<#= operand1 #>;
 private void Res_Template(string operand1, string operand2)
 {
 #>
-unchecked { <#= operand2 #> &= (byte)(~(1 << <#= operand1 #>)); };
+<#= operand2 #> &= 0x<#= (~(1 << int.Parse(operand1)) & 0xFF).ToString("X2") #>;
 <#+
 }
 
@@ -814,68 +799,92 @@ ime = true;
 private void Rl_Template(string operand1, string operand2)
 {
 #>
-temp = carryFlag ? (<#= operand1 #> << 1) | 0x01 : <#= operand1 #> << 1;
-carryFlag = (<#= operand1 #> & 0x80) != 0;
-zeroFlag = (<#= operand1 #> = (byte)temp) == 0;
+f = (byte)(((<#= operand1 #> & 0x80) != 0 ? CFlag : 0) | ((<#= operand1 #> = (byte)((f & CFlag) != 0 ? (<#= operand1 #> << 1) | 0x01 : <#= operand1 #> << 1)) == 0 ? ZFlag : 0));
 <#+
 }
 
 private void Rla_Template(string operand1, string operand2)
 {
 #>
-temp = carryFlag ? (a << 1) | 0x01 : a << 1;
-carryFlag = (a & 0x80) != 0;
-a = (byte)temp;
+if ((f & CFlag) != 0)
+{
+	f = (byte)((a & 0x80) != 0 ? CFlag : 0);
+	a = (byte)((a << 1) | 0x01);
+}
+else
+{
+	f = (byte)((a & 0x80) != 0 ? CFlag : 0);
+	a <<= 1;
+}
 <#+
 }
 
 private void Rlc_Template(string operand1, string operand2)
 {
 #>
-carryFlag = (<#= operand1 #> & 0x80) != 0;
-zeroFlag = (<#= operand1 #> = carryFlag ? (byte)((<#= operand1 #> << 1) | 0x01) : (byte)(<#= operand1 #> << 1)) == 0;
+f = (byte)(((<#= operand1 #> & 0x80) != 0 ? CFlag : 0) | ((<#= operand1 #> = (byte)((<#= operand1 #> & 0x80) != 0 ? (<#= operand1 #> << 1) | 0x01 : <#= operand1 #> << 1)) == 0 ? ZFlag : 0));
 <#+
 }
 
 private void Rlca_Template(string operand1, string operand2)
 {
 #>
-carryFlag = (a & 0x80) != 0;
-a = carryFlag ? (byte)((a << 1) | 0x01) : a = (byte)(a << 1);
+if ((a & 0x80) != 0)
+{
+	f = CFlag;
+	a = (byte)((a << 1) | 0x01);
+}
+else
+{
+	f = 0;
+	a <<= 1;
+}
 <#+
 }
 
 private void Rr_Template(string operand1, string operand2)
 {
 #>
-temp = carryFlag ? (<#= operand1 #> >> 1) | 0x80 : <#= operand1 #> >> 1;
-carryFlag = (<#= operand1 #> & 0x01) != 0;
-zeroFlag = (<#= operand1 #> = (byte)temp) == 0;
+f = (byte)(((<#= operand1 #> & 0x01) != 0 ? CFlag : 0) | ((<#= operand1 #> = (byte)((f & CFlag) != 0 ? (<#= operand1 #> >> 1) | 0x80 : <#= operand1 #> >> 1)) == 0 ? ZFlag : 0));
 <#+
 }
 
 private void Rra_Template(string operand1, string operand2)
 {
 #>
-temp = carryFlag ? (a >> 1) | 0x80 : a >> 1;
-carryFlag = (a & 0x01) != 0;
-a = (byte)temp;
+if ((f & CFlag) != 0)
+{
+	f = (byte)((a & 0x01) != 0 ? CFlag : 0);
+	a = (byte)((a >> 1) | 0x80);
+}
+else
+{
+	f = (byte)((a & 0x01) != 0 ? CFlag : 0);
+	a >>= 1;
+}
 <#+
 }
 
 private void Rrc_Template(string operand1, string operand2)
 {
 #>
-carryFlag = (<#= operand1 #> & 0x01) != 0;
-zeroFlag = (<#= operand1 #> = carryFlag ? (byte)((<#= operand1 #> >> 1) | 0x80) : (byte)(<#= operand1 #> >> 1)) == 0;
+f = (byte)(((<#= operand1 #> & 0x01) != 0 ? CFlag : 0) | ((<#= operand1 #> = (byte)((<#= operand1 #> & 0x01) != 0 ? (<#= operand1 #> >> 1) | 0x80 : <#= operand1 #> >> 1)) == 0 ? ZFlag : 0));
 <#+
 }
 
 private void Rrca_Template(string operand1, string operand2)
 {
 #>
-carryFlag = (a & 0x01) != 0;
-a = carryFlag ? (byte)((a >> 1) | 0x80) : (byte)(a >> 1);
+if ((a & 0x01) != 0)
+{
+	f = CFlag;
+	a = (byte)((a >> 1) | 0x80);
+}
+else
+{
+	f = 0;
+	a >>= 1;
+}
 <#+
 }
 
@@ -893,37 +902,23 @@ private void Sbc_Template(string operand1, string operand2)
 	if (operand1 == operand2)
 	{
 #>
-if (carryFlag)
+if ((f & CFlag) != 0)
 {
-	halfCarryFlag = true;
-	//carryFlag = true;
 	<#= operand1 #> = 0xFF;
-	zeroFlag = false;
+	f = 0x70;
 }
 else
 {
-	halfCarryFlag = false;
-	//carryFlag = false;
 	<#= operand1 #> = 0;
-	zeroFlag = true;
+	f = 0xC0;
 }
 <#+
 	}
 	else
 	{
 #>
-if (carryFlag)
-{
-	halfCarryFlag = (<#= operand1 #> & 0xF) - (<#= operand2 #> & 0xF) < 1;
-	carryFlag = <#= operand1 #> - <#= operand2 #> < 1;
-	zeroFlag = (<#= operand1 #> = (byte)(<#= operand1 #> - <#= operand2 #> - 1)) == 0;
-}
-else
-{
-	halfCarryFlag = (<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF);
-	carryFlag = <#= operand1 #> < <#= operand2 #>;
-	zeroFlag = (<#= operand1 #> -= <#= operand2 #>) == 0;
-}
+if ((f & CFlag) != 0) f = (byte)(((<#= operand1 #> & 0xF) - (<#= operand2 #> & 0xF) < 1 ? HFlag : 0) | (<#= operand1 #> - <#= operand2 #> < 1 ? CFlag : 0) | NFlag | ((<#= operand1 #> = (byte)(<#= operand1 #> - <#= operand2 #> - 1)) == 0 ? ZFlag : 0));
+else f = (byte)(((<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF) ? HFlag : 0) | (<#= operand1 #> < <#= operand2 #> ? CFlag : 0) | NFlag | ((<#= operand1 #> -= <#= operand2 #>) == 0 ? ZFlag : 0));
 <#+
 	}
 }
@@ -933,34 +928,28 @@ private void Scf_Template(string operand1, string operand2) { }
 private void Set_Template(string operand1, string operand2)
 {
 #>
-<#= operand2 #> |= (byte)(1 << <#= operand1 #>);
+<#= operand2 #> |= 0x<#= (1 << int.Parse(operand1)).ToString("X2") #>;
 <#+
 }
 
 private void Sla_Template(string operand1, string operand2)
 {
 #>
-carryFlag = (<#= operand1 #> & 0x80) != 0;
-<#= operand1 #> = (byte)(<#= operand1 #> << 1);
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)(((<#= operand1 #> & 0x80) != 0 ? CFlag : 0) | ((<#= operand1 #> = (byte)(<#= operand1 #> << 1)) == 0 ? ZFlag : 0));
 <#+
 }
 
 private void Sra_Template(string operand1, string operand2)
 {
 #>
-carryFlag = (<#= operand1 #> & 0x01) != 0;
-<#= operand1 #> = (byte)((sbyte)<#= operand1 #> >> 1);
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)(((<#= operand1 #> & 0x01) != 0 ? CFlag : 0) | ((<#= operand1 #> = (byte)((sbyte)<#= operand1 #> >> 1)) == 0 ? ZFlag : 0));
 <#+
 }
 
 private void Srl_Template(string operand1, string operand2)
 {
 #>
-carryFlag = (<#= operand1 #> & 0x01) != 0;
-<#= operand1 #> = (byte)(<#= operand1 #> >> 1);
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)(((<#= operand1 #> & 0x01) != 0 ? CFlag : 0) | ((<#= operand1 #> = (byte)(<#= operand1 #> >> 1)) == 0 ? ZFlag : 0));
 <#+
 }
 
@@ -980,18 +969,14 @@ private void Sub_Template(string operand1, string operand2)
 	if (operand1 == operand2)
 	{
 #>
-halfCarryFlag = false;
-carryFlag = false;
 <#= operand1 #> = 0;
-zeroFlag = true;
+f = 0xC0;
 <#+
 	}
 	else
 	{
 #>
-halfCarryFlag = (<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF);
-carryFlag = <#= operand1 #> < <#= operand2 #>;
-zeroFlag = (<#= operand1 #> -= <#= operand2 #>) == 0;
+f = (byte)(((<#= operand1 #> & 0xF) < (<#= operand2 #> & 0xF) ? HFlag : 0) | (<#= operand1 #> < <#= operand2 #> ? CFlag : 0) | NFlag | ((<#= operand1 #> -= <#= operand2 #>) == 0 ? ZFlag : 0));
 <#+
 	}
 }
@@ -999,8 +984,7 @@ zeroFlag = (<#= operand1 #> -= <#= operand2 #>) == 0;
 private void Swap_Template(string operand1, string operand2)
 {
 #>
-<#= operand1 #> = (byte)((<#= operand1 #> >> 4) | (<#= operand1 #> << 4));
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)((<#= operand1 #> = (byte)((<#= operand1 #> >> 4) | (<#= operand1 #> << 4))) == 0 ? ZFlag : 0);
 <#+
 }
 
@@ -1010,14 +994,13 @@ private void Xor_Template(string operand1, string operand2)
 	{
 #>
 <#= operand1 #> = 0;
-zeroFlag = true;
+f |= ZFlag;
 <#+
 	}
 	else
 	{
 #>
-<#= operand1 #> ^= <#= operand2 #>;
-zeroFlag = <#= operand1 #> == 0;
+f = (byte)((<#= operand1 #> ^= <#= operand2 #>) == 0 ? f | ZFlag : f & NotZFlag);
 <#+
 	}
 }
