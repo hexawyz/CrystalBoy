@@ -19,21 +19,39 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
-	public struct VideoPortSnapshot
+	public class VideoStatusSnapshot
 	{
-		public VideoPortSnapshot(GameBoyMemoryBus bus)
+		private GameBoyMemoryBus bus;
+		private MemoryBlock paletteMemoryBlock;
+
+		public unsafe VideoStatusSnapshot(GameBoyMemoryBus bus)
+		{
+			this.bus = bus;
+			this.paletteMemoryBlock = new MemoryBlock(bus.PaletteMemory.Length);
+			this.paletteMemory = (byte*)this.paletteMemoryBlock.Pointer;
+		}
+
+		public void Capture()
 		{
 			LCDC = bus.ReadPort(Port.LCDC);
 			SCX = bus.ReadPort(Port.SCX);
 			SCY = bus.ReadPort(Port.SCY);
 			WX = bus.ReadPort(Port.WX);
 			WY = bus.ReadPort(Port.WY);
-			BGP = bus.ReadPort(Port.BGP);
-			OBP0 = bus.ReadPort(Port.OBP0);
-			OBP1 = bus.ReadPort(Port.OBP1);
+			if (!bus.ColorMode)
+			{
+				BGP = bus.ReadPort(Port.BGP);
+				OBP0 = bus.ReadPort(Port.OBP0);
+				OBP1 = bus.ReadPort(Port.OBP1);
+			}
+			else unsafe
+			{
+				Memory.Copy((void*)paletteMemory, bus.PaletteMemory.Pointer, (uint)bus.PaletteMemory.Length);
+			}
 		}
 
 		public byte LCDC;
@@ -44,5 +62,6 @@ namespace CrystalBoy.Emulation
 		public byte BGP;
 		public byte OBP0;
 		public byte OBP1;
+		public unsafe readonly byte* paletteMemory;
 	}
 }

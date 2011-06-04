@@ -103,14 +103,13 @@ namespace CrystalBoy.Emulation
 
 			buffer = (byte*)renderMethod.LockBuffer(out stride);
 
-			if ((videoPortSnapshot.LCDC & 0x80) != 0)
+			if ((videoStatusSnapshot.LCDC & 0x80) != 0)
 				if (colorMode)
 				{
-					FillPalettes32((ushort*)paletteMemory);
+					FillPalettes32((ushort*)videoStatusSnapshot.paletteMemory);
 					DrawColorFrame32(buffer, stride);
 				}
-				else
-					DrawFrame32(buffer, stride);
+				else DrawFrame32(buffer, stride);
 			else
 				ClearBuffer32(buffer, stride, 0xFFFFFFFF);
 
@@ -236,7 +235,7 @@ namespace CrystalBoy.Emulation
 			byte* bufferLine = buffer;
 			uint* bufferPixel;
 			int scx, scy, wx, wy;
-			int pi, data1, data2;
+			int pi, ppi, data1, data2;
 			bool bgDraw, winDraw, winDraw2, objDraw, objDrawn, signedIndex;
 			uint** bgPalettes, objPalettes;
 			uint* tilePalette;
@@ -258,7 +257,7 @@ namespace CrystalBoy.Emulation
 			{
 				tilePalette = bgPalettes[0];
 
-				data1 = videoPortSnapshot.LCDC;
+				data1 = videoStatusSnapshot.LCDC;
 				bgDraw = (data1 & 0x01) != 0;
 				bgMap = videoMemory + ((data1 & 0x08) != 0 ? 0x1C00 : 0x1800);
 				winDraw = (data1 & 0x20) != 0;
@@ -268,12 +267,13 @@ namespace CrystalBoy.Emulation
 				signedIndex = (data1 & 0x10) == 0;
 				bgTiles = (ushort*)(signedIndex ? videoMemory + 0x1000 : videoMemory);
 
-				scx = videoPortSnapshot.SCX;
-				scy = videoPortSnapshot.SCY;
-				wx = videoPortSnapshot.WX - 7;
-				wy = videoPortSnapshot.WY;
+				scx = videoStatusSnapshot.SCX;
+				scy = videoStatusSnapshot.SCY;
+				wx = videoStatusSnapshot.WX - 7;
+				wy = videoStatusSnapshot.WY;
 
-				pi = 0;
+				pi = 0; // Port access list index
+				ppi = 0; // Palette access list index
 
 				for (i = 0; i < 144; i++) // Loop on frame lines
 				{
@@ -303,6 +303,15 @@ namespace CrystalBoy.Emulation
 						}
 
 						pi++;
+					}
+					// Update palettes before drawing the line (This is necessary for a lot of demos with dynamic palettes)
+					while (ppi < paletteAccessList.Count && paletteAccessList[ppi].Clock < data2)
+					{
+						// By doing this, we trash the palette memory snapshot… But at least it works. (Might be necessary to allocate another temporary palette buffer in the future)
+						videoStatusSnapshot.paletteMemory[paletteAccessList[ppi].Offset] = paletteAccessList[ppi].Value;
+						bgPalettes[0][paletteAccessList[ppi].Offset / 2] = LookupTables.ColorLookupTable32[((ushort*)videoStatusSnapshot.paletteMemory)[paletteAccessList[ppi].Offset / 2]];
+
+						ppi++;
 					}
 
 					#endregion
@@ -531,7 +540,7 @@ namespace CrystalBoy.Emulation
 			{
 				tilePalette = bgPalettes[0];
 
-				data1 = videoPortSnapshot.LCDC;
+				data1 = videoStatusSnapshot.LCDC;
 				bgDraw = (data1 & 0x01) != 0;
 				bgMap = videoMemory + ((data1 & 0x08) != 0 ? 0x1C00 : 0x1800);
 				winDraw = (data1 & 0x20) != 0;
@@ -541,23 +550,23 @@ namespace CrystalBoy.Emulation
 				signedIndex = (data1 & 0x10) == 0;
 				bgTiles = (ushort*)(signedIndex ? videoMemory + 0x1000 : videoMemory);
 
-				scx = videoPortSnapshot.SCX;
-				scy = videoPortSnapshot.SCY;
-				wx = videoPortSnapshot.WX - 7;
-				wy = videoPortSnapshot.WY;
-				data1 = videoPortSnapshot.BGP;
+				scx = videoStatusSnapshot.SCX;
+				scy = videoStatusSnapshot.SCY;
+				wx = videoStatusSnapshot.WX - 7;
+				wy = videoStatusSnapshot.WY;
+				data1 = videoStatusSnapshot.BGP;
 				for (i = 0; i < 4; i++)
 				{
 					tilePalette[i] = LookupTables.GrayPalette[data1 & 3];
 					data1 >>= 2;
 				}
-				data1 = videoPortSnapshot.OBP0;
+				data1 = videoStatusSnapshot.OBP0;
 				for (j = 0; j < 4; j++)
 				{
 					objPalettes[0][j] = LookupTables.GrayPalette[data1 & 3];
 					data1 >>= 2;
 				}
-				data1 = videoPortSnapshot.OBP1;
+				data1 = videoStatusSnapshot.OBP1;
 				for (j = 0; j < 4; j++)
 				{
 					objPalettes[1][j] = LookupTables.GrayPalette[data1 & 3];

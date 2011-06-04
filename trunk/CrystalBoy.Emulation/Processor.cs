@@ -24,6 +24,15 @@ namespace CrystalBoy.Emulation
 	// It seems the CPU used in GB hardware is Sharp LR35902 (aka GB-Z80)
 	public sealed partial class Processor
 	{
+		public const byte CFlag = 0x10;
+		public const byte HFlag = 0x20;
+		public const byte NFlag = 0x40;
+		public const byte ZFlag = 0x80;
+		public const byte NotCFlag = 0xE0;
+		public const byte NotHFlag = 0xD0;
+		public const byte NotNFlag = 0xB0;
+		public const byte NotZFlag = 0x70;
+
 		byte a, b, c, d, e, f, h, l;
 		ushort sp, pc;
 		bool ime;
@@ -139,43 +148,41 @@ namespace CrystalBoy.Emulation
 
 		public bool ZeroFlag
 		{
-			get { return (f & 0x80) != 0; }
+			get { return (f & ZFlag) != 0; }
 			set
 			{
-				if (value) f |= 0x80;
-				else f &= 0x70;
+				if (value) f |= ZFlag;
+				else f &= NotZFlag;
 			}
 		}
 
 		public bool NegationFlag
 		{
-			get { return (f & 0x40) != 0; }
+			get { return (f & NFlag) != 0; }
 			set
 			{
-				if (value) f |= 0x40;
-				else f &= 0xB0;
+				if (value) f |= NFlag;
+				else f &= NotNFlag;
 			}
 		}
 
 		public bool HalfCarryFlag
 		{
-			get { return (f & 0x20) != 0; }
+			get { return (f & HFlag) != 0; }
 			set
 			{
-				if (value) f |= 0x20;
-				else f &= 0xD0;
+				if (value) f |= HFlag;
+				else f &= NotHFlag;
 			}
 		}
 
 		public bool CarryFlag
 		{
-			get { return (f & 0x10) != 0; }
+			get { return (f & CFlag) != 0; }
 			set
 			{
-				if (value)
-					f |= 0x10;
-				else
-					f &= 0xE0;
+				if (value) f |= CFlag;
+				else f &= NotCFlag;
 			}
 		}
 

@@ -108,10 +108,11 @@ namespace CrystalBoy.Emulation
 			    NewFrame(this, EventArgs.Empty);
 			Render();
 			// Prepare for the new frame...
-			// Clear the video port access list
+			// Clear the video access lists
 			videoPortAccessList.Clear();
+			paletteAccessList.Clear();
 			// Create a new snapshot of the video ports
-			videoPortSnapshot = new VideoPortSnapshot(this);
+			videoStatusSnapshot.Capture();
 		}
 
 		internal int HandleProcessorStop()
