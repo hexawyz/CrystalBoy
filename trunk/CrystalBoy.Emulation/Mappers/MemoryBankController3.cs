@@ -28,58 +28,27 @@ namespace CrystalBoy.Emulation.Mappers
 		{
 			MemoryBankController3 mbc;
 
-			internal RealTimeClockState(MemoryBankController3 mbc)
-			{
-				this.mbc = mbc;
-			}
+			internal RealTimeClockState(MemoryBankController3 mbc) { this.mbc = mbc; }
 
-			public DateTime DateTime
-			{
-				get
-				{
-					return mbc.dateTime;
-				}
-			}
+			public DateTime DateTime { get { return mbc.dateTime; } }
 
-			public int Days
-			{
-				get
-				{
-					return mbc.rtcDays;
-				}
-			}
+			public short Days { get { return mbc.rtcDays; } }
 
-			public int Hours
-			{
-				get
-				{
-					return mbc.rtcHours;
-				}
-			}
+			public byte Hours { get { return mbc.rtcHours; } }
 
-			public int Minutes
-			{
-				get
-				{
-					return mbc.rtcMinutes;
-				}
-			}
+			public byte Minutes { get { return mbc.rtcMinutes; } }
 
-			public int Seconds
-			{
-				get
-				{
-					return mbc.rtcSeconds;
-				}
-			}
+			public byte Seconds { get { return mbc.rtcSeconds; } }
 
-			public bool Frozen
-			{
-				get
-				{
-					return mbc.rtcFreeze;
-				}
-			}
+			public short LatchedDays { get { return mbc.latchedRtcDays; } }
+
+			public byte LatchedHours { get { return mbc.latchedRtcHours; } }
+
+			public byte LatchedMinutes { get { return mbc.latchedRtcMinutes; } }
+
+			public byte LatchedSeconds { get { return mbc.latchedRtcSeconds; } }
+
+			public bool Frozen { get { return mbc.rtcFreeze; } }
 		}
 
 		#endregion
@@ -90,6 +59,8 @@ namespace CrystalBoy.Emulation.Mappers
 		DateTime dateTime;
 		short rtcDays;
 		byte rtcSeconds, rtcMinutes, rtcHours;
+		short latchedRtcDays;
+		byte latchedRtcSeconds, latchedRtcMinutes, latchedRtcHours;
 		bool rtcFreeze, latchBegin;
 
 		#endregion
@@ -103,27 +74,18 @@ namespace CrystalBoy.Emulation.Mappers
 			rtcSeconds = 0;
 			rtcMinutes = 0;
 			rtcHours = 0;
-			dateTime = DateTime.Now;
+			dateTime = DateTime.UtcNow;
 		}
 
 		#endregion
 
 		#region Properties
 
-		public RealTimeClockState RtcState
-		{
-			get
-			{
-				return rtcState;
-			}
-		}
+		public RealTimeClockState RtcState { get { return rtcState; } }
 
 		public override int RamBank
 		{
-			get
-			{
-				return ramBankInternal;
-			}
+			get { return ramBankInternal; }
 			protected set
 			{
 				if (value != ramBankInternal)
@@ -132,25 +94,20 @@ namespace CrystalBoy.Emulation.Mappers
 
 					if (value < 0x4)
 					{
-						if (HandlesRamWrites)
-							HandlesRamWrites = false;
-						if (RamEnabled)
-							MapRamBank(ramBankInternal);
+						if (HandlesRamWrites) HandlesRamWrites = false;
+						if (RamEnabled) MapRamBank(ramBankInternal);
 					}
 					else if (value >= 0x8 && value < 0xD)
 					{
-						if (RamEnabled)
-							MapRtcRegister();
-						if (!HandlesRamWrites)
-							HandlesRamWrites = true;
+						if (RamEnabled) MapRtcRegister();
+						if (!HandlesRamWrites) HandlesRamWrites = true;
 					}
 					else
 					{
 #if DEBUG
 						throw new InvalidOperationException();
 #else
-						if (HandlesRamWrites)
-							HandlesRamWrites = false;
+						if (HandlesRamWrites) HandlesRamWrites = false;
 						UnmapRam();
 #endif
 					}
@@ -160,34 +117,22 @@ namespace CrystalBoy.Emulation.Mappers
 
 		public override bool RamEnabled
 		{
-			get
-			{
-				return ramEnabledInternal;
-			}
+			get { return ramEnabledInternal; }
 			protected set
 			{
 				if (value != ramEnabledInternal)
 				{
 					if (ramEnabledInternal = value)
 					{
-						if (RamBank < 0x4)
-							MapRamBank(RamBank);
-						else if (RamBank >= 0x8 && RamBank < 0xD)
-							MapRtcRegister();
+						if (RamBank < 0x4) MapRamBank(RamBank);
+						else if (RamBank >= 0x8 && RamBank < 0xD) MapRtcRegister();
 					}
-					else
-						UnmapRam();
+					else UnmapRam();
 				}
 			}
 		}
 
 		#endregion
-
-		public override void Reset()
-		{
-			base.Reset();
-			HandlesRamWrites = false;
-		}
 
 		private void MapRtcRegister()
 		{
@@ -195,11 +140,11 @@ namespace CrystalBoy.Emulation.Mappers
 
 			switch (RamBank)
 			{
-				case 8: value = rtcSeconds; break;
-				case 9: value = rtcMinutes; break;
-				case 10: value = rtcHours; break;
-				case 11: value = (byte)rtcDays; break;
-				case 12: value = (byte)(((rtcDays & 0x100) != 0 ? 0x01 : 0x00) | ((rtcDays & 0x200) != 0 ? 0x80 : 0x00) | (rtcFreeze ? 0x40 : 0x00)); break;
+				case 8: value = latchedRtcSeconds; break;
+				case 9: value = latchedRtcMinutes; break;
+				case 10: value = latchedRtcHours; break;
+				case 11: value = (byte)latchedRtcDays; break;
+				case 12: value = (byte)(((latchedRtcDays & 0x100) != 0 ? 0x01 : 0x00) | ((latchedRtcDays & 0x200) != 0 ? 0x80 : 0x00) | (rtcFreeze ? 0x40 : 0x00)); break;
 				default: throw new InvalidOperationException();
 			}
 
@@ -207,22 +152,73 @@ namespace CrystalBoy.Emulation.Mappers
 			MapPort();
 		}
 
+		private void AdjustRtc()
+		{
+			TimeSpan timeSpan = DateTime.UtcNow - dateTime;
+
+			rtcSeconds = (byte)(rtcSeconds + timeSpan.Seconds);
+			rtcMinutes = (byte)(rtcMinutes + timeSpan.Minutes);
+			rtcHours = (byte)(rtcHours + timeSpan.Hours);
+			rtcDays = (short)(rtcDays + timeSpan.Days);
+
+			// Adjusts the values if needed
+			// (An overflow might have happened when we added the time span values…)
+			if (rtcSeconds > 60)
+			{
+				rtcSeconds -= 60;
+				rtcMinutes++;
+			}
+			if (rtcMinutes > 60)
+			{
+				rtcMinutes -= 60;
+				rtcHours++;
+			}
+			if (rtcHours > 24)
+			{
+				rtcHours -= 24;
+				rtcDays++;
+			}
+			dateTime = DateTime.UtcNow;
+		}
+
 		private void LatchRtcRegisters()
 		{
 			if (!rtcFreeze)
 			{
-				TimeSpan timeSpan = DateTime.Now - dateTime;
+				TimeSpan timeSpan = DateTime.UtcNow - dateTime;
 
-				rtcSeconds = (byte)((rtcSeconds + timeSpan.Seconds) % 60);
-				rtcMinutes = (byte)((rtcMinutes + timeSpan.Minutes) % 60);
-				rtcHours = (byte)((rtcHours + timeSpan.Hours) % 24);
-				rtcDays = (short)(rtcDays + timeSpan.Days);
+				latchedRtcSeconds = (byte)(rtcSeconds + timeSpan.Seconds);
+				latchedRtcMinutes = (byte)(rtcMinutes + timeSpan.Minutes);
+				latchedRtcHours = (byte)(rtcHours + timeSpan.Hours);
+				latchedRtcDays = (short)(rtcDays + timeSpan.Days);
 
-				dateTime = DateTime.Now;
+				// Adjusts the latched values if needed
+				// (An overflow might have happened when we added the time span values…)
+				if (latchedRtcSeconds > 60)
+				{
+					latchedRtcSeconds -= 60;
+					latchedRtcMinutes++;
+				}
+				if (latchedRtcMinutes > 60)
+				{
+					latchedRtcMinutes -= 60;
+					latchedRtcHours++;
+				}
+				if (latchedRtcHours > 24)
+				{
+					latchedRtcHours -= 24;
+					rtcDays++;
+				}
+			}
+			else
+			{
+				latchedRtcSeconds = rtcSeconds;
+				latchedRtcMinutes = rtcMinutes;
+				latchedRtcHours = rtcHours;
+				latchedRtcDays = rtcDays;
 			}
 
-			if (RamEnabled && RamBank >= 8)
-				MapRtcRegister();
+			if (RamEnabled && RamBank >= 8) MapRtcRegister();
 		}
 
 		public override void HandleRomWrite(byte offsetLow, byte offsetHigh, byte value)
@@ -250,15 +246,13 @@ namespace CrystalBoy.Emulation.Mappers
 			}
 			else /* if (offsetHigh < 0x80) */
 			{
-				if (value == 0)
-					latchBegin = true;
+				if (value == 0) latchBegin = true;
 				else if (latchBegin && value == 1)
 				{
 					LatchRtcRegisters();
 					latchBegin = false;
 				}
-				else
-					latchBegin = false;
+				else latchBegin = false;
 			}
 		}
 
@@ -266,30 +260,36 @@ namespace CrystalBoy.Emulation.Mappers
 		{
 			byte portValue;
 
-			if (!RamEnabled)
-				return;
+			if (!RamEnabled) return;
 
-			if (rtcFreeze)
-				dateTime = DateTime.Now;
+			if (rtcFreeze) dateTime = DateTime.UtcNow;
 
 			switch (RamBank)
 			{
 				case 8:
+					if (!rtcFreeze) AdjustRtc();
 					portValue = rtcSeconds = (byte)(value % 60);
+					dateTime = DateTime.UtcNow;
 					break;
 				case 9:
+					if (!rtcFreeze) AdjustRtc();
 					portValue = rtcMinutes = (byte)(value % 60);
+					dateTime = DateTime.UtcNow;
 					break;
 				case 10:
+					if (!rtcFreeze) AdjustRtc();
 					portValue = rtcHours = (byte)(value % 24);
+					dateTime = DateTime.UtcNow;
 					break;
 				case 11:
-					rtcDays = (short)(rtcDays & 0xFF00 | value);
-					portValue = value;
+					if (!rtcFreeze) AdjustRtc();
+					rtcDays = (short)(rtcDays & 0xFF00 | (portValue = value));
+					dateTime = DateTime.UtcNow;
 					break;
 				case 12:
+					if (rtcFreeze = (value & 0x40) != 0) AdjustRtc();
+					else dateTime = DateTime.UtcNow;
 					rtcDays = (short)(rtcDays & 0xFF | ((value & 0x1) != 0 ? 0x100 : 0) | ((value & 0x80) != 0 ? 0x200 : 0));
-					rtcFreeze = (value & 0x40) != 0;
 					portValue = (byte)(value & 0xC1);
 					break;
 				default:

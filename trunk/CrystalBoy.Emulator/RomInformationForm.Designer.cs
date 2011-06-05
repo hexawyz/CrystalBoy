@@ -111,8 +111,8 @@ namespace CrystalBoy.Emulator
 			// 
 			// gameGroupBox
 			// 
-			gameGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			gameGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			gameGroupBox.Controls.Add(this.gameTableLayoutPanel);
 			gameGroupBox.Location = new System.Drawing.Point(12, 12);
 			gameGroupBox.Name = "gameGroupBox";
@@ -123,8 +123,8 @@ namespace CrystalBoy.Emulator
 			// 
 			// gameTableLayoutPanel
 			// 
-			this.gameTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this.gameTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gameTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.gameTableLayoutPanel.ColumnCount = 2;
 			this.gameTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32F));
@@ -173,8 +173,8 @@ namespace CrystalBoy.Emulator
 			// 
 			// hardwareGroupBox
 			// 
-			hardwareGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			hardwareGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			hardwareGroupBox.Controls.Add(this.tableLayoutPanel2);
 			hardwareGroupBox.Location = new System.Drawing.Point(12, 95);
 			hardwareGroupBox.Name = "hardwareGroupBox";
@@ -185,8 +185,8 @@ namespace CrystalBoy.Emulator
 			// 
 			// tableLayoutPanel2
 			// 
-			this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.tableLayoutPanel2.ColumnCount = 2;
 			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32F));
@@ -274,9 +274,9 @@ namespace CrystalBoy.Emulator
 			this.tableLayoutPanel2.SetColumnSpan(this.sgbCheckBox, 2);
 			this.sgbCheckBox.Location = new System.Drawing.Point(3, 54);
 			this.sgbCheckBox.Name = "sgbCheckBox";
-			this.sgbCheckBox.Size = new System.Drawing.Size(149, 17);
+			this.sgbCheckBox.Size = new System.Drawing.Size(155, 17);
 			this.sgbCheckBox.TabIndex = 6;
-			this.sgbCheckBox.Text = "Super Game Boy Funtions";
+			this.sgbCheckBox.Text = "Super Game Boy Functions";
 			this.sgbCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// cgbCheckBox
@@ -286,9 +286,9 @@ namespace CrystalBoy.Emulator
 			this.tableLayoutPanel2.SetColumnSpan(this.cgbCheckBox, 2);
 			this.cgbCheckBox.Location = new System.Drawing.Point(3, 77);
 			this.cgbCheckBox.Name = "cgbCheckBox";
-			this.cgbCheckBox.Size = new System.Drawing.Size(149, 17);
+			this.cgbCheckBox.Size = new System.Drawing.Size(151, 17);
 			this.cgbCheckBox.TabIndex = 7;
-			this.cgbCheckBox.Text = "Color game Boy Functions";
+			this.cgbCheckBox.Text = "Color Game Boy Functions";
 			this.cgbCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// okButton

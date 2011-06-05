@@ -117,11 +117,9 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
-		/// <summary>
-		/// Point d'entrée principal de l'application.
-		/// </summary>
+		/// <summary>Application entry point.</summary>
 		[STAThread]
-		static void Main()
+		private static void Main()
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);

@@ -65,6 +65,7 @@ namespace CrystalBoy.Emulation
 			ram = (byte*)Bus.ExternalRam.Pointer;
 			MapRomBank(false, 0);
 			MapRomBank(true, 1);
+			HandlesRamWrites = false;
 			UnmapRam();
 			SetPortValue(0);
 		}
@@ -87,9 +88,7 @@ namespace CrystalBoy.Emulation
 		/// </remarks>
 		public virtual int SavedRamSize { get { return RamSize; } }
 
-		/// <summary>
-		/// Gets or sets a value indicating wether the Mapper handles RAM Writes.
-		/// </summary>
+		/// <summary>Gets or sets a value indicating wether the Mapper handles RAM Writes.</summary>
 		/// <remarks>
 		/// The default Mapper implementation does not handle RAM Writes.
 		/// If you set this property to true, it is very likely that you need to override the HandleRamWrite method.

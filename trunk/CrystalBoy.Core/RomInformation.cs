@@ -26,6 +26,7 @@ namespace CrystalBoy.Core
 	{
 		string name, makerCode, makerName;
 		bool regularSupport, cgbSupport, sgbSupport, japanese;
+		bool hasRam, hasBattery, hasTimer, hasRumble;
 		int romSize, ramSize, romBankCount, ramBankCount;
 		RomType romType;
 
@@ -80,19 +81,68 @@ namespace CrystalBoy.Core
 			makerName = MakerDictionary.GetMakerName(this.makerCode);
 
 			// Read the cartidge type
-			romType = (RomType)pMemory[0x147];
+			switch (romType = (RomType)pMemory[0x147])
+			{
+				case RomType.RomMbc3TimerRamBattery:
+					hasRam = true;
+					goto case RomType.RomMbc3TimerBattery;
+				case RomType.RomMbc3TimerBattery:
+					hasTimer = true;
+					hasBattery = true;
+					break;
+				case RomType.RomMbc5RumbleRamBattery:
+					hasBattery = true;
+					goto case RomType.RomMbc5RumbleRam;
+				case RomType.RomMbc5RumbleRam:
+					hasRam = true;
+					goto case RomType.RomMbc5Rumble;
+				case RomType.RomMbc5Rumble:
+					hasRumble = true;
+					break;
+				case RomType.RomRamBattery:
+				case RomType.RomMbc1RamBattery:
+				case RomType.RomMbc2Battery:
+				case RomType.RomMbc3RamBattery:
+				case RomType.RomMbc4RamBattery:
+				case RomType.RomMbc5RamBattery:
+				case RomType.RomMbc7RamBattery:
+				case RomType.RomMmm01RamBattery:
+				case RomType.RomHuC1RamBattery:
+					hasBattery = true;
+					goto case RomType.RomRam;
+				case RomType.RomRam:
+				case RomType.RomMbc1Ram:
+				case RomType.RomMbc2: // MBC2 has internal RAM
+				case RomType.RomMbc3Ram:
+				case RomType.RomMbc4Ram:
+				case RomType.RomMbc5Ram:
+				case RomType.RomMbc6Ram:
+				case RomType.RomMmm01Ram:
+					hasRam = true;
+					break;
+			}
 
 			// Read the ROM size
 			romBankCount = GetRomBankCount(pMemory[0x148]);
 			romSize = GetRomSize(pMemory[0x148]);
-			ramBankCount = GetRamBankCount(pMemory[0x149]);
-			ramSize = GetRamSize(pMemory[0x149]);
+			// Read the RAM size
+			if (romType == RomType.RomMbc2 || romType == RomType.RomMbc2Battery)
+			{
+				// MBC2 has an internal RAM of 512 half-bytes, which doesn't count as external RAM, even though it has the same effect.
+				ramBankCount = 1;
+				ramSize = 512;
+			}
+			else
+			{
+				ramBankCount = GetRamBankCount(pMemory[0x149]);
+				ramSize = GetRamSize(pMemory[0x149]);
+			}
 
 			// Read the region flag
 			japanese = (pMemory[0x150] == 0); // Should be 0x01 for non-japanese
 		}
 
-		static int GetRomBankCount(int sizeFlag)
+		private static int GetRomBankCount(int sizeFlag)
 		{
 			if (sizeFlag <= 0x7)
 				return 2 << sizeFlag;
@@ -110,7 +160,7 @@ namespace CrystalBoy.Core
 				}
 		}
 
-		static int GetRomSize(int sizeFlag)
+		private static int GetRomSize(int sizeFlag)
 		{
 			int bankCount = GetRomBankCount(sizeFlag);
 
@@ -120,7 +170,7 @@ namespace CrystalBoy.Core
 				return -1;
 		}
 
-		static int GetRamBankCount(int sizeFlag)
+		private static int GetRamBankCount(int sizeFlag)
 		{
 			switch (sizeFlag)
 			{
@@ -139,7 +189,7 @@ namespace CrystalBoy.Core
 			}
 		}
 
-		static int GetRamSize(int sizeFlag)
+		private static int GetRamSize(int sizeFlag)
 		{
 			switch (sizeFlag)
 			{
@@ -158,100 +208,36 @@ namespace CrystalBoy.Core
 			}
 		}
 
-		public string Name
-		{
-			get
-			{
-				return name;
-			}
-		}
+		public string Name { get { return name; } }
 
-		public string MakerCode
-		{
-			get
-			{
-				return makerCode;
-			}
-		}
+		public string MakerCode { get { return makerCode; } }
 
-		public string MakerName
-		{
-			get
-			{
-				return makerName;
-			}
-		}
+		public string MakerName { get { return makerName; } }
 
-		public bool RegularGameBoySupport
-		{
-			get
-			{
-				return regularSupport;
-			}
-		}
+		public bool RegularGameBoySupport { get { return regularSupport; } }
 
-		public bool ColorGameBoySupport
-		{
-			get
-			{
-				return cgbSupport;
-			}
-		}
+		public bool ColorGameBoySupport { get { return cgbSupport; } }
 
-		public bool SuperGameBoySupport
-		{
-			get
-			{
-				return sgbSupport;
-			}
-		}
+		public bool SuperGameBoySupport { get { return sgbSupport; } }
 
-		public RomType RomType
-		{
-			get
-			{
-				return romType;
-			}
-		}
+		public RomType RomType { get { return romType; } }
 
-		public int RomSize
-		{
-			get
-			{
-				return romSize;
-			}
-		}
+		public int RomSize { get { return romSize; } }
 
-		public int RamSize
-		{
-			get
-			{
-				return ramSize;
-			}
-		}
+		public int RamSize { get { return ramSize; } }
 
-		public bool IsJapanese
-		{
-			get
-			{
-				return japanese;
-			}
-		}
+		public bool IsJapanese { get { return japanese; } }
 
-		public int RomBankCount
-		{
-			get
-			{
-				return romBankCount;
-			}
-		}
+		public int RomBankCount { get { return romBankCount; } }
 
-		public int RamBankCount
-		{
-			get
-			{
-				return ramBankCount;
-			}
-		}
+		public int RamBankCount { get { return ramBankCount; } }
+
+		public bool HasRam { get { return hasRam; } }
+
+		public bool HasBattery { get { return hasBattery; } }
+
+		public bool HasTimer { get { return hasTimer; } }
+
+		public bool HasRumble { get { return hasRumble; } }
 	}
 }

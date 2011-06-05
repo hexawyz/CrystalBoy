@@ -20,22 +20,17 @@ using System;
 
 namespace CrystalBoy.Emulation.Mappers
 {
-	/// <summary>
-	/// 
-	/// </summary>
+	/// <summary>Represents common features of MBC mappers.</summary>
+	/// <remarks>This class shall be used as a base class for MBC-derived mappers emulation.</remarks>
 	public abstract class MemoryBankController : Mapper
 	{
 		protected int romBankInternal, ramBankInternal;
 		protected bool ramEnabledInternal;
 
-		/// <summary>
-		/// Initializes a new instance of the class MemoryBankController
-		/// </summary>
-		/// <param name="bus"></param>
+		/// <summary>Initializes a new instance of the <see cref="MemoryBankController"/> class.</summary>
+		/// <param name="bus">The memory bus associated with this instance.</param>
 		public MemoryBankController(GameBoyMemoryBus bus)
-			: base(bus)
-		{
-		}
+			: base(bus) { }
 
 		public override void Reset()
 		{
@@ -49,10 +44,7 @@ namespace CrystalBoy.Emulation.Mappers
 
 		public virtual int RomBank
 		{
-			get
-			{
-				return romBankInternal;
-			}
+			get { return romBankInternal; }
 			protected set
 			{
 				romBankInternal = value;
@@ -63,10 +55,7 @@ namespace CrystalBoy.Emulation.Mappers
 
 		public virtual int RamBank
 		{
-			get
-			{
-				return ramBankInternal;
-			}
+			get { return ramBankInternal; }
 			protected set
 			{
 				ramBankInternal = value;
@@ -78,16 +67,11 @@ namespace CrystalBoy.Emulation.Mappers
 
 		public virtual bool RamEnabled
 		{
-			get
-			{
-				return ramEnabledInternal;
-			}
+			get { return ramEnabledInternal; }
 			protected set
 			{
-				if (value)
-					MapRamBank(ramBankInternal);
-				else
-					UnmapRam();
+				if (ramEnabledInternal = value) MapRamBank(ramBankInternal);
+				else UnmapRam();
 			}
 		}
 	}
