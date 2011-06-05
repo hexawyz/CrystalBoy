@@ -242,7 +242,7 @@ namespace CrystalBoy.Emulator
 						}
 
 						// Do some active wait, even though this is bad…
-						while (frameStopwatch.Elapsed.TotalMilliseconds < (1000f / 60f)) ;
+						while (frameStopwatch.Elapsed.TotalMilliseconds < (1000d / 60d)) ;
 					}
 				}
 				

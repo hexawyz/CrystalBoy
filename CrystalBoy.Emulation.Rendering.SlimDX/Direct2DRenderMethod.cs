@@ -24,6 +24,7 @@ using SlimDX;
 using SlimDX.Direct2D;
 using Format = SlimDX.DXGI.Format;
 using Size = System.Drawing.Size;
+using RectangleF = System.Drawing.RectangleF;
 using System.Runtime.InteropServices;
 
 namespace CrystalBoy.Emulation.Rendering.SlimDX
@@ -33,7 +34,8 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 	{
 		Factory factory;
 		WindowRenderTarget renderTarget;
-		Bitmap bitmap;
+		Bitmap bitmap1, bitmap2;
+		RectangleF drawRectangle;
 		byte[] buffer;
 		GCHandle bufferHandle;
 		bool bufferLocked;
@@ -43,17 +45,45 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 		{
 			buffer = new byte[160 * 144 * 4];
 			factory = new Factory(FactoryType.SingleThreaded, DebugLevel.None);
-			CreateRenderTarget();
-			CreateBitmap();
+			Reset();
+			renderObject.FindForm().SizeChanged += OnSizeChanged;
 		}
 
 		public override void Dispose()
 		{
-			DisposeBitmap();
+			DisposeBitmaps();
 			DisposeRenderTarget();
 
 			if (factory != null) factory.Dispose();
 			factory = null;
+
+			RenderObject.FindForm().SizeChanged -= OnSizeChanged;
+		}
+
+		private void Reset()
+		{
+			DisposeBitmaps();
+			DisposeRenderTarget();
+
+			CreateRenderTarget();
+			CreateBitmaps();
+		}
+
+		private void OnSizeChanged(object sender, EventArgs e)
+		{
+			if (renderTarget != null) renderTarget.Resize(RenderObject.ClientSize);
+			RecalculateDrawRectangle();
+		}
+
+		private void RecalculateDrawRectangle()
+		{
+			int w = RenderObject.ClientSize.Width;
+			int h = RenderObject.ClientSize.Height;
+			float s;
+
+			if ((s = (float)h * 160 / 144) <= w) drawRectangle = new RectangleF(0.5f * (w - s), 0, s, h);
+			else if ((s = (float)w * 144 / 160) <= h) drawRectangle = new RectangleF(0, 0.5f * (h - s), w, s);
+			else drawRectangle = new RectangleF(0, 0, w, h);
 		}
 
 		private void CreateRenderTarget()
@@ -61,9 +91,10 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 			renderTarget = new WindowRenderTarget
 			(
 				factory,
-				new RenderTargetProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore), Type = RenderTargetType.Hardware },
-				new WindowRenderTargetProperties() { Handle = RenderObject.Handle, PixelSize = new Size(160, 144), PresentOptions = PresentOptions.Immediately }
+				new RenderTargetProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore), Type = RenderTargetType.Default, MinimumFeatureLevel = FeatureLevel.Direct3D9 },
+				new WindowRenderTargetProperties() { Handle = RenderObject.Handle, PixelSize = RenderObject.ClientSize, PresentOptions = PresentOptions.Immediately }
 			);
+			RecalculateDrawRectangle();
 		}
 
 		private void DisposeRenderTarget()
@@ -72,15 +103,20 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 			renderTarget = null;
 		}
 
-		private void CreateBitmap()
+		private void CreateBitmaps()
 		{
-			bitmap = new Bitmap(renderTarget, new Size(160, 144), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore) });
+			bitmap1 = new Bitmap(renderTarget, new Size(160, 144), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore) });
+			bitmap1.FromMemory(buffer, 160 * 4);
+			bitmap2 = new Bitmap(renderTarget, new Size(160, 144), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore) });
+			bitmap2.FromBitmap(bitmap1);
 		}
 
-		private void DisposeBitmap()
+		private void DisposeBitmaps()
 		{
-			if (bitmap != null) bitmap.Dispose();
-			bitmap = null;
+			if (bitmap1 != null) bitmap1.Dispose();
+			bitmap1 = null;
+			if (bitmap2 != null) bitmap2.Dispose();
+			bitmap2 = null;
 		}
 
 		public unsafe override void* LockBuffer(out int stride)
@@ -103,16 +139,34 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 			bufferHandle.Free();
 			bufferLocked = false;
 
-			bitmap.FromMemory(buffer, 160 * 4);
+			SwapBitmaps();
+
+			bitmap1.FromMemory(buffer, 160 * 4);
 		}
 
-		public override void Render()
+		private void SwapBitmaps()
+		{
+			var temp = bitmap1;
+			bitmap1 = bitmap2;
+			bitmap2 = temp;
+		}
+
+		public override void Render() { Render(true); }
+
+		private void Render(bool retry)
 		{
 			renderTarget.BeginDraw();
 
-			renderTarget.DrawBitmap(bitmap);
+			renderTarget.DrawBitmap(bitmap2, drawRectangle, 1.0f, Interpolation ? InterpolationMode.Linear : InterpolationMode.NearestNeighbor);
+			renderTarget.DrawBitmap(bitmap1, drawRectangle, 0.5f, Interpolation ? InterpolationMode.Linear : InterpolationMode.NearestNeighbor);
 
-			renderTarget.EndDraw();
+			// If needed, try to recreate the target.
+			if (renderTarget.EndDraw().IsFailure)
+			{
+				Reset();
+				// Try to render again, but only once. (We don't want to enter an infinite recursion… AKA Stack Overflow)
+				if (retry) Render(false);
+			}
 		}
 	}
 }

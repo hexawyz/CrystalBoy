@@ -31,10 +31,51 @@ namespace CrystalBoy.Emulator
 		[STAThread]
 		static void Main()
 		{
-			RuntimeHelpers.RunClassConstructor(typeof(LookupTables).TypeHandle);
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
+#if PLUGIN_EXCEPTION_CATCHER
+			// Catches plugin loading exception and display an error message
+			// Plugins are loaded in the static initializer of MainForm, meaning that this will cause an un-repairable crash if any plugin fails to load...
+			try
+			{
+#endif
+				RuntimeHelpers.RunClassConstructor(typeof(LookupTables).TypeHandle);
+				Application.EnableVisualStyles();
+				Application.SetCompatibleTextRenderingDefault(false);
+				Application.Run(new MainForm());
+#if PLUGIN_EXCEPTION_CATCHER
+			}
+			catch (TypeInitializationException ex)
+			{
+				var sb = new System.Text.StringBuilder();
+
+				sb.AppendFormat("{0}:", ex.GetType().Name);
+				sb.AppendLine();
+				sb.AppendLine();
+				sb.AppendLine("* Message:");
+				sb.AppendLine(ex.Message);
+				sb.AppendLine();
+				sb.AppendLine("* StackTrace:");
+				sb.AppendLine(ex.StackTrace);
+				sb.AppendLine();
+				if (ex.InnerException != null)
+				{
+					sb.AppendFormat("InnerException {0}:", ex.InnerException.GetType().Name);
+					sb.AppendLine();
+					sb.AppendLine();
+					sb.AppendLine("* Message:");
+					sb.AppendLine(ex.InnerException.Message);
+					sb.AppendLine();
+					sb.AppendLine("* StackTrace:");
+					sb.AppendLine(ex.InnerException.StackTrace);
+					sb.AppendLine();
+				}
+
+				if (MessageBox.Show(sb.ToString() + "It would help making the emualtor better if you paste this error message as an issue at http://code.google.com/p/crystalboy." + Environment.NewLine + "Copy this messageto the clipboard ?", "Exception", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+				{
+					Clipboard.Clear();
+					Clipboard.SetData(DataFormats.UnicodeText, sb.ToString());
+				}
+			}
+#endif
 		}
 	}
 }
