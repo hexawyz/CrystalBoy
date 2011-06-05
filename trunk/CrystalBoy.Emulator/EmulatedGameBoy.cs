@@ -90,22 +90,15 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				long delta;
-
 				if (emulationStatus == EmulationStatus.Running)
 				{
-					if (tickIndex == 0)
-						delta = tickCounts[tickCounts.Length - 1] - tickCounts[0];
-					else
-						delta = tickCounts[tickIndex - 1] - tickCounts[tickIndex];
+					long delta = tickIndex == 0 ?
+						 tickCounts[tickCounts.Length - 1] - tickCounts[0] :
+						 tickCounts[tickIndex - 1] - tickCounts[tickIndex];
 
-					if (delta > 0)
-						return (double)(1000 * tickCounts.Length) / delta;
-					else
-						return 0;
+					return delta > 0 ? (double)(1000 * tickCounts.Length) / delta : 0;
 				}
-				else
-					return 0;
+				else return 0;
 			}
 		}
 
@@ -113,22 +106,15 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				long delta;
-
 				if (emulationStatus == EmulationStatus.Running)
 				{
-					if (tickIndex == 0)
-						delta = tickCounts[tickCounts.Length - 1] - tickCounts[0];
-					else
-						delta = tickCounts[tickIndex - 1] - tickCounts[tickIndex];
+					long delta = tickIndex == 0 ?
+						tickCounts[tickCounts.Length - 1] - tickCounts[0] :
+						tickCounts[tickIndex - 1] - tickCounts[tickIndex];
 
-					if (delta > 0)
-						return (int)(1000 * tickCounts.Length / delta);
-					else
-						return 0;
+					return delta > 0 ? (int)(1000 * tickCounts.Length / delta) : 0;
 				}
-				else
-					return 0;
+				else return 0;
 			}
 		}
 
@@ -202,13 +188,8 @@ namespace CrystalBoy.Emulator
 		private void RunFrameInternal()
 		{
 			bus.PressedKeys = ReadKeys();
-			if (Processor.Emulate(true))
-				OnNewFrame(EventArgs.Empty);
-			else
-				Pause(true);
-			tickCounts[tickIndex++] = frameRateStopwatch.ElapsedMilliseconds;
-			if (tickIndex >= tickCounts.Length)
-				tickIndex = 0;
+			if (Processor.Emulate(true)) OnNewFrame(EventArgs.Empty);
+			else Pause(true);
 		}
 
 		private bool IsKeyDown(Keys vKey) { return (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0; }
@@ -253,14 +234,20 @@ namespace CrystalBoy.Emulator
 
 					if (timer < 17) // Exact timing for one frame at 60fps is 16⅔ ms
 					{
-						// Conversion from long to int is safe since the value is less than 17.
-						// Sleep is a really bad tool for precise timing, but it will play its role when needed.
-						System.Threading.Thread.Sleep(16 - (int)timer);
+						if (timer < 16)
+						{
+							// Conversion from long to int is safe since the value is less than 17.
+							// Sleep is a really bad tool for precise timing, but it will play its role when needed.
+							System.Threading.Thread.Sleep(16 - (int)timer);
+						}
 
 						// Do some active wait, even though this is bad…
-						while (frameStopwatch.Elapsed.TotalMilliseconds < (1000 / 60)) ;
+						while (frameStopwatch.Elapsed.TotalMilliseconds < (1000f / 60f)) ;
 					}
 				}
+				
+				tickCounts[tickIndex++] = frameRateStopwatch.ElapsedMilliseconds;
+				if (tickIndex >= tickCounts.Length) tickIndex = 0;
 
 				frameStopwatch.Reset();
 				frameStopwatch.Start();
