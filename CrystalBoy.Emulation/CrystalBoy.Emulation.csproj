@@ -83,6 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PortAccess.cs" />
     <Compile Include="RenderMethod.cs" />
+    <Compile Include="RumbleEventArgs.cs" />
     <Compile Include="VideoStatusSnapshot.cs" />
   </ItemGroup>
   <ItemGroup>

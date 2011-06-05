@@ -18,29 +18,14 @@
 
 using System;
 
-namespace CrystalBoy.Emulation.Mappers
+namespace CrystalBoy.Emulation
 {
-	sealed class RomController : Mapper
+	public sealed class RumbleEventArgs : EventArgs
 	{
-		public RomController(GameBoyMemoryBus bus)
-			: base(bus)
-		{
-		}
+		private bool enabled;
 
-		public override unsafe void Reset()
-		{
-			base.Reset();
+		public RumbleEventArgs(bool enabled) { this.enabled = true; }
 
-			if (Bus.RomInformation.HasRam)
-				MapRamBank(0);
-		}
-
-		public override void HandleRomWrite(byte offsetLow, byte offsetHigh, byte value)
-		{
-		}
-
-		public override void HandleRamWrite(byte offsetLow, byte offsetHigh, byte value)
-		{
-		}
+		public bool Enabeld { get { return enabled; } }
 	}
 }

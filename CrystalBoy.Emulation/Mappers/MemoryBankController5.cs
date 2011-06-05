@@ -20,12 +20,32 @@ using System;
 
 namespace CrystalBoy.Emulation.Mappers
 {
-	sealed class MemoryBankController5 : MemoryBankController
+	public sealed class MemoryBankController5 : MemoryBankController
 	{
+		bool rumble;
+
 		public MemoryBankController5(GameBoyMemoryBus bus)
-			: base(bus)
+			: base(bus) { }
+
+		public override void Reset()
 		{
+			rumble = false;
+			base.Reset();
 		}
+
+		public bool Rumble
+		{
+			get { return rumble; }
+			private set
+			{
+				rumble = value;
+
+				if (RumbleChanged != null)
+					RumbleChanged(this, new RumbleEventArgs(value));
+			}
+		}
+
+		public event EventHandler RumbleChanged;
 
 		public override void HandleRomWrite(byte offsetLow, byte offsetHigh, byte value)
 		{
@@ -43,14 +63,17 @@ namespace CrystalBoy.Emulation.Mappers
 			else if (offsetHigh < 0x40)
 			{
 				// Update bit 8 of rom bank
-				if ((value & 0x01) != 0)
-					RomBank = (byte)(0x100 | RomBank & 0xFF);
-				else
-					RomBank &= 0xFF;
+				if ((value & 0x01) != 0) RomBank = (byte)(0x100 | RomBank & 0xFF);
+				else RomBank &= 0xFF;
 			}
 			else if (offsetHigh < 0x60)
 			{
-				RamBank = (byte)(value & 0xF);
+				if (Bus.RomInformation.HasRumble)
+				{
+					RamBank = (byte)(value & 0x7);
+					Rumble = (value & 0x8) != 0;
+				}
+				else RamBank = (byte)(value & 0xF);
 			}
 			else /* if (offsetHigh < 0x80) */
 			{

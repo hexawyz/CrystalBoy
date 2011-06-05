@@ -20,7 +20,7 @@ using System;
 
 namespace CrystalBoy.Emulation.Mappers
 {
-	sealed class MemoryBankController1 : MemoryBankController
+	internal sealed class MemoryBankController1 : MemoryBankController
 	{
 		byte extraBits;
 		bool bankedRamMode;
@@ -30,6 +30,13 @@ namespace CrystalBoy.Emulation.Mappers
 		{
 			/* this.extraBits = 0; */
 			/* this.bankedRamMode = false; */
+		}
+
+		public override void Reset()
+		{
+			this.extraBits = 0;
+			this.bankedRamMode = false;
+			base.Reset();
 		}
 
 		public override void HandleRomWrite(byte offsetLow, byte offsetHigh, byte value)
@@ -49,8 +56,12 @@ namespace CrystalBoy.Emulation.Mappers
 				if (value == 0)
 					value = 1;
 
+				// Use the extra bits for ROM bank number if not in RAM banking mode
+				if (!bankedRamMode)
+					value |= (byte)(extraBits << 5);
+
 				// Update the 5 lower bits of rom bank
-				RomBank = (byte)(RomBank & 0x60 | value);
+				RomBank = value;
 			}
 			else if (offsetHigh < 0x60)
 			{
