@@ -31,10 +31,6 @@ namespace CrystalBoy.Emulator
 {
 	partial class MainForm : Form
 	{
-		private static Assembly[] pluginAssemblies = LoadPluginAssemblies();
-		private static Type[] availableRenderMethods = DetectRenderMethods();
-		private static Dictionary<Type, string> renderMethodDitionary = BuildRenderMethodDictionary();
-
 		private DebuggerForm debuggerForm;
 		private TileViewerForm tileViewerForm;
 		private MapViewerForm mapViewerForm;
@@ -45,59 +41,6 @@ namespace CrystalBoy.Emulator
 		private bool pausedForResizing;
 
 		#region Constructor and Initialization
-
-		#region Plugin Management
-
-		private static Assembly[] LoadPluginAssemblies()
-		{
-			List<Assembly> assemblyList = new List<Assembly>();
-
-			foreach (string pluginAssembly in Settings.Default.PluginAssemblies)
-			{
-				try { assemblyList.Add(Assembly.LoadFrom(pluginAssembly)); }
-				catch (FileNotFoundException) { }
-				catch (BadImageFormatException) { }
-			}
-
-			return assemblyList.ToArray();
-		}
-
-		private static Type[] DetectRenderMethods()
-		{
-			List<Type> typeList = new List<Type>();
-			Type[] defaultTypeArray = new Type[] { typeof(Control) };
-
-			// Check for embedded render methods
-			// This will be useful for providing an al-in-one assembly using ILMerge
-			foreach (Type type in typeof(MainForm).Assembly.GetTypes())
-				if (typeof(RenderMethod<Control>).IsAssignableFrom(type) && type.GetConstructor(defaultTypeArray) != null)
-					typeList.Add(type);
-
-			// Check for external render methods
-			foreach (Assembly pluginAssembly in pluginAssemblies)
-				foreach (Type type in pluginAssembly.GetExportedTypes())
-					if (typeof(RenderMethod<Control>).IsAssignableFrom(type) && type.GetConstructor(defaultTypeArray) != null)
-						typeList.Add(type);
-
-			return typeList.ToArray();
-		}
-
-		private static Dictionary<Type, string> BuildRenderMethodDictionary()
-		{
-			Dictionary<Type, string> renderMethodDictionary = new Dictionary<Type,string>();
-
-			foreach (Type renderMethodType in availableRenderMethods)
-			{
-				DisplayNameAttribute[] displayNameAttributes = (DisplayNameAttribute[])renderMethodType.GetCustomAttributes(typeof(DisplayNameAttribute), false);
-				string name = string.Intern(displayNameAttributes.Length > 0 ? displayNameAttributes[0].DisplayName : renderMethodType.Name);
-
-				renderMethodDictionary.Add(renderMethodType, name);
-			}
-
-			return renderMethodDictionary;
-		}
-
-		#endregion
 
 		public MainForm()
 		{
@@ -119,14 +62,14 @@ namespace CrystalBoy.Emulator
 		{
 			renderMethodMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
 
-			foreach (Type renderMethodType in availableRenderMethods)
+			foreach (var renderMethod in Program.RenderMethodDictionary)
 			{
-				ToolStripMenuItem renderMethodMenuItem = new ToolStripMenuItem(renderMethodDitionary[renderMethodType]);
+				ToolStripMenuItem renderMethodMenuItem = new ToolStripMenuItem(renderMethod.Value);
 
 				renderMethodMenuItem.Click += new EventHandler(renderMethodMenuItem_Click);
-				renderMethodMenuItem.Tag = renderMethodType;
+				renderMethodMenuItem.Tag = renderMethod.Key;
 
-				renderMethodMenuItemDictionary.Add(renderMethodType, renderMethodMenuItem);
+				renderMethodMenuItemDictionary.Add(renderMethod.Key, renderMethodMenuItem);
 
 				renderMethodToolStripMenuItem.DropDownItems.Add(renderMethodMenuItem);
 			}
@@ -190,19 +133,21 @@ namespace CrystalBoy.Emulator
 				SwitchRenderMethod(renderMethodType);
 			else // If simple reflexion failed, try using Name and FullName matches (there may be multiple matches in that case but it is better to avoid writing the full AssemblyQualifiedName in initial configurtaion files)
 			{
-				for (int i = 0; i < availableRenderMethods.Length; i++)
-				{
-					renderMethodType = availableRenderMethods[i];
+				Type firstRenderMethod = null;
 
-					if (renderMethodType.Name == renderMethodName || renderMethodType.FullName == renderMethodName)
+				foreach (var renderMethod in Program.RenderMethodDictionary)
+				{
+					if (firstRenderMethod == null) firstRenderMethod = renderMethod.Key;
+
+					if (renderMethod.Key.Name == renderMethodName || renderMethod.Key.FullName == renderMethodName)
 					{
-						SwitchRenderMethod(renderMethodType);
+						SwitchRenderMethod(renderMethod.Key);
 						return;
 					}
 				}
 
 				// If nothing was found, try using the first render method found, or throw an exception if nothing can be done
-				if (availableRenderMethods.Length > 0) SwitchRenderMethod(availableRenderMethods[0]);
+				if (firstRenderMethod != null) SwitchRenderMethod(firstRenderMethod);
 				else throw new InvalidOperationException();
 			}
 		}

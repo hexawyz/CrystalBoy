@@ -17,65 +17,125 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Reflection;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using CrystalBoy.Emulation;
+using CrystalBoy.Emulator.Properties;
 
 namespace CrystalBoy.Emulator
 {
-	static class Program
+	internal static class Program
 	{
+		private static readonly List<Assembly> pluginAssemblyList = new List<Assembly>();
+		private static readonly Dictionary<Type, string> renderMethodDictionary = new Dictionary<Type, string>();
+
+		public static readonly ReadOnlyCollection<Assembly> pluginAssemblyCollection = new ReadOnlyCollection<Assembly>(pluginAssemblyList);
+		public static readonly Dictionary<Type, string> RenderMethodDictionary = renderMethodDictionary; // Need to implement a read only dictionary later
+
+		#region Plugin Management
+
+		private static void LoadPluginAssemblies()
+		{
+			var pluginAssemblies = new System.Collections.Specialized.StringCollection();
+			bool updateNeeded = false;
+
+			foreach (string pluginAssembly in Settings.Default.PluginAssemblies)
+			{
+				try
+				{
+					var assembly = Assembly.LoadFrom(pluginAssembly);
+
+					FindPlugins(assembly);
+					pluginAssemblyList.Add(assembly);
+
+					pluginAssemblies.Add(pluginAssembly);
+				}
+				catch (FileNotFoundException)
+				{
+					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyNotFoundErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					updateNeeded = true;
+				}
+				catch (BadImageFormatException)
+				{
+					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyArchitectureErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					updateNeeded = true;
+				}
+				catch (Exception ex)
+				{
+					Console.Error.WriteLine(ex);
+					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyLoadErrorMessage, pluginAssembly, ex), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+					updateNeeded = true;
+				}
+			}
+
+			if (updateNeeded)
+			{
+				Settings.Default.PluginAssemblies = pluginAssemblies;
+				Settings.Default.Save();
+			}
+		}
+		
+		private static void FindPlugins(Assembly assembly)
+		{
+			Type[] defaultTypeArray = new Type[] { typeof(Control) };
+
+			try
+			{
+				foreach (Type type in assembly.GetTypes())
+				{
+					try
+					{
+						if (typeof(RenderMethod<Control>).IsAssignableFrom(type) && type.GetConstructor(defaultTypeArray) != null)
+							AddRenderMethod(type);
+					}
+					catch (TypeLoadException ex)
+					{
+						MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+						Console.Error.WriteLine(ex);
+					}
+				}
+			}
+			catch (ReflectionTypeLoadException ex)
+			{
+				MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				Console.Error.WriteLine(ex);
+			}
+		}
+
+		private static void AddRenderMethod(Type renderMethodType)
+		{
+			DisplayNameAttribute[] displayNameAttributes = (DisplayNameAttribute[])renderMethodType.GetCustomAttributes(typeof(DisplayNameAttribute), false);
+			string name = string.Intern(displayNameAttributes.Length > 0 ? displayNameAttributes[0].DisplayName : renderMethodType.Name);
+
+			renderMethodDictionary.Add(renderMethodType, name);
+		}
+
+		#endregion
+
 		/// <summary>
 		/// Point d'entrée principal de l'application.
 		/// </summary>
 		[STAThread]
 		static void Main()
 		{
-#if PLUGIN_EXCEPTION_CATCHER
-			// Catches plugin loading exception and display an error message
-			// Plugins are loaded in the static initializer of MainForm, meaning that this will cause an un-repairable crash if any plugin fails to load...
-			try
-			{
-#endif
-				RuntimeHelpers.RunClassConstructor(typeof(LookupTables).TypeHandle);
-				Application.EnableVisualStyles();
-				Application.SetCompatibleTextRenderingDefault(false);
-				Application.Run(new MainForm());
-#if PLUGIN_EXCEPTION_CATCHER
-			}
-			catch (TypeInitializationException ex)
-			{
-				var sb = new System.Text.StringBuilder();
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
 
-				sb.AppendFormat("{0}:", ex.GetType().Name);
-				sb.AppendLine();
-				sb.AppendLine();
-				sb.AppendLine("* Message:");
-				sb.AppendLine(ex.Message);
-				sb.AppendLine();
-				sb.AppendLine("* StackTrace:");
-				sb.AppendLine(ex.StackTrace);
-				sb.AppendLine();
-				if (ex.InnerException != null)
-				{
-					sb.AppendFormat("InnerException {0}:", ex.InnerException.GetType().Name);
-					sb.AppendLine();
-					sb.AppendLine();
-					sb.AppendLine("* Message:");
-					sb.AppendLine(ex.InnerException.Message);
-					sb.AppendLine();
-					sb.AppendLine("* StackTrace:");
-					sb.AppendLine(ex.InnerException.StackTrace);
-					sb.AppendLine();
-				}
+			RuntimeHelpers.RunClassConstructor(typeof(LookupTables).TypeHandle);
 
-				if (MessageBox.Show(sb.ToString() + "It would help making the emualtor better if you paste this error message as an issue at http://code.google.com/p/crystalboy." + Environment.NewLine + "Copy this messageto the clipboard ?", "Exception", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
-				{
-					Clipboard.Clear();
-					Clipboard.SetData(DataFormats.UnicodeText, sb.ToString());
-				}
-			}
-#endif
+			// Check for embedded plugins
+			// This will be useful for providing an all-in-one assembly using ILMerge
+			FindPlugins(typeof(Program).Assembly);
+
+			// Load plugin assembles and check for external plugins
+			LoadPluginAssemblies();
+
+			Application.Run(new MainForm());
 		}
 	}
 }

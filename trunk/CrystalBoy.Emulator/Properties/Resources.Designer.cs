@@ -61,11 +61,62 @@ namespace CrystalBoy.Emulator.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The plugin assembly &quot;{0}&quot; is not valid for your system.
+        ///It will be removed from the plugin assembly list..
+        /// </summary>
+        internal static string AssemblyArchitectureErrorMessage {
+            get {
+                return ResourceManager.GetString("AssemblyArchitectureErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The plugin assembly &quot;{0}&quot; could not be loaded.
+        ///It will be removed from the plugin assembly list.
+        ///
+        ///Details:
+        ///{1}.
+        /// </summary>
+        internal static string AssemblyLoadErrorMessage {
+            get {
+                return ResourceManager.GetString("AssemblyLoadErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Plugin assembly loading error.
+        /// </summary>
+        internal static string AssemblyLoadErrorTitle {
+            get {
+                return ResourceManager.GetString("AssemblyLoadErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The plugin assembly &quot;{0}&quot; could not be found.
+        ///It will be removed from the plugin assembly list..
+        /// </summary>
+        internal static string AssemblyNotFoundErrorMessage {
+            get {
+                return ResourceManager.GetString("AssemblyNotFoundErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à {0} Bytes.
         /// </summary>
         internal static string ByteFormat {
             get {
                 return ResourceManager.GetString("ByteFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Error.
+        /// </summary>
+        internal static string ErrorTitle {
+            get {
+                return ResourceManager.GetString("ErrorTitle", resourceCulture);
             }
         }
         
@@ -97,11 +148,29 @@ namespace CrystalBoy.Emulator.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à No usable render method found..
+        /// </summary>
+        internal static string NoRenderMethodErrorMesage {
+            get {
+                return ResourceManager.GetString("NoRenderMethodErrorMesage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à {0} Byte.
         /// </summary>
         internal static string OneByteFormat {
             get {
                 return ResourceManager.GetString("OneByteFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Plugin loading error.
+        /// </summary>
+        internal static string TypeLoadingErrorTitle {
+            get {
+                return ResourceManager.GetString("TypeLoadingErrorTitle", resourceCulture);
             }
         }
     }
