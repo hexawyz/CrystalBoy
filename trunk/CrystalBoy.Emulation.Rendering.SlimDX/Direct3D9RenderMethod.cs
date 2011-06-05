@@ -51,7 +51,7 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 			CreateVertexBuffer();
 			ResetRenderStates();
 			ResetTextureFilter();
-			renderObject.SizeChanged += (sender, e) => ResetDevice();
+			renderObject.SizeChanged += OnSizeChanged;
 			temporaryBuffer = new byte[4 * 160 * 144];
 		}
 
@@ -59,6 +59,7 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 		{
 			DisposeResources();
 			DisposeDevice();
+			RenderObject.SizeChanged -= OnSizeChanged;
 		}
 
 		private void DisposeResources()
@@ -79,11 +80,13 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 			presentParameters.DeviceWindowHandle = RenderObject.Handle;
 		}
 
+		private void OnSizeChanged(object sender, EventArgs e) { ResetDevice(); }
+
 		#region Device
 
 		private void CreateDevice()
 		{
-			device = new Device(direct3D, 0, DeviceType.Hardware, RenderObject.Handle, CreateFlags.HardwareVertexProcessing, presentParameters);
+			device = new Device(direct3D, 0, DeviceType.Hardware, RenderObject.Handle, CreateFlags.HardwareVertexProcessing | CreateFlags.FpuPreserve, presentParameters);
 		}
 
 		private bool ResetDevice()

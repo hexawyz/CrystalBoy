@@ -205,6 +205,7 @@ namespace CrystalBoy.Emulation
 			public int Right;
 			public int PixelData;
 			public int Palette;
+			public bool Priority;
 		}
 
 		ObjectData[] objectData = new ObjectData[10];
@@ -236,7 +237,8 @@ namespace CrystalBoy.Emulation
 			uint* bufferPixel;
 			int scx, scy, wx, wy;
 			int pi, ppi, data1, data2;
-			bool bgPriority, winDraw, winDraw2, objDraw, objDrawn, signedIndex;
+			bool bgPriority, winDraw, winDraw2, objDraw, signedIndex;
+			byte objDrawn, objPriority; 
 			uint** bgPalettes, objPalettes;
 			uint* tilePalette;
 			byte* bgMap, winMap,
@@ -271,6 +273,15 @@ namespace CrystalBoy.Emulation
 				scy = videoStatusSnapshot.SCY;
 				wx = videoStatusSnapshot.WX - 7;
 				wy = videoStatusSnapshot.WY;
+
+				// Initialize objPriority to 1 as it's the default value, but it's only to please the C# compiler.
+				// This is an internal status flag used for CGB rendering which is more complex than DMG.
+				// This flag is the combination of the VRAM Bank Tile Attribute Bit 7 (BG Priority) and the master priority flag in LCDC Bit 0
+				// Values for objPriority flag: (Internal status flag)
+				//  0: BG priority (BG drawn over the sprite)
+				//  1: OBJ priority controlled by OAM flag (Sprite appears over BG, or only if BG color index is 0)
+				//  2: OBJ priority (Sprite draw over BG & WIN)
+				objPriority = 1;
 
 				pi = 0; // Port access list index
 				ppi = 0; // Palette access list index
@@ -333,6 +344,7 @@ namespace CrystalBoy.Emulation
 							objectData[objCount].Right = data2;
 							data2 = bgTile[3]; // Fourth byte contain flags that we'll examine
 							objectData[objCount].Palette = data2 & 0x7; // Use the palette index stored in flags
+							objectData[objCount].Priority = (data2 & 0x80) == 0; // Store the priority information
 							// Now we check the Y flip flag, as we'll use it to calculate the tile line offset
 							if ((data2 & 0x40) != 0)
 								data1 = (objHeight + data1 - i - 1) << 1;
@@ -382,7 +394,7 @@ namespace CrystalBoy.Emulation
 					// Do the actual drawing
 					for (j = 0; j < 160; j++) // Loop on line pixels
 					{
-						objDrawn = false; // Draw no object by default
+						objDrawn = 0; // Draw no object by default
 
 						if (objDraw && objCount > 0)
 						{
@@ -391,7 +403,7 @@ namespace CrystalBoy.Emulation
 								if (objectData[data2].Left <= j && objectData[data2].Right > j)
 								{
 									objColor = (uint)(objectData[data2].PixelData >> ((j - objectData[data2].Left) << 1)) & 3;
-									if (objDrawn = objColor != 0)
+									if ((objDrawn = (byte)(objColor != 0 ? objectData[data2].Priority ? 2 : 1 : 0)) != 0)
 									{
 										objColor = objPalettes[objectData[data2].Palette][objColor];
 										break;
@@ -405,36 +417,21 @@ namespace CrystalBoy.Emulation
 							{
 								data2 = *(winTile + 0x2000);
 								tilePalette = bgPalettes[data2 & 0x7];
-								if ((data2 & 0x40) != 0)
-									data1 = 7 - winLineOffset;
-								else
-									data1 = winLineOffset;
-								if (signedIndex)
-									data1 += (sbyte)*winTile++ << 3;
-								else
-									data1 += *winTile++ << 3;
-								if ((data2 & 0x8) != 0)
-									data1 += 0x1000;
-								if ((data2 & 0x20) != 0)
-									data1 = flippedPaletteIndexTable[bgTiles[data1]];
-								else
-									data1 = paletteIndexTable[bgTiles[data1]];
+								data1 = ((data2 & 0x40) != 0 ? 7 - winLineOffset : winLineOffset) + (signedIndex ? (sbyte)*winTile++ << 3 : *winTile++ << 3);
+								if ((data2 & 0x8) != 0) data1 += 0x1000;
+								data1 = (data2 & 0x20) != 0 ? flippedPaletteIndexTable[bgTiles[data1]] : paletteIndexTable[bgTiles[data1]];
 
-								objDrawn = objDrawn && ((data2 & 0x80) == 0);
+								objPriority = bgPriority ? (data2 & 0x80) != 0 ? (byte)0 : (byte)1 : (byte)2;
 
 								if (j == 0 && wx < 0)
 								{
 									pixelIndex = -wx;
 									data1 >>= pixelIndex << 1;
 								}
-								else
-									pixelIndex = 0;
+								else pixelIndex = 0;
 							}
 
-							if (objDrawn)
-								*bufferPixel++ = objColor;
-							else
-								*bufferPixel++ = tilePalette[data1 & 0x3];
+							*bufferPixel++ = objDrawn != 0 && objPriority != 0 && (objPriority == 2 || objDrawn == 2 || (data1 & 0x3) == 0) ? objColor : tilePalette[data1 & 0x3];
 
 							data1 >>= 2;
 							pixelIndex++;
@@ -451,33 +448,17 @@ namespace CrystalBoy.Emulation
 
 								data2 = *(bgTile + 0x2000);
 								tilePalette = bgPalettes[data2 & 0x7];
-								if ((data2 & 0x40) != 0)
-									data1 = 7 - bgLineOffset;
-								else
-									data1 = bgLineOffset;
-								if (signedIndex)
-									data1 += (sbyte)*bgTile++ << 3;
-								else
-									data1 += *bgTile++ << 3;
-								if ((data2 & 0x8) != 0)
-									data1 += 0x1000;
-								if ((data2 & 0x20) != 0)
-									data1 = flippedPaletteIndexTable[bgTiles[data1]];
-								else
-									data1 = paletteIndexTable[bgTiles[data1]];
+								data1 = ((data2 & 0x40) != 0 ? 7 - bgLineOffset : bgLineOffset) + (signedIndex ? (sbyte)*bgTile++ << 3 : *bgTile++ << 3);
+								if ((data2 & 0x8) != 0) data1 += 0x1000;
+								data1 = (data2 & 0x20) != 0 ? flippedPaletteIndexTable[bgTiles[data1]] : paletteIndexTable[bgTiles[data1]];
 
-								objDrawn = objDrawn && ((data2 & 0x80) == 0);
+								objPriority = bgPriority ? (data2 & 0x80) != 0 ? (byte)0 : (byte)1 : (byte)2;
 
-								if (j == 0 && pixelIndex > 0)
-									data1 >>= pixelIndex << 1;
-								else
-									pixelIndex = 0;
+								if (j == 0 && pixelIndex > 0) data1 >>= pixelIndex << 1;
+								else pixelIndex = 0;
 							}
 
-							if (objDrawn)
-								*bufferPixel++ = objColor;
-							else
-								*bufferPixel++ = tilePalette[data1 & 0x3];
+							*bufferPixel++ = objDrawn != 0 && objPriority != 0 && (objPriority == 2 || objDrawn == 2 || (data1 & 0x3) == 0) ? objColor : tilePalette[data1 & 0x3];
 							data1 >>= 2;
 							pixelIndex++;
 						}
@@ -517,7 +498,8 @@ namespace CrystalBoy.Emulation
 			uint* bufferPixel;
 			int scx, scy, wx, wy;
 			int pi, data1, data2;
-			bool bgDraw, winDraw, winDraw2, objDraw, objDrawn, signedIndex;
+			bool bgDraw, winDraw, winDraw2, objDraw, signedIndex;
+			byte objDrawn;
 			uint** bgPalettes, objPalettes;
 			uint* tilePalette;
 			byte* bgMap, winMap,
@@ -646,6 +628,7 @@ namespace CrystalBoy.Emulation
 							objectData[objCount].Right = data2;
 							data2 = bgTile[3]; // Fourth byte contain flags that we'll examine
 							objectData[objCount].Palette = (data2 & 0x10) != 0 ? 1 : 0; // Set the palette index according to the flags
+							objectData[objCount].Priority = (data2 & 0x80) == 0; // Store the priority information
 							// Now we check the Y flip flag, as we'll use it to calculate the tile line offset
 							if ((data2 & 0x40) != 0)
 								data1 = (objHeight + data1 - i - 1) << 1;
@@ -692,7 +675,7 @@ namespace CrystalBoy.Emulation
 					// Do the actual drawing
 					for (j = 0; j < 160; j++) // Loop on line pixels
 					{
-						objDrawn = false; // Draw no object by default
+						objDrawn = 0; // Draw no object by default
 
 						if (objDraw && objCount > 0)
 						{
@@ -701,7 +684,7 @@ namespace CrystalBoy.Emulation
 								if (objectData[data2].Left <= j && objectData[data2].Right > j)
 								{
 									objColor = (uint)(objectData[data2].PixelData >> ((j - objectData[data2].Left) << 1)) & 3;
-									if (objDrawn = objColor != 0)
+									if ((objDrawn = (byte)(objColor != 0 ? objectData[data2].Priority ? 2 : 1 : 0)) != 0)
 									{
 										objColor = objPalettes[objectData[data2].Palette][objColor];
 										break;
@@ -713,10 +696,7 @@ namespace CrystalBoy.Emulation
 						{
 							if (pixelIndex >= 8 || j == 0 || j == wx)
 							{
-								if (signedIndex)
-									data1 = winLineOffset + ((sbyte)*winTile++ << 3);
-								else
-									data1 = winLineOffset + (*winTile++ << 3);
+								data1 = winLineOffset + (signedIndex ? (sbyte)*winTile++ << 3 : *winTile++ << 3);
 
 								data1 = paletteIndexTable[bgTiles[data1]];
 
@@ -725,14 +705,10 @@ namespace CrystalBoy.Emulation
 									pixelIndex = -wx;
 									data1 >>= pixelIndex << 1;
 								}
-								else
-									pixelIndex = 0;
+								else pixelIndex = 0;
 							}
 
-							if (objDrawn)
-								*bufferPixel++ = objColor;
-							else
-								*bufferPixel++ = tilePalette[data1 & 0x3];
+							*bufferPixel++ = objDrawn != 0 && (objDrawn == 2 || (data1 & 0x3) == 0) ? objColor : tilePalette[data1 & 0x3];
 
 							data1 >>= 2;
 							pixelIndex++;
@@ -747,28 +723,19 @@ namespace CrystalBoy.Emulation
 									bgTileIndex = 0;
 								}
 
-								if (signedIndex)
-									data1 = bgLineOffset + ((sbyte)*bgTile++ << 3);
-								else
-									data1 = bgLineOffset + (*bgTile++ << 3);
+								data1 = bgLineOffset + (signedIndex ? (sbyte)*bgTile++ << 3 : *bgTile++ << 3);
 
 								data1 = paletteIndexTable[bgTiles[data1]];
 
-								if (j == 0 && pixelIndex > 0)
-									data1 >>= pixelIndex << 1;
-								else
-									pixelIndex = 0;
+								if (j == 0 && pixelIndex > 0) data1 >>= pixelIndex << 1;
+								else pixelIndex = 0;
 							}
 
-							if (objDrawn)
-								*bufferPixel++ = objColor;
-							else
-								*bufferPixel++ = tilePalette[data1 & 0x3];
+							*bufferPixel++ = objDrawn != 0 && (objDrawn == 2 || (data1 & 0x3) == 0) ? objColor : tilePalette[data1 & 0x3];
 							data1 >>= 2;
 							pixelIndex++;
 						}
-						else
-							*bufferPixel++ = LookupTables.GrayPalette[0];
+						else *bufferPixel++ = objDrawn != 0 ? objColor : LookupTables.GrayPalette[0];
 					}
 
 					bufferLine += stride;
