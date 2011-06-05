@@ -1,0 +1,10 @@
+#summary Screenshots of CrystalBoy
+#labels Featured
+
+= Introduction =
+
+I did take some screenshots durign the development of the emualtor, but never took time to upload them here.
+They may be a bit old, but they still reflect the emulator good enough.
+
+
+= Details =
