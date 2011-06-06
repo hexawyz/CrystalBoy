@@ -38,6 +38,8 @@ namespace CrystalBoy.Emulation
 			this.bus = bus;
 		}
 
+		public event EventHandler RamDisabled;
+
 		/// <summary>Resets the Mapper</summary>
 		/// <remarks>
 		/// The default Reset implementation performs the following operations
@@ -139,7 +141,12 @@ namespace CrystalBoy.Emulation
 		/// Thus, unless you implement your own version of HandleRamWrite, writes will never affect the real RAM.
 		/// This can be used by mappers that supports RAM enabling and disabling.
 		/// </remarks>
-		protected void UnmapRam() { bus.UnmapExternalRam(); }
+		protected void UnmapRam()
+		{
+			bus.UnmapExternalRam();
+			if (RamDisabled != null)
+				RamDisabled(this, EventArgs.Empty);
+		}
 
 		#endregion
 

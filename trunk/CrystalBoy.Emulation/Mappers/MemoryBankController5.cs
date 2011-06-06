@@ -45,7 +45,7 @@ namespace CrystalBoy.Emulation.Mappers
 			}
 		}
 
-		public event EventHandler RumbleChanged;
+		public event EventHandler<RumbleEventArgs> RumbleChanged;
 
 		public override void HandleRomWrite(byte offsetLow, byte offsetHigh, byte value)
 		{

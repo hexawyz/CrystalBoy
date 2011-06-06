@@ -39,6 +39,7 @@ namespace CrystalBoy.Emulator
 		private RenderMethod renderMethod;
 		private Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
 		private bool pausedForResizing;
+		private Stream ramSaveStream;
 
 		#region Constructor and Initialization
 
@@ -198,18 +199,58 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
+		private void UnloadRom()
+		{
+			emulatedGameBoy.Pause();
+
+			if (ramSaveStream != null)
+			{
+				emulatedGameBoy.Mapper.RamDisabled -= Mapper_RamDisabled;
+
+				ramSaveStream.Seek(0, SeekOrigin.Begin);
+				ramSaveStream.Write(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
+				ramSaveStream.Close();
+
+				ramSaveStream = null;
+			}
+
+			emulatedGameBoy.UnloadRom();
+		}
+
 		private void LoadRom(string fileName)
 		{
-			FileInfo fileInfo = new FileInfo(fileName);
+			var romFileInfo = new FileInfo(fileName);
 
 			// Open only existing rom files
-			if (!fileInfo.Exists)
+			if (!romFileInfo.Exists)
 				throw new FileNotFoundException();
 			// Limit the rom size to 4 Mb
-			if (fileInfo.Length > 4 * 1024 * 1024)
+			if (romFileInfo.Length > 4 * 1024 * 1024)
 				throw new InvalidOperationException();
-			emulatedGameBoy.LoadRom(MemoryUtility.ReadFile(fileInfo));
+
+			emulatedGameBoy.LoadRom(MemoryUtility.ReadFile(romFileInfo));
+
+			if (emulatedGameBoy.RomInformation.HasRam)
+			{
+				var ramFileInfo = new FileInfo(Path.Combine(romFileInfo.DirectoryName, Path.GetFileNameWithoutExtension(romFileInfo.Name)) + ".sav");
+
+				ramSaveStream = ramFileInfo.Open(FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+				ramSaveStream.SetLength(emulatedGameBoy.Mapper.SavedRamSize);
+				ramSaveStream.Read(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
+
+				emulatedGameBoy.Mapper.RamDisabled += Mapper_RamDisabled;
+			}
+
 			emulatedGameBoy.Run();
+		}
+
+		private void Mapper_RamDisabled(object sender, EventArgs e)
+		{
+			if (ramSaveStream != null)
+			{
+				ramSaveStream.Seek(0, SeekOrigin.Begin);
+				ramSaveStream.Write(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
+			}
 		}
 
 		#region Size Management
@@ -284,6 +325,7 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnClosed(EventArgs e)
 		{
+			UnloadRom();
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
@@ -317,7 +359,10 @@ namespace CrystalBoy.Emulator
 		private void openToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				UnloadRom();
 				LoadRom(openFileDialog.FileName);
+			}
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)

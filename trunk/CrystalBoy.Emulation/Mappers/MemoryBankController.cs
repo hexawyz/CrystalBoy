@@ -60,8 +60,7 @@ namespace CrystalBoy.Emulation.Mappers
 			{
 				ramBankInternal = value;
 
-				if (ramEnabledInternal)
-					MapRamBank(ramBankInternal);
+				if (ramEnabledInternal) MapRamBank(ramBankInternal);
 			}
 		}
 

@@ -34,13 +34,7 @@ namespace CrystalBoy.Emulation
 
 		#region Properties
 
-		public Mapper Mapper
-		{
-			get
-			{
-				return mapper;
-			}
-		}
+		public Mapper Mapper { get { return mapper; } }
 
 		#endregion
 
@@ -94,7 +88,7 @@ namespace CrystalBoy.Emulation
 
 			this.romInformation = romInfo;
 			this.externalRomBlock = externalRom;
-			this.colorMode = romInfo.ColorGameBoySupport;
+			this.colorMode = ColorHardware & romInfo.ColorGameBoySupport;
 
 			switch (this.romInformation.RomType)
 			{
@@ -134,6 +128,14 @@ namespace CrystalBoy.Emulation
 
 		public void UnloadRom()
 		{
+			if (externalRomBlock != null)
+			{
+				this.mapper = null;
+				this.externalRomBlock = null;
+				this.romInformation = null;
+				this.colorMode = ColorHardware;
+				Reset();
+			}
 		}
 
 		#endregion
