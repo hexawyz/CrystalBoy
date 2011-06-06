@@ -32,10 +32,8 @@ namespace CrystalBoy.Core
 		{
 			get
 			{
-				if (buffer != null)
-					return buffer;
-				else
-					return buffer = new byte[bufferLength];
+				if (buffer != null) return buffer;
+				else return buffer = new byte[bufferLength];
 			}
 		}
 
@@ -44,10 +42,15 @@ namespace CrystalBoy.Core
 		public static MemoryBlock ReadFile(FileInfo fileInfo)
 		{
 			FileStream fileStream;
-			MemoryBlock memoryBlock;
 
 			// Open the file in exclusive mode
-			fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+			using (fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
+				return ReadStream(fileStream, checked((int)fileStream.Length));
+		}
+
+		public static MemoryBlock ReadStream(Stream stream, int length)
+		{
+			MemoryBlock memoryBlock;
 
 			// Initialize variables
 			memoryBlock = null;
@@ -55,10 +58,10 @@ namespace CrystalBoy.Core
 			try
 			{
 				// Create the memory block once the file has been successfully opened
-				memoryBlock = new MemoryBlock((int)fileStream.Length);
+				memoryBlock = new MemoryBlock((int)length);
 
 				// Read the file using the extension method defined below
-				fileStream.Read(memoryBlock, 0, memoryBlock.Length);
+				stream.Read(memoryBlock, 0, memoryBlock.Length);
 			}
 			catch
 			{
@@ -71,7 +74,7 @@ namespace CrystalBoy.Core
 			finally
 			{
 				// Close the file
-				fileStream.Close();
+				stream.Close();
 			}
 
 			return memoryBlock;
@@ -158,10 +161,6 @@ namespace CrystalBoy.Core
 		public static unsafe void WriteFile(FileInfo fileInfo, MemoryBlock memoryBlock)
 		{
 			FileStream fileStream;
-			byte* pMemory;
-			int bytesLeft,
-				bytesToWrite;
-			byte[] buffer;
 
 			if (fileInfo == null)
 				throw new ArgumentNullException("fileInfo");
@@ -169,43 +168,8 @@ namespace CrystalBoy.Core
 				throw new ArgumentNullException("memoryBlock");
 
 			// Open the file in exclusive mode
-			fileStream = fileInfo.Open(FileMode.Open, FileAccess.Write, FileShare.Read);
-
-			// Initialize variables
-			bytesLeft = memoryBlock.Length;
-			bytesToWrite = bufferLength;
-
-			try
-			{
-				// Get a pointer to the memory block
-				pMemory = (byte*)memoryBlock.Pointer;
-
-				// Obtain a reference to the buffer (lazy allocation)
-				buffer = Buffer;
-
-				// Write the file in chunks
-				fixed (byte* pBuffer = buffer)
-				{
-					while (bytesLeft > 0)
-					{
-						if (bytesLeft < bytesToWrite)
-							bytesToWrite = bytesLeft;
-						Memory.Copy(pMemory, pBuffer, (uint)bytesToWrite);
-						fileStream.Write(buffer, 0, bytesToWrite);
-						pMemory += bytesToWrite;
-						bytesLeft -= bytesToWrite;
-					}
-				}
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
-				// Close the file
-				fileStream.Close();
-			}
+			using (fileStream = fileInfo.Open(FileMode.Open, FileAccess.Write, FileShare.Read))
+				fileStream.Write(memoryBlock, 0, memoryBlock.Length);
 		}
 
 		public static unsafe void Write(this Stream stream, MemoryBlock memoryBlock, int offset, int length)
@@ -239,7 +203,7 @@ namespace CrystalBoy.Core
 				{
 					if (bytesLeft < bytesToWrite)
 						bytesToWrite = bytesLeft;
-					Memory.Copy(pMemory, pBuffer, (uint)bytesToWrite);
+					Memory.Copy(pBuffer, pMemory, (uint)bytesToWrite);
 					stream.Write(buffer, 0, bytesToWrite);
 					pMemory += bytesToWrite;
 					bytesLeft -= bytesToWrite;

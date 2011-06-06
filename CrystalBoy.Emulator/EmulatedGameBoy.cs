@@ -58,8 +58,13 @@ namespace CrystalBoy.Emulator
 			emulationStatus = EmulationStatus.Stopped;
 			bus.LoadRom(rom);
 			emulationStatus = EmulationStatus.Paused;
-			Reset();
 			OnRomChanged(EventArgs.Empty);
+		}
+
+		public void UnloadRom()
+		{
+			emulationStatus = EmulationStatus.Stopped;
+			bus.UnloadRom();
 		}
 
 		public RomInformation RomInformation { get { return bus.RomInformation; } }
@@ -68,7 +73,11 @@ namespace CrystalBoy.Emulator
 
 		public GameBoyMemoryBus Bus { get { return bus; } }
 
+		public Mapper Mapper { get { return bus.Mapper; } }
+
 		public Processor Processor { get { return bus.Processor; } }
+
+		public MemoryBlock ExternalRam { get { return bus.ExternalRam; } }
 
 		public EmulationStatus EmulationStatus
 		{

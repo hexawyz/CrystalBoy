@@ -198,7 +198,7 @@ namespace CrystalBoy.Core
 				case 1: // 2 Kb (1 bank)
 					return 2048;
 				case 2: // 8 Kb (1 bank)
-					return 8196;
+					return 8192;
 				case 3: // 32 Kb (4 banks)
 					return 32768;
 				case 4: // 128 Kb (16 banks)

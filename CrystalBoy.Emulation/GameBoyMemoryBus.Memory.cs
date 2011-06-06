@@ -465,10 +465,11 @@ namespace CrystalBoy.Emulation
 
 		internal unsafe void MapExternalRamBank(int bankIndex)
 		{
-			byte* source = (byte*)externalRamBlock.Pointer + bankIndex * 0x2000;
+			byte* source = (byte*)externalRamBlock.Pointer + (bankIndex & 0x0F) * 0x2000;
+			byte** segment = segmentArray + 0xA0;
 
-			for (int i = 0xA0; i < 0xC0; i++, source += 256)
-				segmentArray[i] = source;
+			for (int i = 0x20; i != 0; i--, source += 256)
+				*segment++ = source;
 
 			ramBank = bankIndex;
 		}
