@@ -22,7 +22,7 @@ using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
-	delegate void MemoryWriteHandler(byte offsetLow, byte offsetHigh, byte value);
+	internal delegate void MemoryWriteHandler(byte offsetLow, byte offsetHigh, byte value);
 
 	partial class GameBoyMemoryBus : IMemoryBus
 	{
@@ -131,30 +131,18 @@ namespace CrystalBoy.Emulation
 
 		private void ResetRomWriteHandler()
 		{
-			if (mapper != null)
-			{
-				MemoryWriteHandler handler = new MemoryWriteHandler(mapper.HandleRomWrite);
+			MemoryWriteHandler handler = mapper != null ? new MemoryWriteHandler(mapper.HandleRomWrite) : null;
 
-				for (int i = 0x00; i < 0x80; i++)
-					segmentWriteHandlerArray[i] = handler;
-			}
-			else
-				for (int i = 0x00; i < 0x80; i++)
-					segmentWriteHandlerArray[i] = null;
+			for (int i = 0x00; i < 0x80; i++)
+				segmentWriteHandlerArray[i] = handler;
 		}
 
 		internal void ResetRamWriteHandler()
 		{
-			if (mapper != null && mapper.HandlesRamWrites)
-			{
-				MemoryWriteHandler handler = new MemoryWriteHandler(mapper.HandleRamWrite);
+			MemoryWriteHandler handler = mapper != null ? mapper.RamWriteHandler : null;
 
-				for (int i = 0xA0; i < 0xC0; i++)
-					segmentWriteHandlerArray[i] = handler;
-			}
-			else
-				for (int i = 0xA0; i < 0xC0; i++)
-					segmentWriteHandlerArray[i] = null;
+			for (int i = 0xA0; i < 0xC0; i++)
+				segmentWriteHandlerArray[i] = handler;
 		}
 
 		#endregion
@@ -189,6 +177,12 @@ namespace CrystalBoy.Emulation
 		#endregion 
 
 		#region Memory Banks
+
+		public int LowerExternalRomBank { get { return lowerRomBank; } }
+
+		public int UpperExternalRomBank { get { return upperRombank; } }
+
+		public int ExternalRamBank { get { return ramBank; } }
 
 		public int VideoRamBank { get { return videoRamBank; } }
 
@@ -313,6 +307,13 @@ namespace CrystalBoy.Emulation
 
 			if (handler != null) handler(offsetLow, offsetHigh, value);
 			else segmentArray[offsetHigh][offsetLow] = value;
+		}
+
+		internal unsafe void RamWritePassthrough(byte offsetLow, byte offsetHigh, byte value)
+		{
+			// Ensures the write only goes to the external RAM area…
+			if (offsetHigh >= 0xA0 && offsetHigh < 0xC0)
+				segmentArray[offsetHigh][offsetLow] = value;
 		}
 
 		private void WritePort(byte offsetLow, byte offsetHigh, byte value) { WritePort(offsetLow, value); }

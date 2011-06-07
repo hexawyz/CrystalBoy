@@ -205,7 +205,7 @@ namespace CrystalBoy.Emulator
 
 			if (ramSaveStream != null)
 			{
-				emulatedGameBoy.Mapper.RamDisabled -= Mapper_RamDisabled;
+				emulatedGameBoy.Mapper.RamUpdated -= Mapper_RamUpdated;
 
 				ramSaveStream.Seek(0, SeekOrigin.Begin);
 				ramSaveStream.Write(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
@@ -230,7 +230,7 @@ namespace CrystalBoy.Emulator
 
 			emulatedGameBoy.LoadRom(MemoryUtility.ReadFile(romFileInfo));
 
-			if (emulatedGameBoy.RomInformation.HasRam)
+			if (emulatedGameBoy.RomInformation.HasRam && emulatedGameBoy.RomInformation.HasBattery)
 			{
 				var ramFileInfo = new FileInfo(Path.Combine(romFileInfo.DirectoryName, Path.GetFileNameWithoutExtension(romFileInfo.Name)) + ".sav");
 
@@ -238,13 +238,13 @@ namespace CrystalBoy.Emulator
 				ramSaveStream.SetLength(emulatedGameBoy.Mapper.SavedRamSize);
 				ramSaveStream.Read(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
 
-				emulatedGameBoy.Mapper.RamDisabled += Mapper_RamDisabled;
+				emulatedGameBoy.Mapper.RamUpdated += Mapper_RamUpdated;
 			}
 
 			emulatedGameBoy.Run();
 		}
 
-		private void Mapper_RamDisabled(object sender, EventArgs e)
+		private void Mapper_RamUpdated(object sender, EventArgs e)
 		{
 			if (ramSaveStream != null)
 			{
