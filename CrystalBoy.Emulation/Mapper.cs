@@ -24,21 +24,28 @@ namespace CrystalBoy.Emulation
 	public abstract class Mapper
 	{
 		GameBoyMemoryBus bus;
+		MemoryWriteHandler ramWriteInternalHandler, ramWriteHandler;
 
 		unsafe byte* ram;
+		bool ramWriteDetected;
 
 		bool handlesRamWrites;
 
 		public Mapper(GameBoyMemoryBus bus)
 		{
-			if (bus == null)
-				throw new ArgumentNullException();
+			if (bus == null) throw new ArgumentNullException();
 
-			// Initializations to default values are left as comments for reference, but the code is not needed
 			this.bus = bus;
+			this.ramWriteInternalHandler = HandleRamWriteInternal;
+			this.ramWriteHandler = HandleRamWrite;
 		}
 
-		public event EventHandler RamDisabled;
+		/// <summary>Occurs when the external RAM has been updated.</summary>
+		/// <remarks>
+		/// Subclasses handling raw writes by themselves must carefully call the <see cref="M:RamWritten"/> method when needed in order for this event to get triggered.
+		/// Other subclasses will get the default automatic detection behavior, which should work fine in most, if not all cases.
+		/// </remarks>
+		public event EventHandler RamUpdated;
 
 		/// <summary>Resets the Mapper</summary>
 		/// <remarks>
@@ -95,7 +102,7 @@ namespace CrystalBoy.Emulation
 		/// The default Mapper implementation does not handle RAM Writes.
 		/// If you set this property to true, it is very likely that you need to override the HandleRamWrite method.
 		/// </remarks>
-		public bool HandlesRamWrites
+		protected bool HandlesRamWrites
 		{
 			get { return handlesRamWrites; }
 			set
@@ -105,6 +112,24 @@ namespace CrystalBoy.Emulation
 					handlesRamWrites = value;
 					bus.ResetRamWriteHandler();
 				}
+			}
+		}
+
+		internal MemoryWriteHandler RamWriteHandler
+		{
+			get
+			{
+				// Determines the RAM write handler to use given the current emulation state.
+				// We want to intercept ram writes internally if no particular handling was specifically requested.
+				// Also, we don't care about RAM writes if the ROM has no battery (because there is no need to save it somewhere…),
+				// or if a RAM write was already detected during this RAM mapping session.
+				return bus.ExternalRamBank >= 0 ?
+					handlesRamWrites ?
+						ramWriteHandler :
+						bus.RomInformation.HasRam && bus.RomInformation.HasBattery && !ramWriteDetected ?
+							ramWriteInternalHandler :
+							null :
+					null;
 			}
 		}
 
@@ -133,7 +158,14 @@ namespace CrystalBoy.Emulation
 
 		/// <summary>Maps a RAM bank into the RAM area.</summary>
 		/// <param name="bankIndex">Index of the RAM bank to map</param>
-		protected void MapRamBank(int bankIndex) { bus.MapExternalRamBank(bankIndex); }
+		protected void MapRamBank(int bankIndex)
+		{
+			// We do not access the RAM write detection flag here…
+			// And this should stay like this if possible.
+			// (Write detection need only to happen once. Thus, the detection function will only ever be called once per ram mapping/unmapping session)
+			bus.MapExternalRamBank(bankIndex);
+			bus.ResetRamWriteHandler();
+		}
 
 		/// <summary>Unmaps RAM from the RAM area.</summary>
 		/// <remarks>
@@ -144,8 +176,10 @@ namespace CrystalBoy.Emulation
 		protected void UnmapRam()
 		{
 			bus.UnmapExternalRam();
-			if (RamDisabled != null)
-				RamDisabled(this, EventArgs.Empty);
+			if (ramWriteDetected && RamUpdated != null)
+				RamUpdated(this, EventArgs.Empty);
+			ramWriteDetected = false;
+			bus.ResetRamWriteHandler();
 		}
 
 		#endregion
@@ -156,6 +190,29 @@ namespace CrystalBoy.Emulation
 		/// <param name="value">Value written</param>
 		public abstract void HandleRomWrite(byte offsetLow, byte offsetHigh, byte value);
 
+		/// <summary>Notifies of a write to external RAM.</summary>
+		/// <remarks>
+		/// Use this method while implementing RAM writes in a non-standard fashion.
+		/// By default, ram writes will be detected by the base Mapper implementation.
+		/// Detecting RAM writes allows for on-demand battery file writes.
+		/// The RamUpdated event will be triggered when unmapping the RAM, only if (real) ram writes were detected.
+		/// </remarks>
+		protected void RamWritten() { ramWriteDetected = true; }
+
+		/// <summary>Intercepts all RAM writes.</summary>
+		/// <param name="offsetLow">Less significant byte of the write offset</param>
+		/// <param name="offsetHigh">Most significant byte of the write offset</param>
+		/// <param name="value">Value written</param>
+		/// <remarks>This method will be used only for detecting ram updates transparently.</remarks>
+		private void HandleRamWriteInternal(byte offsetLow, byte offsetHigh, byte value)
+		{
+			ramWriteDetected = true;
+			// Process as if the method was never there…
+			bus.RamWritePassthrough(offsetLow, offsetHigh, value);
+			// Once a RAM write is detected, this method is no longer useful, so we can reset the write handler to a more performant state (null)
+			bus.ResetRamWriteHandler();
+		}
+
 		/// <summary>Handles a RAM write.</summary>
 		/// <param name="offsetLow">Less significant byte of the write offset</param>
 		/// <param name="offsetHigh">Most significant byte of the write offset</param>
@@ -163,6 +220,7 @@ namespace CrystalBoy.Emulation
 		/// <remarks>
 		/// The default implementation of HandleRamWrite does nothing.
 		/// If you impelement your own version, do not bother calling the base implementation (the one in Mapper) because it is useless.
+		/// However, please call the <see cref="M:RamWriten"/> method if you write directly to the external RAM.
 		/// </remarks>
 		public virtual void HandleRamWrite(byte offsetLow, byte offsetHigh, byte value) { }
 	}
