@@ -53,6 +53,8 @@ namespace CrystalBoy.Emulator
 
 		public void Reset() { bus.Reset(); }
 
+		public void Reset(HardwareType hardwareType) { bus.Reset(hardwareType); }
+
 		public void LoadRom(MemoryBlock rom)
 		{
 			emulationStatus = EmulationStatus.Stopped;
@@ -66,6 +68,8 @@ namespace CrystalBoy.Emulator
 			emulationStatus = EmulationStatus.Stopped;
 			bus.UnloadRom();
 		}
+
+		public HardwareType HardwareType { get { return bus.HardwareType; } }
 
 		public RomInformation RomInformation { get { return bus.RomInformation; } }
 

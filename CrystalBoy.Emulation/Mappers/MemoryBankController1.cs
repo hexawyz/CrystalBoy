@@ -20,7 +20,7 @@ using System;
 
 namespace CrystalBoy.Emulation.Mappers
 {
-	internal sealed class MemoryBankController1 : MemoryBankController
+	public sealed class MemoryBankController1 : MemoryBankController
 	{
 		byte extraBits;
 		bool bankedRamMode;

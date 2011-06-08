@@ -193,6 +193,8 @@ namespace CrystalBoy.Emulation
 				this.hardwareType = value;
 				// This information should be more convenient provided as a flag
 				this.colorHardware = value >= HardwareType.GameBoyColor;
+				// Don't forget to reset the color mode flag too…
+				this.colorMode = ColorHardware && RomInformation != null ? RomInformation.ColorGameBoySupport : false;
 			}
 		}
 

@@ -133,6 +133,11 @@ namespace CrystalBoy.Emulator
 			toolStripMenuItem4.Name = "toolStripMenuItem4";
 			toolStripMenuItem4.Size = new System.Drawing.Size(149, 6);
 			// 
+			// toolStripMenuItem6
+			// 
+			toolStripMenuItem6.Name = "toolStripMenuItem6";
+			toolStripMenuItem6.Size = new System.Drawing.Size(149, 6);
+			// 
 			// mainMenuStrip
 			// 
 			this.mainMenuStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -339,48 +344,61 @@ namespace CrystalBoy.Emulator
 			this.hardwareToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.hardwareToolStripMenuItem.Text = "&Hardware";
 			this.hardwareToolStripMenuItem.ToolTipText = "Emulated hardware";
+			this.hardwareToolStripMenuItem.DropDownOpening += new System.EventHandler(this.hardwareToolStripMenuItem_DropDownOpening);
 			// 
 			// gameBoyToolStripMenuItem
 			// 
 			this.gameBoyToolStripMenuItem.Name = "gameBoyToolStripMenuItem";
 			this.gameBoyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.gameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoy;
 			this.gameBoyToolStripMenuItem.Text = "&Game Boy";
 			this.gameBoyToolStripMenuItem.ToolTipText = "Emulate Game Boy Hardware";
+			this.gameBoyToolStripMenuItem.Click += new System.EventHandler(this.gameBoyToolStripMenuItem_Click);
 			// 
 			// gameBoyPocketToolStripMenuItem
 			// 
 			this.gameBoyPocketToolStripMenuItem.Name = "gameBoyPocketToolStripMenuItem";
 			this.gameBoyPocketToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.gameBoyPocketToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyPocket;
 			this.gameBoyPocketToolStripMenuItem.Text = "Game Boy &Pocket";
 			this.gameBoyPocketToolStripMenuItem.ToolTipText = "Emulate Pocket Game Boy Hardware";
+			this.gameBoyPocketToolStripMenuItem.Click += new System.EventHandler(this.gameBoyPocketToolStripMenuItem_Click);
 			// 
 			// gameBoyColorToolStripMenuItem
 			// 
 			this.gameBoyColorToolStripMenuItem.Name = "gameBoyColorToolStripMenuItem";
 			this.gameBoyColorToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.gameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyColor;
 			this.gameBoyColorToolStripMenuItem.Text = "Game Boy &Color";
 			this.gameBoyColorToolStripMenuItem.ToolTipText = "Emulate Color Game Boy Hardware";
+			this.gameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.gameBoyColorToolStripMenuItem_Click);
 			// 
 			// gameBoyAdvanceToolStripMenuItem
 			// 
 			this.gameBoyAdvanceToolStripMenuItem.Name = "gameBoyAdvanceToolStripMenuItem";
 			this.gameBoyAdvanceToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.gameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyAdvance;
 			this.gameBoyAdvanceToolStripMenuItem.Text = "Game Boy Advance";
 			this.gameBoyAdvanceToolStripMenuItem.ToolTipText = "Emulate Game Boy Advance Hardware";
+			this.gameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.gameBoyAdvanceToolStripMenuItem_Click);
 			// 
 			// superGameBoyToolStripMenuItem
 			// 
 			this.superGameBoyToolStripMenuItem.Name = "superGameBoyToolStripMenuItem";
 			this.superGameBoyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.superGameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy;
 			this.superGameBoyToolStripMenuItem.Text = "&Super Game Boy";
 			this.superGameBoyToolStripMenuItem.ToolTipText = "Emulate Super Game Boy Hardware";
+			this.superGameBoyToolStripMenuItem.Click += new System.EventHandler(this.superGameBoyToolStripMenuItem_Click);
 			// 
 			// superGameBoy2ToolStripMenuItem
 			// 
 			this.superGameBoy2ToolStripMenuItem.Name = "superGameBoy2ToolStripMenuItem";
 			this.superGameBoy2ToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			this.superGameBoy2ToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy2;
 			this.superGameBoy2ToolStripMenuItem.Text = "Super Game Boy &2";
 			this.superGameBoy2ToolStripMenuItem.ToolTipText = "Emulate Super Game Boy 2 Hardware";
+			this.superGameBoy2ToolStripMenuItem.Click += new System.EventHandler(this.superGameBoy2ToolStripMenuItem_Click);
 			// 
 			// joypadToolStripMenuItem
 			// 
@@ -457,7 +475,7 @@ namespace CrystalBoy.Emulator
 			// aboutToolStripMenuItem
 			// 
 			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
 			this.aboutToolStripMenuItem.Text = "&About";
 			// 
 			// openFileDialog
@@ -519,11 +537,6 @@ namespace CrystalBoy.Emulator
 			this.emulationStatusToolStripStatusLabel.Name = "emulationStatusToolStripStatusLabel";
 			this.emulationStatusToolStripStatusLabel.Size = new System.Drawing.Size(50, 17);
 			this.emulationStatusToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// toolStripMenuItem6
-			// 
-			toolStripMenuItem6.Name = "toolStripMenuItem6";
-			toolStripMenuItem6.Size = new System.Drawing.Size(149, 6);
 			// 
 			// MainForm
 			// 
