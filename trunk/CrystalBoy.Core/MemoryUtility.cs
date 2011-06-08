@@ -83,7 +83,7 @@ namespace CrystalBoy.Core
 		public static unsafe int Read(this Stream stream, MemoryBlock memoryBlock, int offset, int length)
 		{
 			byte* pMemory;
-			int bytesRead, bytesToRead;
+			int bytesRead, bytesToRead, totalBytesRead;
 			byte[] buffer;
 
 			if (memoryBlock == null)
@@ -99,6 +99,7 @@ namespace CrystalBoy.Core
 			// Obtain a reference to the buffer (lazy allocation)
 			buffer = Buffer;
 
+			totalBytesRead = 0;
 			bytesToRead = Math.Min(bufferLength, length);
 
 			// Read the file in chunks
@@ -107,6 +108,7 @@ namespace CrystalBoy.Core
 				while ((bytesRead = stream.Read(buffer, 0, bytesToRead)) > 0)
 				{
 					MemoryBlock.Copy(pMemory, pBuffer, bytesRead);
+					totalBytesRead += bytesRead;
 					pMemory += bytesRead;
 					length -= bytesRead;
 					if (length < bytesToRead)
@@ -114,13 +116,13 @@ namespace CrystalBoy.Core
 				}
 			}
 
-			return 0;
+			return totalBytesRead;
 		}
 
 		public static unsafe int Read(this BinaryReader reader, MemoryBlock memoryBlock, int offset, int length)
 		{
 			byte* pMemory;
-			int bytesRead, bytesToRead;
+			int bytesRead, bytesToRead, totalBytesRead;
 			byte[] buffer;
 
 			if (memoryBlock == null)
@@ -136,6 +138,7 @@ namespace CrystalBoy.Core
 			// Obtain a reference to the buffer (lazy allocation)
 			buffer = Buffer;
 
+			totalBytesRead = 0;
 			bytesToRead = Math.Min(bufferLength, length);
 
 			// Read the file in chunks
@@ -144,6 +147,7 @@ namespace CrystalBoy.Core
 				while ((bytesRead = reader.Read(buffer, 0, bytesToRead)) > 0)
 				{
 					Memory.Copy(pMemory, pBuffer, (uint)bytesRead);
+					totalBytesRead += bytesRead;
 					pMemory += bytesRead;
 					length -= bytesRead;
 					if (length < bytesToRead)
@@ -151,7 +155,7 @@ namespace CrystalBoy.Core
 				}
 			}
 
-			return 0;
+			return totalBytesRead;
 		}
 
 		#endregion
@@ -242,7 +246,7 @@ namespace CrystalBoy.Core
 				{
 					if (bytesLeft < bytesToWrite)
 						bytesToWrite = bytesLeft;
-					Memory.Copy(pMemory, pBuffer, (uint)bytesToWrite);
+					Memory.Copy(pBuffer, pMemory, (uint)bytesToWrite);
 					writer.Write(buffer, 0, bytesToWrite);
 					pMemory += bytesToWrite;
 					bytesLeft -= bytesToWrite;

@@ -34,12 +34,10 @@ namespace CrystalBoy.Emulation.Mappers
 
 		public override void Reset()
 		{
+			base.Reset(); // Call the base implementation rather than do everything on our own… this will work better if the base class gets updated…
 			romBankInternal = 1;
 			ramBankInternal = 0;
 			ramEnabledInternal = false;
-			MapRomBank(false, 0);
-			MapRomBank(true, 1);
-			UnmapRam();
 		}
 
 		public virtual int RomBank

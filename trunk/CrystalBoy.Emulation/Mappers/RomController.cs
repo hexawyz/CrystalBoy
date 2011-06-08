@@ -20,7 +20,7 @@ using System;
 
 namespace CrystalBoy.Emulation.Mappers
 {
-	sealed class RomController : Mapper
+	public sealed class RomController : Mapper
 	{
 		public RomController(GameBoyMemoryBus bus)
 			: base(bus)

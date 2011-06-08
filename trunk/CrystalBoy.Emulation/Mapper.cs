@@ -29,7 +29,7 @@ namespace CrystalBoy.Emulation
 		unsafe byte* ram;
 		bool ramWriteDetected;
 
-		bool handlesRamWrites;
+		bool interceptsRamWrites;
 
 		public Mapper(GameBoyMemoryBus bus)
 		{
@@ -74,7 +74,7 @@ namespace CrystalBoy.Emulation
 			ram = (byte*)Bus.ExternalRam.Pointer;
 			MapRomBank(false, 0);
 			MapRomBank(true, 1);
-			HandlesRamWrites = false;
+			InterceptsRamWrites = false;
 			UnmapRam();
 			SetPortValue(0);
 		}
@@ -102,14 +102,14 @@ namespace CrystalBoy.Emulation
 		/// The default Mapper implementation does not handle RAM Writes.
 		/// If you set this property to true, it is very likely that you need to override the HandleRamWrite method.
 		/// </remarks>
-		protected bool HandlesRamWrites
+		protected bool InterceptsRamWrites
 		{
-			get { return handlesRamWrites; }
+			get { return interceptsRamWrites; }
 			set
 			{
-				if (value != handlesRamWrites)
+				if (value != interceptsRamWrites)
 				{
-					handlesRamWrites = value;
+					interceptsRamWrites = value;
 					bus.ResetRamWriteHandler();
 				}
 			}
@@ -123,13 +123,11 @@ namespace CrystalBoy.Emulation
 				// We want to intercept ram writes internally if no particular handling was specifically requested.
 				// Also, we don't care about RAM writes if the ROM has no battery (because there is no need to save it somewhere…),
 				// or if a RAM write was already detected during this RAM mapping session.
-				return bus.ExternalRamBank >= 0 ?
-					handlesRamWrites ?
-						ramWriteHandler :
-						bus.RomInformation.HasRam && bus.RomInformation.HasBattery && !ramWriteDetected ?
+				return interceptsRamWrites ?
+					ramWriteHandler :
+					bus.ExternalRamBank >= 0 && bus.RomInformation.HasBattery && !ramWriteDetected ?
 							ramWriteInternalHandler :
-							null :
-					null;
+							null;
 			}
 		}
 

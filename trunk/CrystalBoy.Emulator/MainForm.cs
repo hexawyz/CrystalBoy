@@ -39,7 +39,8 @@ namespace CrystalBoy.Emulator
 		private RenderMethod renderMethod;
 		private Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
 		private bool pausedForResizing;
-		private Stream ramSaveStream;
+		private BinaryWriter ramSaveWriter;
+		private BinaryReader ramSaveReader;
 
 		#region Constructor and Initialization
 
@@ -203,15 +204,15 @@ namespace CrystalBoy.Emulator
 		{
 			emulatedGameBoy.Pause();
 
-			if (ramSaveStream != null)
+			if (ramSaveWriter != null)
 			{
-				emulatedGameBoy.Mapper.RamUpdated -= Mapper_RamUpdated;
+				WriteRam();
 
-				ramSaveStream.Seek(0, SeekOrigin.Begin);
-				ramSaveStream.Write(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
-				ramSaveStream.Close();
+				ramSaveWriter.Close();
+				ramSaveWriter = null;
 
-				ramSaveStream = null;
+				if (ramSaveReader != null) ramSaveReader.Close();
+				ramSaveReader = null;
 			}
 
 			emulatedGameBoy.UnloadRom();
@@ -234,9 +235,37 @@ namespace CrystalBoy.Emulator
 			{
 				var ramFileInfo = new FileInfo(Path.Combine(romFileInfo.DirectoryName, Path.GetFileNameWithoutExtension(romFileInfo.Name)) + ".sav");
 
-				ramSaveStream = ramFileInfo.Open(FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-				ramSaveStream.SetLength(emulatedGameBoy.Mapper.SavedRamSize);
+				var ramSaveStream = ramFileInfo.Open(FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+				ramSaveStream.SetLength(emulatedGameBoy.Mapper.SavedRamSize + (emulatedGameBoy.RomInformation.HasTimer ? 48 : 0));
 				ramSaveStream.Read(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
+				ramSaveWriter = new BinaryWriter(ramSaveStream);
+
+				if (emulatedGameBoy.RomInformation.HasTimer)
+				{
+					var mbc3 = emulatedGameBoy.Mapper as CrystalBoy.Emulation.Mappers.MemoryBankController3;
+
+					if (mbc3 != null)
+					{
+						var rtcState = mbc3.RtcState;
+						ramSaveReader = new BinaryReader(ramSaveStream);
+
+						rtcState.Frozen = true;
+
+						rtcState.Seconds = (byte)ramSaveReader.ReadInt32();
+						rtcState.Minutes = (byte)ramSaveReader.ReadInt32();
+						rtcState.Hours = (byte)ramSaveReader.ReadInt32();
+						rtcState.Days = (short)((byte)ramSaveReader.ReadInt32() + ((byte)ramSaveReader.ReadInt32() << 8));
+
+						rtcState.LatchedSeconds = (byte)ramSaveReader.ReadInt32();
+						rtcState.LatchedMinutes = (byte)ramSaveReader.ReadInt32();
+						rtcState.LatchedHours = (byte)ramSaveReader.ReadInt32();
+						rtcState.LatchedDays = (short)((byte)ramSaveReader.ReadInt32() + ((byte)ramSaveReader.ReadInt32() << 8));
+
+						rtcState.DateTime = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(ramSaveReader.ReadInt64());
+
+						rtcState.Frozen = false;
+					}
+				}
 
 				emulatedGameBoy.Mapper.RamUpdated += Mapper_RamUpdated;
 			}
@@ -244,12 +273,37 @@ namespace CrystalBoy.Emulator
 			emulatedGameBoy.Run();
 		}
 
-		private void Mapper_RamUpdated(object sender, EventArgs e)
+		private void Mapper_RamUpdated(object sender, EventArgs e) { if (ramSaveWriter != null) WriteRam(); }
+
+		private void WriteRam()
 		{
-			if (ramSaveStream != null)
+			ramSaveWriter.Seek(0, SeekOrigin.Begin);
+			ramSaveWriter.Write(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
+			if (emulatedGameBoy.RomInformation.HasTimer)
 			{
-				ramSaveStream.Seek(0, SeekOrigin.Begin);
-				ramSaveStream.Write(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
+				var mbc3 = emulatedGameBoy.Mapper as CrystalBoy.Emulation.Mappers.MemoryBankController3;
+
+				if (mbc3 != null)
+				{
+					var rtcState = mbc3.RtcState;
+
+					// I'll save the date using the same format as VBA in order to be more compatible, but i originally planned to store it whithout wasting bytes…
+					// Luckily enough, it seems we use the same iternal representation… (But there probably is no other way to do it)
+
+					ramSaveWriter.Write((int)rtcState.Seconds & 0xFF);
+					ramSaveWriter.Write((int)rtcState.Minutes & 0xFF);
+					ramSaveWriter.Write((int)rtcState.Hours & 0xFF);
+					ramSaveWriter.Write((int)rtcState.Days & 0xFF);
+					ramSaveWriter.Write((rtcState.Days >> 8) & 0xFF);
+
+					ramSaveWriter.Write((int)rtcState.LatchedSeconds & 0xFF);
+					ramSaveWriter.Write((int)rtcState.LatchedMinutes & 0xFF);
+					ramSaveWriter.Write((int)rtcState.LatchedHours & 0xFF);
+					ramSaveWriter.Write((int)rtcState.LatchedDays & 0xFF);
+					ramSaveWriter.Write((rtcState.LatchedDays >> 8) & 0xFF);
+
+					ramSaveWriter.Write((long)((rtcState.DateTime - new DateTime(1970, 1, 1)).TotalSeconds));
+				}
 			}
 		}
 
@@ -388,6 +442,12 @@ namespace CrystalBoy.Emulator
 
 		private void resetToolStripMenuItem_Click(object sender, EventArgs e) { emulatedGameBoy.Reset(); }
 
+		private void limitSpeedToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Settings.Default.LimitSpeed =
+				emulatedGameBoy.EnableFramerateLimiter = limitSpeedToolStripMenuItem.Checked;
+		}
+
 		#region Video
 
 		private void videoToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -437,6 +497,37 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
+		#region Hardware
+
+		private void hardwareToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+		{
+			// The tags have been set by manually editing the designed form code.
+			// This should work fine as long as the tag isn't modified in the Windows Forms editor.
+			foreach (ToolStripMenuItem item in hardwareToolStripMenuItem.DropDownItems)
+				if (item.Tag is HardwareType)
+					item.Checked = (HardwareType)item.Tag == emulatedGameBoy.HardwareType;
+		}
+
+		private void gameBoyToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoy); }
+
+		private void gameBoyPocketToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoyPocket); }
+
+		private void gameBoyColorToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoyColor); }
+
+		private void gameBoyAdvanceToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoyAdvance); }
+
+		private void superGameBoyToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.SuperGameBoy); }
+
+		private void superGameBoy2ToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.SuperGameBoy2); }
+
+		private void SwitchHardware(HardwareType hardwareType)
+		{
+			if (!emulatedGameBoy.RomLoaded || MessageBox.Show(this, "The emulation must be reset for changing the emulated hardware.\nDo you agree to reset the emulation ?", "CrystalBoy", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				emulatedGameBoy.Reset(hardwareType);
+		}
+
+		#endregion
+
 		#endregion
 
 		#region Tools
@@ -468,12 +559,6 @@ namespace CrystalBoy.Emulator
 		#endregion
 
 		#endregion
-
-		private void limitSpeedToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Settings.Default.LimitSpeed = 
-				emulatedGameBoy.EnableFramerateLimiter = limitSpeedToolStripMenuItem.Checked;
-		}
 
 		#endregion
 	}
