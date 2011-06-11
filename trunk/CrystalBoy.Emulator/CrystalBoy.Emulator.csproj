@@ -97,16 +97,29 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="DebuggerForm.fr-FR.resx">
+      <DependentUpon>DebuggerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DebuggerForm.resx">
       <DependentUpon>DebuggerForm.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.fr-FR.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="MapViewerForm.fr-FR.resx">
+      <DependentUpon>MapViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MapViewerForm.resx">
       <DependentUpon>MapViewerForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.fr.resx">
+      <LastGenOutput>Resources.fr.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -114,9 +127,15 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="RomInformationForm.fr-FR.resx">
+      <DependentUpon>RomInformationForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="RomInformationForm.resx">
       <DependentUpon>RomInformationForm.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TileViewerForm.fr-FR.resx">
+      <DependentUpon>TileViewerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TileViewerForm.resx">
       <DependentUpon>TileViewerForm.cs</DependentUpon>

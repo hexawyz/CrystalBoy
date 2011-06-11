@@ -47,11 +47,17 @@ namespace CrystalBoy.Emulator
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
-			System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
-			System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+			System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+			System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
+			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
+			this.statusStrip = new System.Windows.Forms.StatusStrip();
+			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.frameRateToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.emulationStatusToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,6 +66,7 @@ namespace CrystalBoy.Emulator
 			this.emulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.runFrameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.limitSpeedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.audioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.audioEnabledToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,66 +97,77 @@ namespace CrystalBoy.Emulator
 			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
-			this.statusStrip = new System.Windows.Forms.StatusStrip();
-			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-			this.frameRateToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-			this.emulationStatusToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-			toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+			toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
-			this.mainMenuStrip.SuspendLayout();
 			this.toolStripContainer.BottomToolStripPanel.SuspendLayout();
 			this.toolStripContainer.TopToolStripPanel.SuspendLayout();
 			this.toolStripContainer.SuspendLayout();
 			this.statusStrip.SuspendLayout();
+			this.mainMenuStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// toolStripMenuItem1
 			// 
 			toolStripMenuItem1.Name = "toolStripMenuItem1";
-			toolStripMenuItem1.Size = new System.Drawing.Size(199, 6);
+			resources.ApplyResources(toolStripMenuItem1, "toolStripMenuItem1");
 			// 
-			// toolStripMenuItem3
+			// toolStripContainer
 			// 
-			toolStripMenuItem3.Name = "toolStripMenuItem3";
-			toolStripMenuItem3.Size = new System.Drawing.Size(149, 6);
 			// 
-			// toolStripMenuItem2
+			// toolStripContainer.BottomToolStripPanel
 			// 
-			toolStripMenuItem2.Name = "toolStripMenuItem2";
-			toolStripMenuItem2.Size = new System.Drawing.Size(199, 6);
+			this.toolStripContainer.BottomToolStripPanel.Controls.Add(this.statusStrip);
 			// 
-			// toolStripMenuItem5
+			// toolStripContainer.ContentPanel
 			// 
-			toolStripMenuItem5.Name = "toolStripMenuItem5";
-			toolStripMenuItem5.Size = new System.Drawing.Size(153, 6);
+			resources.ApplyResources(this.toolStripContainer.ContentPanel, "toolStripContainer.ContentPanel");
+			this.toolStripContainer.ContentPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.toolStripContainer_ContentPanel_Paint);
+			resources.ApplyResources(this.toolStripContainer, "toolStripContainer");
+			this.toolStripContainer.Name = "toolStripContainer";
 			// 
-			// toolStripMenuItem4
+			// toolStripContainer.TopToolStripPanel
 			// 
-			toolStripMenuItem4.Name = "toolStripMenuItem4";
-			toolStripMenuItem4.Size = new System.Drawing.Size(149, 6);
+			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.mainMenuStrip);
 			// 
-			// toolStripMenuItem6
+			// statusStrip
 			// 
-			toolStripMenuItem6.Name = "toolStripMenuItem6";
-			toolStripMenuItem6.Size = new System.Drawing.Size(149, 6);
+			resources.ApplyResources(this.statusStrip, "statusStrip");
+			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel,
+            this.frameRateToolStripStatusLabel,
+            this.emulationStatusToolStripStatusLabel});
+			this.statusStrip.Name = "statusStrip";
+			this.statusStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
+			// 
+			// toolStripStatusLabel
+			// 
+			this.toolStripStatusLabel.Name = "toolStripStatusLabel";
+			resources.ApplyResources(this.toolStripStatusLabel, "toolStripStatusLabel");
+			this.toolStripStatusLabel.Spring = true;
+			// 
+			// frameRateToolStripStatusLabel
+			// 
+			resources.ApplyResources(this.frameRateToolStripStatusLabel, "frameRateToolStripStatusLabel");
+			this.frameRateToolStripStatusLabel.Name = "frameRateToolStripStatusLabel";
+			// 
+			// emulationStatusToolStripStatusLabel
+			// 
+			resources.ApplyResources(this.emulationStatusToolStripStatusLabel, "emulationStatusToolStripStatusLabel");
+			this.emulationStatusToolStripStatusLabel.Name = "emulationStatusToolStripStatusLabel";
 			// 
 			// mainMenuStrip
 			// 
-			this.mainMenuStrip.Dock = System.Windows.Forms.DockStyle.None;
+			resources.ApplyResources(this.mainMenuStrip, "mainMenuStrip");
 			this.mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.emulationToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.helpToolStripMenuItem});
-			this.mainMenuStrip.Location = new System.Drawing.Point(0, 0);
 			this.mainMenuStrip.Name = "mainMenuStrip";
-			this.mainMenuStrip.Size = new System.Drawing.Size(292, 24);
-			this.mainMenuStrip.TabIndex = 0;
 			// 
 			// fileToolStripMenuItem
 			// 
@@ -160,35 +178,29 @@ namespace CrystalBoy.Emulator
             toolStripMenuItem2,
             this.exitToolStripMenuItem});
 			this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-			this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-			this.fileToolStripMenuItem.Text = "&File";
-			this.fileToolStripMenuItem.ToolTipText = "The file menu";
+			resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
 			// 
 			// openToolStripMenuItem
 			// 
 			this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-			this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-			this.openToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-			this.openToolStripMenuItem.Text = "&Open";
-			this.openToolStripMenuItem.ToolTipText = "Open a Game Boy ROM";
+			resources.ApplyResources(this.openToolStripMenuItem, "openToolStripMenuItem");
 			this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
 			// 
 			// romInformationToolStripMenuItem
 			// 
 			this.romInformationToolStripMenuItem.Name = "romInformationToolStripMenuItem";
-			this.romInformationToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-			this.romInformationToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-			this.romInformationToolStripMenuItem.Text = "&Rom information";
-			this.romInformationToolStripMenuItem.ToolTipText = "Show the ROM Information Window";
+			resources.ApplyResources(this.romInformationToolStripMenuItem, "romInformationToolStripMenuItem");
 			this.romInformationToolStripMenuItem.Click += new System.EventHandler(this.romInformationToolStripMenuItem_Click);
+			// 
+			// toolStripMenuItem2
+			// 
+			toolStripMenuItem2.Name = "toolStripMenuItem2";
+			resources.ApplyResources(toolStripMenuItem2, "toolStripMenuItem2");
 			// 
 			// exitToolStripMenuItem
 			// 
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-			this.exitToolStripMenuItem.Text = "E&xit";
-			this.exitToolStripMenuItem.ToolTipText = "Exit the application";
+			resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
 			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
 			// 
 			// emulationToolStripMenuItem
@@ -197,6 +209,7 @@ namespace CrystalBoy.Emulator
             this.pauseToolStripMenuItem,
             this.resetToolStripMenuItem,
             toolStripMenuItem3,
+            this.runFrameToolStripMenuItem,
             this.limitSpeedToolStripMenuItem,
             toolStripMenuItem4,
             this.audioToolStripMenuItem,
@@ -206,28 +219,31 @@ namespace CrystalBoy.Emulator
             toolStripMenuItem6,
             this.optionsToolStripMenuItem});
 			this.emulationToolStripMenuItem.Name = "emulationToolStripMenuItem";
-			this.emulationToolStripMenuItem.Size = new System.Drawing.Size(73, 20);
-			this.emulationToolStripMenuItem.Text = "&Emulation";
-			this.emulationToolStripMenuItem.ToolTipText = "Emulation options";
+			resources.ApplyResources(this.emulationToolStripMenuItem, "emulationToolStripMenuItem");
 			this.emulationToolStripMenuItem.DropDownOpening += new System.EventHandler(this.emulationToolStripMenuItem_DropDownOpening);
 			// 
 			// pauseToolStripMenuItem
 			// 
 			this.pauseToolStripMenuItem.Name = "pauseToolStripMenuItem";
-			this.pauseToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-			this.pauseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.pauseToolStripMenuItem.Text = "&Pause";
-			this.pauseToolStripMenuItem.ToolTipText = "Pause the emulation";
+			resources.ApplyResources(this.pauseToolStripMenuItem, "pauseToolStripMenuItem");
 			this.pauseToolStripMenuItem.Click += new System.EventHandler(this.pauseToolStripMenuItem_Click);
 			// 
 			// resetToolStripMenuItem
 			// 
 			this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-			this.resetToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-			this.resetToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.resetToolStripMenuItem.Text = "&Reset";
-			this.resetToolStripMenuItem.ToolTipText = "Reset the emulation";
+			resources.ApplyResources(this.resetToolStripMenuItem, "resetToolStripMenuItem");
 			this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
+			// 
+			// toolStripMenuItem3
+			// 
+			toolStripMenuItem3.Name = "toolStripMenuItem3";
+			resources.ApplyResources(toolStripMenuItem3, "toolStripMenuItem3");
+			// 
+			// runFrameToolStripMenuItem
+			// 
+			this.runFrameToolStripMenuItem.Name = "runFrameToolStripMenuItem";
+			resources.ApplyResources(this.runFrameToolStripMenuItem, "runFrameToolStripMenuItem");
+			this.runFrameToolStripMenuItem.Click += new System.EventHandler(this.runFrameToolStripMenuItem_Click);
 			// 
 			// limitSpeedToolStripMenuItem
 			// 
@@ -235,9 +251,13 @@ namespace CrystalBoy.Emulator
 			this.limitSpeedToolStripMenuItem.CheckOnClick = true;
 			this.limitSpeedToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.limitSpeedToolStripMenuItem.Name = "limitSpeedToolStripMenuItem";
-			this.limitSpeedToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.limitSpeedToolStripMenuItem.Text = "Limit &Speed";
+			resources.ApplyResources(this.limitSpeedToolStripMenuItem, "limitSpeedToolStripMenuItem");
 			this.limitSpeedToolStripMenuItem.Click += new System.EventHandler(this.limitSpeedToolStripMenuItem_Click);
+			// 
+			// toolStripMenuItem4
+			// 
+			toolStripMenuItem4.Name = "toolStripMenuItem4";
+			resources.ApplyResources(toolStripMenuItem4, "toolStripMenuItem4");
 			// 
 			// audioToolStripMenuItem
 			// 
@@ -245,21 +265,17 @@ namespace CrystalBoy.Emulator
             this.audioEnabledToolStripMenuItem,
             this.muteToolStripMenuItem});
 			this.audioToolStripMenuItem.Name = "audioToolStripMenuItem";
-			this.audioToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.audioToolStripMenuItem.Text = "&Audio";
+			resources.ApplyResources(this.audioToolStripMenuItem, "audioToolStripMenuItem");
 			// 
 			// audioEnabledToolStripMenuItem
 			// 
 			this.audioEnabledToolStripMenuItem.Name = "audioEnabledToolStripMenuItem";
-			this.audioEnabledToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.audioEnabledToolStripMenuItem.Text = "&Enabled";
+			resources.ApplyResources(this.audioEnabledToolStripMenuItem, "audioEnabledToolStripMenuItem");
 			// 
 			// muteToolStripMenuItem
 			// 
 			this.muteToolStripMenuItem.Name = "muteToolStripMenuItem";
-			this.muteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M)));
-			this.muteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.muteToolStripMenuItem.Text = "&Mute";
+			resources.ApplyResources(this.muteToolStripMenuItem, "muteToolStripMenuItem");
 			// 
 			// videoToolStripMenuItem
 			// 
@@ -269,9 +285,7 @@ namespace CrystalBoy.Emulator
             toolStripMenuItem5,
             this.interpolationToolStripMenuItem});
 			this.videoToolStripMenuItem.Name = "videoToolStripMenuItem";
-			this.videoToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.videoToolStripMenuItem.Text = "&Video";
-			this.videoToolStripMenuItem.ToolTipText = "Video options";
+			resources.ApplyResources(this.videoToolStripMenuItem, "videoToolStripMenuItem");
 			this.videoToolStripMenuItem.DropDownOpening += new System.EventHandler(this.videoToolStripMenuItem_DropDownOpening);
 			// 
 			// zoomToolStripMenuItem
@@ -282,53 +296,47 @@ namespace CrystalBoy.Emulator
             this.zoom300toolStripMenuItem,
             this.zoom400toolStripMenuItem});
 			this.zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
-			this.zoomToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-			this.zoomToolStripMenuItem.Text = "Zoom";
+			resources.ApplyResources(this.zoomToolStripMenuItem, "zoomToolStripMenuItem");
 			this.zoomToolStripMenuItem.DropDownOpening += new System.EventHandler(this.zoomToolStripMenuItem_DropDownOpening);
 			// 
 			// zoom100toolStripMenuItem
 			// 
 			this.zoom100toolStripMenuItem.Name = "zoom100toolStripMenuItem";
-			this.zoom100toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-			this.zoom100toolStripMenuItem.Text = "Zoom 100%";
-			this.zoom100toolStripMenuItem.ToolTipText = "Zoom to 100%";
+			resources.ApplyResources(this.zoom100toolStripMenuItem, "zoom100toolStripMenuItem");
 			this.zoom100toolStripMenuItem.Click += new System.EventHandler(this.zoom100toolStripMenuItem_Click);
 			// 
 			// zoom200toolStripMenuItem
 			// 
 			this.zoom200toolStripMenuItem.Name = "zoom200toolStripMenuItem";
-			this.zoom200toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-			this.zoom200toolStripMenuItem.Text = "Zoom 200%";
-			this.zoom200toolStripMenuItem.ToolTipText = "Zoom to 200%";
+			resources.ApplyResources(this.zoom200toolStripMenuItem, "zoom200toolStripMenuItem");
 			this.zoom200toolStripMenuItem.Click += new System.EventHandler(this.zoom200toolStripMenuItem_Click);
 			// 
 			// zoom300toolStripMenuItem
 			// 
 			this.zoom300toolStripMenuItem.Name = "zoom300toolStripMenuItem";
-			this.zoom300toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-			this.zoom300toolStripMenuItem.Text = "Zoom 300%";
-			this.zoom300toolStripMenuItem.ToolTipText = "Zoom to 300%";
+			resources.ApplyResources(this.zoom300toolStripMenuItem, "zoom300toolStripMenuItem");
 			this.zoom300toolStripMenuItem.Click += new System.EventHandler(this.zoom300toolStripMenuItem_Click);
 			// 
 			// zoom400toolStripMenuItem
 			// 
 			this.zoom400toolStripMenuItem.Name = "zoom400toolStripMenuItem";
-			this.zoom400toolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-			this.zoom400toolStripMenuItem.Text = "Zoom 400%";
-			this.zoom400toolStripMenuItem.ToolTipText = "Zoom to 400%";
+			resources.ApplyResources(this.zoom400toolStripMenuItem, "zoom400toolStripMenuItem");
 			this.zoom400toolStripMenuItem.Click += new System.EventHandler(this.zoom400toolStripMenuItem_Click);
 			// 
 			// renderMethodToolStripMenuItem
 			// 
 			this.renderMethodToolStripMenuItem.Name = "renderMethodToolStripMenuItem";
-			this.renderMethodToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-			this.renderMethodToolStripMenuItem.Text = "Render Method";
+			resources.ApplyResources(this.renderMethodToolStripMenuItem, "renderMethodToolStripMenuItem");
+			// 
+			// toolStripMenuItem5
+			// 
+			toolStripMenuItem5.Name = "toolStripMenuItem5";
+			resources.ApplyResources(toolStripMenuItem5, "toolStripMenuItem5");
 			// 
 			// interpolationToolStripMenuItem
 			// 
 			this.interpolationToolStripMenuItem.Name = "interpolationToolStripMenuItem";
-			this.interpolationToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-			this.interpolationToolStripMenuItem.Text = "&Interpolation";
+			resources.ApplyResources(this.interpolationToolStripMenuItem, "interpolationToolStripMenuItem");
 			this.interpolationToolStripMenuItem.Click += new System.EventHandler(this.interpolationToolStripMenuItem_Click);
 			// 
 			// hardwareToolStripMenuItem
@@ -341,76 +349,65 @@ namespace CrystalBoy.Emulator
             this.superGameBoyToolStripMenuItem,
             this.superGameBoy2ToolStripMenuItem});
 			this.hardwareToolStripMenuItem.Name = "hardwareToolStripMenuItem";
-			this.hardwareToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.hardwareToolStripMenuItem.Text = "&Hardware";
-			this.hardwareToolStripMenuItem.ToolTipText = "Emulated hardware";
+			resources.ApplyResources(this.hardwareToolStripMenuItem, "hardwareToolStripMenuItem");
 			this.hardwareToolStripMenuItem.DropDownOpening += new System.EventHandler(this.hardwareToolStripMenuItem_DropDownOpening);
 			// 
 			// gameBoyToolStripMenuItem
 			// 
 			this.gameBoyToolStripMenuItem.Name = "gameBoyToolStripMenuItem";
-			this.gameBoyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			resources.ApplyResources(this.gameBoyToolStripMenuItem, "gameBoyToolStripMenuItem");
 			this.gameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoy;
-			this.gameBoyToolStripMenuItem.Text = "&Game Boy";
-			this.gameBoyToolStripMenuItem.ToolTipText = "Emulate Game Boy Hardware";
 			this.gameBoyToolStripMenuItem.Click += new System.EventHandler(this.gameBoyToolStripMenuItem_Click);
 			// 
 			// gameBoyPocketToolStripMenuItem
 			// 
 			this.gameBoyPocketToolStripMenuItem.Name = "gameBoyPocketToolStripMenuItem";
-			this.gameBoyPocketToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			resources.ApplyResources(this.gameBoyPocketToolStripMenuItem, "gameBoyPocketToolStripMenuItem");
 			this.gameBoyPocketToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyPocket;
-			this.gameBoyPocketToolStripMenuItem.Text = "Game Boy &Pocket";
-			this.gameBoyPocketToolStripMenuItem.ToolTipText = "Emulate Pocket Game Boy Hardware";
 			this.gameBoyPocketToolStripMenuItem.Click += new System.EventHandler(this.gameBoyPocketToolStripMenuItem_Click);
 			// 
 			// gameBoyColorToolStripMenuItem
 			// 
 			this.gameBoyColorToolStripMenuItem.Name = "gameBoyColorToolStripMenuItem";
-			this.gameBoyColorToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			resources.ApplyResources(this.gameBoyColorToolStripMenuItem, "gameBoyColorToolStripMenuItem");
 			this.gameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyColor;
-			this.gameBoyColorToolStripMenuItem.Text = "Game Boy &Color";
-			this.gameBoyColorToolStripMenuItem.ToolTipText = "Emulate Color Game Boy Hardware";
 			this.gameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.gameBoyColorToolStripMenuItem_Click);
 			// 
 			// gameBoyAdvanceToolStripMenuItem
 			// 
 			this.gameBoyAdvanceToolStripMenuItem.Name = "gameBoyAdvanceToolStripMenuItem";
-			this.gameBoyAdvanceToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			resources.ApplyResources(this.gameBoyAdvanceToolStripMenuItem, "gameBoyAdvanceToolStripMenuItem");
 			this.gameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyAdvance;
-			this.gameBoyAdvanceToolStripMenuItem.Text = "Game Boy Advance";
-			this.gameBoyAdvanceToolStripMenuItem.ToolTipText = "Emulate Game Boy Advance Hardware";
 			this.gameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.gameBoyAdvanceToolStripMenuItem_Click);
 			// 
 			// superGameBoyToolStripMenuItem
 			// 
 			this.superGameBoyToolStripMenuItem.Name = "superGameBoyToolStripMenuItem";
-			this.superGameBoyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			resources.ApplyResources(this.superGameBoyToolStripMenuItem, "superGameBoyToolStripMenuItem");
 			this.superGameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy;
-			this.superGameBoyToolStripMenuItem.Text = "&Super Game Boy";
-			this.superGameBoyToolStripMenuItem.ToolTipText = "Emulate Super Game Boy Hardware";
 			this.superGameBoyToolStripMenuItem.Click += new System.EventHandler(this.superGameBoyToolStripMenuItem_Click);
 			// 
 			// superGameBoy2ToolStripMenuItem
 			// 
 			this.superGameBoy2ToolStripMenuItem.Name = "superGameBoy2ToolStripMenuItem";
-			this.superGameBoy2ToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+			resources.ApplyResources(this.superGameBoy2ToolStripMenuItem, "superGameBoy2ToolStripMenuItem");
 			this.superGameBoy2ToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy2;
-			this.superGameBoy2ToolStripMenuItem.Text = "Super Game Boy &2";
-			this.superGameBoy2ToolStripMenuItem.ToolTipText = "Emulate Super Game Boy 2 Hardware";
 			this.superGameBoy2ToolStripMenuItem.Click += new System.EventHandler(this.superGameBoy2ToolStripMenuItem_Click);
 			// 
 			// joypadToolStripMenuItem
 			// 
 			this.joypadToolStripMenuItem.Name = "joypadToolStripMenuItem";
-			this.joypadToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.joypadToolStripMenuItem.Text = "Joypad";
+			resources.ApplyResources(this.joypadToolStripMenuItem, "joypadToolStripMenuItem");
+			// 
+			// toolStripMenuItem6
+			// 
+			toolStripMenuItem6.Name = "toolStripMenuItem6";
+			resources.ApplyResources(toolStripMenuItem6, "toolStripMenuItem6");
 			// 
 			// optionsToolStripMenuItem
 			// 
 			this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-			this.optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.optionsToolStripMenuItem.Text = "&Options";
+			resources.ApplyResources(this.optionsToolStripMenuItem, "optionsToolStripMenuItem");
 			// 
 			// toolsToolStripMenuItem
 			// 
@@ -421,134 +418,60 @@ namespace CrystalBoy.Emulator
             this.mapViewerToolStripMenuItem,
             this.oamViewerToolStripMenuItem});
 			this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
-			this.toolsToolStripMenuItem.Text = "&Tools";
-			this.toolsToolStripMenuItem.ToolTipText = "Tools for developers";
+			resources.ApplyResources(this.toolsToolStripMenuItem, "toolsToolStripMenuItem");
 			// 
 			// debuggerToolStripMenuItem
 			// 
 			this.debuggerToolStripMenuItem.Name = "debuggerToolStripMenuItem";
-			this.debuggerToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-			this.debuggerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-			this.debuggerToolStripMenuItem.Text = "&Debugger";
-			this.debuggerToolStripMenuItem.ToolTipText = "Show the Debugger Window";
+			resources.ApplyResources(this.debuggerToolStripMenuItem, "debuggerToolStripMenuItem");
 			this.debuggerToolStripMenuItem.Click += new System.EventHandler(this.debuggerToolStripMenuItem_Click);
 			// 
 			// memoryViewerToolStripMenuItem
 			// 
 			this.memoryViewerToolStripMenuItem.Name = "memoryViewerToolStripMenuItem";
-			this.memoryViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-			this.memoryViewerToolStripMenuItem.Text = "&Memory Viewer";
-			this.memoryViewerToolStripMenuItem.ToolTipText = "Show the Memory Viewer Window";
+			resources.ApplyResources(this.memoryViewerToolStripMenuItem, "memoryViewerToolStripMenuItem");
 			// 
 			// tileViewerToolStripMenuItem
 			// 
 			this.tileViewerToolStripMenuItem.Name = "tileViewerToolStripMenuItem";
-			this.tileViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-			this.tileViewerToolStripMenuItem.Text = "&Tile Viewer";
-			this.tileViewerToolStripMenuItem.ToolTipText = "Show the Tile Viewer Window";
+			resources.ApplyResources(this.tileViewerToolStripMenuItem, "tileViewerToolStripMenuItem");
 			this.tileViewerToolStripMenuItem.Click += new System.EventHandler(this.tileViewerToolStripMenuItem_Click);
 			// 
 			// mapViewerToolStripMenuItem
 			// 
 			this.mapViewerToolStripMenuItem.Name = "mapViewerToolStripMenuItem";
-			this.mapViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-			this.mapViewerToolStripMenuItem.Text = "&Map Viewer";
-			this.mapViewerToolStripMenuItem.ToolTipText = "Show the Map Viewer Window";
+			resources.ApplyResources(this.mapViewerToolStripMenuItem, "mapViewerToolStripMenuItem");
 			this.mapViewerToolStripMenuItem.Click += new System.EventHandler(this.mapViewerToolStripMenuItem_Click);
 			// 
 			// oamViewerToolStripMenuItem
 			// 
 			this.oamViewerToolStripMenuItem.Name = "oamViewerToolStripMenuItem";
-			this.oamViewerToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-			this.oamViewerToolStripMenuItem.Text = "&OAM Viewer";
-			this.oamViewerToolStripMenuItem.ToolTipText = "Show the OAM Viewer Window";
+			resources.ApplyResources(this.oamViewerToolStripMenuItem, "oamViewerToolStripMenuItem");
 			// 
 			// helpToolStripMenuItem
 			// 
 			this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem});
 			this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-			this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-			this.helpToolStripMenuItem.Text = "&Help";
+			resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
 			// 
 			// aboutToolStripMenuItem
 			// 
 			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
-			this.aboutToolStripMenuItem.Text = "&About";
+			resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
 			// 
 			// openFileDialog
 			// 
 			this.openFileDialog.DefaultExt = "gb";
-			this.openFileDialog.Filter = "GameBoy ROMs (*.gb;*.gbc;*.gbc)|*.gb;*.gbc;*.gbc|All Files (*.*)|*.*";
-			// 
-			// toolStripContainer
-			// 
-			// 
-			// toolStripContainer.BottomToolStripPanel
-			// 
-			this.toolStripContainer.BottomToolStripPanel.Controls.Add(this.statusStrip);
-			// 
-			// toolStripContainer.ContentPanel
-			// 
-			this.toolStripContainer.ContentPanel.Size = new System.Drawing.Size(292, 220);
-			this.toolStripContainer.ContentPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.toolStripContainer_ContentPanel_Paint);
-			this.toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.toolStripContainer.Location = new System.Drawing.Point(0, 0);
-			this.toolStripContainer.Name = "toolStripContainer";
-			this.toolStripContainer.Size = new System.Drawing.Size(292, 266);
-			this.toolStripContainer.TabIndex = 1;
-			// 
-			// toolStripContainer.TopToolStripPanel
-			// 
-			this.toolStripContainer.TopToolStripPanel.Controls.Add(this.mainMenuStrip);
-			// 
-			// statusStrip
-			// 
-			this.statusStrip.Dock = System.Windows.Forms.DockStyle.None;
-			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel,
-            this.frameRateToolStripStatusLabel,
-            this.emulationStatusToolStripStatusLabel});
-			this.statusStrip.Location = new System.Drawing.Point(0, 0);
-			this.statusStrip.Name = "statusStrip";
-			this.statusStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
-			this.statusStrip.Size = new System.Drawing.Size(292, 22);
-			this.statusStrip.TabIndex = 0;
-			// 
-			// toolStripStatusLabel
-			// 
-			this.toolStripStatusLabel.Name = "toolStripStatusLabel";
-			this.toolStripStatusLabel.Size = new System.Drawing.Size(157, 17);
-			this.toolStripStatusLabel.Spring = true;
-			this.toolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// frameRateToolStripStatusLabel
-			// 
-			this.frameRateToolStripStatusLabel.AutoSize = false;
-			this.frameRateToolStripStatusLabel.Name = "frameRateToolStripStatusLabel";
-			this.frameRateToolStripStatusLabel.Size = new System.Drawing.Size(70, 17);
-			this.frameRateToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// emulationStatusToolStripStatusLabel
-			// 
-			this.emulationStatusToolStripStatusLabel.AutoSize = false;
-			this.emulationStatusToolStripStatusLabel.Name = "emulationStatusToolStripStatusLabel";
-			this.emulationStatusToolStripStatusLabel.Size = new System.Drawing.Size(50, 17);
-			this.emulationStatusToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			resources.ApplyResources(this.openFileDialog, "openFileDialog");
 			// 
 			// MainForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(292, 266);
 			this.Controls.Add(this.toolStripContainer);
 			this.MainMenuStrip = this.mainMenuStrip;
 			this.Name = "MainForm";
-			this.Text = "CrystalBoy Emulator";
-			this.mainMenuStrip.ResumeLayout(false);
-			this.mainMenuStrip.PerformLayout();
 			this.toolStripContainer.BottomToolStripPanel.ResumeLayout(false);
 			this.toolStripContainer.BottomToolStripPanel.PerformLayout();
 			this.toolStripContainer.TopToolStripPanel.ResumeLayout(false);
@@ -557,6 +480,8 @@ namespace CrystalBoy.Emulator
 			this.toolStripContainer.PerformLayout();
 			this.statusStrip.ResumeLayout(false);
 			this.statusStrip.PerformLayout();
+			this.mainMenuStrip.ResumeLayout(false);
+			this.mainMenuStrip.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -606,6 +531,7 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripMenuItem audioEnabledToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem muteToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem limitSpeedToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem runFrameToolStripMenuItem;
 	}
 }
 

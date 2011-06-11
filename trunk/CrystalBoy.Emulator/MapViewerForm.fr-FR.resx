@@ -117,59 +117,89 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AssemblyArchitectureErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" is not valid for your system.
-It will be removed from the plugin assembly list.</value>
+  <data name="backgroundMapGroupBox.Text" xml:space="preserve">
+    <value>Arrière-plan</value>
   </data>
-  <data name="AssemblyLoadErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" could not be loaded.
-It will be removed from the plugin assembly list.
-
-Details:
-{1}</value>
+  <data name="windowMapGroupBox.Text" xml:space="preserve">
+    <value>Fenêtre</value>
   </data>
-  <data name="AssemblyLoadErrorTitle" xml:space="preserve">
-    <value>Plugin assembly loading error</value>
+  <data name="customMapGroupBox.Text" xml:space="preserve">
+    <value>Vu de l'arrière-plan</value>
   </data>
-  <data name="AssemblyNotFoundErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" could not be found.
-It will be removed from the plugin assembly list.</value>
+  <data name="autoMapsTabPage.Text" xml:space="preserve">
+    <value>Automatique</value>
   </data>
-  <data name="ByteFormat" xml:space="preserve">
-    <value>{0} Bytes</value>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="label13.Size" type="System.Drawing.Size, System.Drawing">
+    <value>48, 13</value>
   </data>
-  <data name="EmulationResetMessage" xml:space="preserve">
-    <value>The emulation must be reset for changing the emulated hardware.
-Do you agree to reset the emulation ?</value>
+  <data name="label13.Text" xml:space="preserve">
+    <value>Priorité : </value>
   </data>
-  <data name="ErrorTitle" xml:space="preserve">
-    <value>Error</value>
+  <data name="label11.Size" type="System.Drawing.Size, System.Drawing">
+    <value>49, 13</value>
   </data>
-  <data name="GenericMessageTitle" xml:space="preserve">
-    <value>CrystalBoy</value>
+  <data name="label11.Text" xml:space="preserve">
+    <value>Palette : </value>
   </data>
-  <data name="GigaByteFormat" xml:space="preserve">
-    <value>{0:N2} GB</value>
+  <data name="label9.Size" type="System.Drawing.Size, System.Drawing">
+    <value>53, 13</value>
   </data>
-  <data name="KiloByteFormat" xml:space="preserve">
-    <value>{0:N2} kB</value>
+  <data name="label9.Text" xml:space="preserve">
+    <value>Position : </value>
   </data>
-  <data name="MegaByteFormat" xml:space="preserve">
-    <value>{0:N2} MB</value>
+  <data name="label4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>63, 13</value>
   </data>
-  <data name="NoRenderMethodErrorMesage" xml:space="preserve">
-    <value>No usable render method found.</value>
+  <data name="label4.Text" xml:space="preserve">
+    <value>Retourner : </value>
   </data>
-  <data name="OneByteFormat" xml:space="preserve">
-    <value>{0} Byte</value>
+  <data name="label3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>62, 13</value>
   </data>
-  <data name="PausedText" xml:space="preserve">
-    <value>Paused</value>
+  <data name="label3.Text" xml:space="preserve">
+    <value>Caractère : </value>
   </data>
-  <data name="RunningText" xml:space="preserve">
-    <value>Running</value>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>54, 13</value>
   </data>
-  <data name="TypeLoadingErrorTitle" xml:space="preserve">
-    <value>Plugin loading error</value>
+  <data name="label2.Text" xml:space="preserve">
+    <value>Adresse : </value>
+  </data>
+  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>38, 13</value>
+  </data>
+  <data name="label1.Text" xml:space="preserve">
+    <value>Pixel : </value>
+  </data>
+  <data name="refreshButton.Text" xml:space="preserve">
+    <value>&amp;Rafraîchir</value>
+  </data>
+  <data name="closeButton.Text" xml:space="preserve">
+    <value>&amp;Fermer</value>
+  </data>
+  <data name="customMapsTabPage.Text" xml:space="preserve">
+    <value>Personnalisé</value>
+  </data>
+  <data name="groupBox2.Text" xml:space="preserve">
+    <value>Mettre à jour</value>
+  </data>
+  <data name="frameUpdateCheckBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>55, 17</value>
+  </data>
+  <data name="frameUpdateCheckBox.Text" xml:space="preserve">
+    <value>&amp;Image</value>
+  </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>Caractère</value>
+  </data>
+  <data name="mapDataGroupBox.Text" xml:space="preserve">
+    <value>Données</value>
+  </data>
+  <data name="tileDataGroupBox.Text" xml:space="preserve">
+    <value>Caractères</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>Visualiseur d'arrière-plan</value>
   </data>
 </root>

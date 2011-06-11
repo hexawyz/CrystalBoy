@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Resources;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -29,6 +30,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("GoldenCrystal")]
 [assembly: AssemblyProduct("CrystalBoy")]
 [assembly: AssemblyCopyright("Copyright © GoldenCrystal 2008-2011")]
+[assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: SuppressIldasm]
 

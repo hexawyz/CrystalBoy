@@ -87,5 +87,17 @@ namespace CrystalBoy.Emulator.Properties {
                 this["LimitSpeed"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GameBoyColor")]
+        public global::CrystalBoy.Emulation.HardwareType HardwareType {
+            get {
+                return ((global::CrystalBoy.Emulation.HardwareType)(this["HardwareType"]));
+            }
+            set {
+                this["HardwareType"] = value;
+            }
+        }
     }
 }

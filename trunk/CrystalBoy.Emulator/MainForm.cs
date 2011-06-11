@@ -52,6 +52,8 @@ namespace CrystalBoy.Emulator
 			emulatedGameBoy.RomChanged += OnRomChanged;
 			emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
 			emulatedGameBoy.NewFrame += OnNewFrame;
+			try { emulatedGameBoy.Reset(Settings.Default.HardwareType); }
+			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
 			AdjustSize(Settings.Default.RenderSize);
 			ResetEmulationMenuItems(false);
 			UpdateEmulationStatus();
@@ -356,7 +358,7 @@ namespace CrystalBoy.Emulator
 			resetToolStripMenuItem.Enabled = enable;
 		}
 
-		private void UpdateEmulationStatus() { emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus.ToString(); }
+		private void UpdateEmulationStatus() { emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus == EmulationStatus.Running ? Resources.RunningText : Resources.PausedText; }
 
 		private void UpdateFrameRate()
 		{
@@ -437,7 +439,13 @@ namespace CrystalBoy.Emulator
 		private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Paused) emulatedGameBoy.Run();
-			else emulatedGameBoy.Pause();
+			else if (emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause();
+		}
+
+		private void runFrameToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause();
+			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Paused) emulatedGameBoy.RunFrame();
 		}
 
 		private void resetToolStripMenuItem_Click(object sender, EventArgs e) { emulatedGameBoy.Reset(); }
@@ -522,8 +530,8 @@ namespace CrystalBoy.Emulator
 
 		private void SwitchHardware(HardwareType hardwareType)
 		{
-			if (!emulatedGameBoy.RomLoaded || MessageBox.Show(this, "The emulation must be reset for changing the emulated hardware.\nDo you agree to reset the emulation ?", "CrystalBoy", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-				emulatedGameBoy.Reset(hardwareType);
+			if (!emulatedGameBoy.RomLoaded || MessageBox.Show(this, Resources.EmulationResetMessage, Resources.GenericMessageTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				emulatedGameBoy.Reset(Settings.Default.HardwareType = hardwareType);
 		}
 
 		#endregion

@@ -23,7 +23,7 @@ using CrystalBoy.Disassembly;
 
 namespace CrystalBoy.Disassembly.OpcodeTableGenerator
 {
-	static class Utility
+	public static class Utility
 	{
 		static readonly string[] registers = { "BC", "DE", "HL", "SP" };
 		static readonly string[] registers2 = { "BC", "DE", "HL", "AF" };

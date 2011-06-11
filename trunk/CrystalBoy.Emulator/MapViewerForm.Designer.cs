@@ -47,6 +47,7 @@ namespace CrystalBoy.Emulator
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.GroupBox backgroundMapGroupBox;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapViewerForm));
 			System.Windows.Forms.GroupBox windowMapGroupBox;
 			System.Windows.Forms.GroupBox customMapGroupBox;
 			System.Windows.Forms.TabPage autoMapsTabPage;
@@ -110,157 +111,97 @@ namespace CrystalBoy.Emulator
 			// backgroundMapGroupBox
 			// 
 			backgroundMapGroupBox.Controls.Add(this.backgroundMapPanel);
-			backgroundMapGroupBox.Location = new System.Drawing.Point(3, 3);
+			resources.ApplyResources(backgroundMapGroupBox, "backgroundMapGroupBox");
 			backgroundMapGroupBox.Name = "backgroundMapGroupBox";
-			backgroundMapGroupBox.Size = new System.Drawing.Size(268, 281);
-			backgroundMapGroupBox.TabIndex = 0;
 			backgroundMapGroupBox.TabStop = false;
-			backgroundMapGroupBox.Text = "Background Map";
 			// 
 			// backgroundMapPanel
 			// 
 			this.backgroundMapPanel.BackColor = System.Drawing.Color.White;
-			this.backgroundMapPanel.Location = new System.Drawing.Point(6, 19);
+			resources.ApplyResources(this.backgroundMapPanel, "backgroundMapPanel");
 			this.backgroundMapPanel.Name = "backgroundMapPanel";
-			this.backgroundMapPanel.Size = new System.Drawing.Size(256, 256);
-			this.backgroundMapPanel.TabIndex = 2;
 			// 
 			// windowMapGroupBox
 			// 
 			windowMapGroupBox.Controls.Add(this.windowMapPanel);
-			windowMapGroupBox.Location = new System.Drawing.Point(277, 3);
+			resources.ApplyResources(windowMapGroupBox, "windowMapGroupBox");
 			windowMapGroupBox.Name = "windowMapGroupBox";
-			windowMapGroupBox.Size = new System.Drawing.Size(268, 281);
-			windowMapGroupBox.TabIndex = 1;
 			windowMapGroupBox.TabStop = false;
-			windowMapGroupBox.Text = "Window Map";
 			// 
 			// windowMapPanel
 			// 
 			this.windowMapPanel.BackColor = System.Drawing.Color.White;
-			this.windowMapPanel.Location = new System.Drawing.Point(6, 19);
+			resources.ApplyResources(this.windowMapPanel, "windowMapPanel");
 			this.windowMapPanel.Name = "windowMapPanel";
-			this.windowMapPanel.Size = new System.Drawing.Size(256, 256);
-			this.windowMapPanel.TabIndex = 3;
 			// 
 			// customMapGroupBox
 			// 
 			customMapGroupBox.Controls.Add(this.customMapPanel);
-			customMapGroupBox.Location = new System.Drawing.Point(277, 3);
+			resources.ApplyResources(customMapGroupBox, "customMapGroupBox");
 			customMapGroupBox.Name = "customMapGroupBox";
-			customMapGroupBox.Size = new System.Drawing.Size(268, 281);
-			customMapGroupBox.TabIndex = 4;
 			customMapGroupBox.TabStop = false;
-			customMapGroupBox.Text = "Map";
 			// 
 			// customMapPanel
 			// 
 			this.customMapPanel.BackColor = System.Drawing.Color.White;
-			this.customMapPanel.Location = new System.Drawing.Point(6, 19);
+			resources.ApplyResources(this.customMapPanel, "customMapPanel");
 			this.customMapPanel.Name = "customMapPanel";
-			this.customMapPanel.Size = new System.Drawing.Size(256, 256);
-			this.customMapPanel.TabIndex = 2;
 			// 
 			// autoMapsTabPage
 			// 
 			autoMapsTabPage.Controls.Add(backgroundMapGroupBox);
 			autoMapsTabPage.Controls.Add(windowMapGroupBox);
-			autoMapsTabPage.Location = new System.Drawing.Point(4, 22);
+			resources.ApplyResources(autoMapsTabPage, "autoMapsTabPage");
 			autoMapsTabPage.Name = "autoMapsTabPage";
-			autoMapsTabPage.Padding = new System.Windows.Forms.Padding(3);
-			autoMapsTabPage.Size = new System.Drawing.Size(548, 287);
-			autoMapsTabPage.TabIndex = 0;
-			autoMapsTabPage.Text = "Automatic";
 			autoMapsTabPage.UseVisualStyleBackColor = true;
 			// 
 			// label13
 			// 
-			label13.AutoSize = true;
-			label13.Location = new System.Drawing.Point(6, 118);
-			label13.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(label13, "label13");
 			label13.Name = "label13";
-			label13.Size = new System.Drawing.Size(44, 13);
-			label13.TabIndex = 12;
-			label13.Text = "Priority: ";
 			// 
 			// label11
 			// 
-			label11.AutoSize = true;
-			label11.Location = new System.Drawing.Point(6, 101);
-			label11.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(label11, "label11");
 			label11.Name = "label11";
-			label11.Size = new System.Drawing.Size(46, 13);
-			label11.TabIndex = 10;
-			label11.Text = "Palette: ";
 			// 
 			// label9
 			// 
-			label9.AutoSize = true;
-			label9.Location = new System.Drawing.Point(6, 33);
-			label9.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(label9, "label9");
 			label9.Name = "label9";
-			label9.Size = new System.Drawing.Size(50, 13);
-			label9.TabIndex = 8;
-			label9.Text = "Position: ";
 			// 
 			// label4
 			// 
-			label4.AutoSize = true;
-			label4.Location = new System.Drawing.Point(6, 84);
-			label4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(label4, "label4");
 			label4.Name = "label4";
-			label4.Size = new System.Drawing.Size(29, 13);
-			label4.TabIndex = 3;
-			label4.Text = "Flip: ";
 			// 
 			// label3
 			// 
-			label3.AutoSize = true;
-			label3.Location = new System.Drawing.Point(6, 67);
-			label3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(label3, "label3");
 			label3.Name = "label3";
-			label3.Size = new System.Drawing.Size(30, 13);
-			label3.TabIndex = 2;
-			label3.Text = "Tile: ";
 			// 
 			// label2
 			// 
-			label2.AutoSize = true;
-			label2.Location = new System.Drawing.Point(6, 50);
-			label2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(label2, "label2");
 			label2.Name = "label2";
-			label2.Size = new System.Drawing.Size(51, 13);
-			label2.TabIndex = 1;
-			label2.Text = "Address: ";
 			// 
 			// label1
 			// 
-			label1.AutoSize = true;
-			label1.Location = new System.Drawing.Point(6, 16);
-			label1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(label1, "label1");
 			label1.Name = "label1";
-			label1.Size = new System.Drawing.Size(35, 13);
-			label1.TabIndex = 0;
-			label1.Text = "Pixel: ";
 			// 
 			// refreshButton
 			// 
-			this.refreshButton.Location = new System.Drawing.Point(412, 331);
+			resources.ApplyResources(this.refreshButton, "refreshButton");
 			this.refreshButton.Name = "refreshButton";
-			this.refreshButton.Size = new System.Drawing.Size(75, 23);
-			this.refreshButton.TabIndex = 2;
-			this.refreshButton.Text = "&Refresh";
 			this.refreshButton.UseVisualStyleBackColor = true;
 			this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
 			// 
 			// closeButton
 			// 
 			this.closeButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.closeButton.Location = new System.Drawing.Point(493, 331);
+			resources.ApplyResources(this.closeButton, "closeButton");
 			this.closeButton.Name = "closeButton";
-			this.closeButton.Size = new System.Drawing.Size(75, 23);
-			this.closeButton.TabIndex = 3;
-			this.closeButton.Text = "&Close";
 			this.closeButton.UseVisualStyleBackColor = true;
 			this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
 			// 
@@ -268,12 +209,10 @@ namespace CrystalBoy.Emulator
 			// 
 			this.tabControl.Controls.Add(autoMapsTabPage);
 			this.tabControl.Controls.Add(this.customMapsTabPage);
-			this.tabControl.Location = new System.Drawing.Point(12, 12);
+			resources.ApplyResources(this.tabControl, "tabControl");
 			this.tabControl.Multiline = true;
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
-			this.tabControl.Size = new System.Drawing.Size(556, 313);
-			this.tabControl.TabIndex = 5;
 			// 
 			// customMapsTabPage
 			// 
@@ -283,63 +222,42 @@ namespace CrystalBoy.Emulator
 			this.customMapsTabPage.Controls.Add(this.mapDataGroupBox);
 			this.customMapsTabPage.Controls.Add(this.tileDataGroupBox);
 			this.customMapsTabPage.Controls.Add(customMapGroupBox);
-			this.customMapsTabPage.Location = new System.Drawing.Point(4, 22);
+			resources.ApplyResources(this.customMapsTabPage, "customMapsTabPage");
 			this.customMapsTabPage.Name = "customMapsTabPage";
-			this.customMapsTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.customMapsTabPage.Size = new System.Drawing.Size(548, 287);
-			this.customMapsTabPage.TabIndex = 1;
-			this.customMapsTabPage.Text = "Custom";
 			this.customMapsTabPage.UseVisualStyleBackColor = true;
 			// 
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.pauseUpdateCheckBox);
 			this.groupBox2.Controls.Add(this.frameUpdateCheckBox);
-			this.groupBox2.Location = new System.Drawing.Point(3, 145);
+			resources.ApplyResources(this.groupBox2, "groupBox2");
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(100, 65);
-			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Update on";
 			// 
 			// pauseUpdateCheckBox
 			// 
-			this.pauseUpdateCheckBox.AutoSize = true;
-			this.pauseUpdateCheckBox.Location = new System.Drawing.Point(6, 42);
+			resources.ApplyResources(this.pauseUpdateCheckBox, "pauseUpdateCheckBox");
 			this.pauseUpdateCheckBox.Name = "pauseUpdateCheckBox";
-			this.pauseUpdateCheckBox.Size = new System.Drawing.Size(56, 17);
-			this.pauseUpdateCheckBox.TabIndex = 1;
-			this.pauseUpdateCheckBox.Text = "Pause";
 			this.pauseUpdateCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// frameUpdateCheckBox
 			// 
-			this.frameUpdateCheckBox.AutoSize = true;
-			this.frameUpdateCheckBox.Location = new System.Drawing.Point(6, 19);
+			resources.ApplyResources(this.frameUpdateCheckBox, "frameUpdateCheckBox");
 			this.frameUpdateCheckBox.Name = "frameUpdateCheckBox";
-			this.frameUpdateCheckBox.Size = new System.Drawing.Size(77, 17);
-			this.frameUpdateCheckBox.TabIndex = 0;
-			this.frameUpdateCheckBox.Text = "New frame";
 			this.frameUpdateCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// groupBox1
 			// 
 			this.groupBox1.Controls.Add(this.panel1);
-			this.groupBox1.Location = new System.Drawing.Point(195, 195);
+			resources.ApplyResources(this.groupBox1, "groupBox1");
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(76, 89);
-			this.groupBox1.TabIndex = 8;
 			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Tile View";
 			// 
 			// panel1
 			// 
 			this.panel1.BackColor = System.Drawing.Color.White;
-			this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-			this.panel1.Location = new System.Drawing.Point(6, 19);
+			resources.ApplyResources(this.panel1, "panel1");
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(64, 64);
-			this.panel1.TabIndex = 0;
 			// 
 			// informationGroupBox
 			// 
@@ -357,115 +275,66 @@ namespace CrystalBoy.Emulator
 			this.informationGroupBox.Controls.Add(label3);
 			this.informationGroupBox.Controls.Add(label2);
 			this.informationGroupBox.Controls.Add(label1);
-			this.informationGroupBox.Location = new System.Drawing.Point(109, 3);
+			resources.ApplyResources(this.informationGroupBox, "informationGroupBox");
 			this.informationGroupBox.Name = "informationGroupBox";
-			this.informationGroupBox.Size = new System.Drawing.Size(162, 136);
-			this.informationGroupBox.TabIndex = 7;
 			this.informationGroupBox.TabStop = false;
-			this.informationGroupBox.Text = "Information";
 			// 
 			// label14
 			// 
-			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(80, 118);
-			this.label14.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.label14, "label14");
 			this.label14.Name = "label14";
-			this.label14.Size = new System.Drawing.Size(10, 13);
-			this.label14.TabIndex = 13;
-			this.label14.Text = "-";
 			// 
 			// label12
 			// 
-			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(80, 101);
-			this.label12.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.label12, "label12");
 			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(10, 13);
-			this.label12.TabIndex = 11;
-			this.label12.Text = "-";
 			// 
 			// label10
 			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(80, 84);
-			this.label10.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.label10, "label10");
 			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(10, 13);
-			this.label10.TabIndex = 9;
-			this.label10.Text = "-";
 			// 
 			// label8
 			// 
-			this.label8.AutoSize = true;
-			this.label8.Location = new System.Drawing.Point(80, 67);
-			this.label8.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.label8, "label8");
 			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(10, 13);
-			this.label8.TabIndex = 7;
-			this.label8.Text = "-";
 			// 
 			// label7
 			// 
-			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(80, 50);
-			this.label7.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.label7, "label7");
 			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(10, 13);
-			this.label7.TabIndex = 6;
-			this.label7.Text = "-";
 			// 
 			// label6
 			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(80, 33);
-			this.label6.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.label6, "label6");
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(10, 13);
-			this.label6.TabIndex = 5;
-			this.label6.Text = "-";
 			// 
 			// label5
 			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(80, 16);
-			this.label5.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.label5, "label5");
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(10, 13);
-			this.label5.TabIndex = 4;
-			this.label5.Text = "-";
 			// 
 			// mapDataGroupBox
 			// 
 			this.mapDataGroupBox.Controls.Add(this.mapData1RadioButton);
 			this.mapDataGroupBox.Controls.Add(this.mapData0RadioButton);
-			this.mapDataGroupBox.Location = new System.Drawing.Point(3, 74);
+			resources.ApplyResources(this.mapDataGroupBox, "mapDataGroupBox");
 			this.mapDataGroupBox.Name = "mapDataGroupBox";
-			this.mapDataGroupBox.Size = new System.Drawing.Size(100, 65);
-			this.mapDataGroupBox.TabIndex = 6;
 			this.mapDataGroupBox.TabStop = false;
-			this.mapDataGroupBox.Text = "Map Data";
 			// 
 			// mapData1RadioButton
 			// 
-			this.mapData1RadioButton.AutoSize = true;
-			this.mapData1RadioButton.Location = new System.Drawing.Point(6, 42);
+			resources.ApplyResources(this.mapData1RadioButton, "mapData1RadioButton");
 			this.mapData1RadioButton.Name = "mapData1RadioButton";
-			this.mapData1RadioButton.Size = new System.Drawing.Size(77, 17);
-			this.mapData1RadioButton.TabIndex = 1;
 			this.mapData1RadioButton.TabStop = true;
-			this.mapData1RadioButton.Text = "9C00-9FFF";
 			this.mapData1RadioButton.UseVisualStyleBackColor = true;
 			// 
 			// mapData0RadioButton
 			// 
-			this.mapData0RadioButton.AutoSize = true;
+			resources.ApplyResources(this.mapData0RadioButton, "mapData0RadioButton");
 			this.mapData0RadioButton.Checked = true;
-			this.mapData0RadioButton.Location = new System.Drawing.Point(6, 19);
 			this.mapData0RadioButton.Name = "mapData0RadioButton";
-			this.mapData0RadioButton.Size = new System.Drawing.Size(77, 17);
-			this.mapData0RadioButton.TabIndex = 0;
 			this.mapData0RadioButton.TabStop = true;
-			this.mapData0RadioButton.Text = "9800-9BFF";
 			this.mapData0RadioButton.UseVisualStyleBackColor = true;
 			this.mapData0RadioButton.CheckedChanged += new System.EventHandler(this.dataRadioButton_CheckedChanged);
 			// 
@@ -473,44 +342,32 @@ namespace CrystalBoy.Emulator
 			// 
 			this.tileDataGroupBox.Controls.Add(this.tileData1RadioButton);
 			this.tileDataGroupBox.Controls.Add(this.tileData0RadioButton);
-			this.tileDataGroupBox.Location = new System.Drawing.Point(3, 3);
+			resources.ApplyResources(this.tileDataGroupBox, "tileDataGroupBox");
 			this.tileDataGroupBox.Name = "tileDataGroupBox";
-			this.tileDataGroupBox.Size = new System.Drawing.Size(100, 65);
-			this.tileDataGroupBox.TabIndex = 5;
 			this.tileDataGroupBox.TabStop = false;
-			this.tileDataGroupBox.Text = "Character Data";
 			// 
 			// tileData1RadioButton
 			// 
-			this.tileData1RadioButton.AutoSize = true;
-			this.tileData1RadioButton.Location = new System.Drawing.Point(6, 42);
+			resources.ApplyResources(this.tileData1RadioButton, "tileData1RadioButton");
 			this.tileData1RadioButton.Name = "tileData1RadioButton";
-			this.tileData1RadioButton.Size = new System.Drawing.Size(76, 17);
-			this.tileData1RadioButton.TabIndex = 1;
 			this.tileData1RadioButton.TabStop = true;
-			this.tileData1RadioButton.Text = "8800-97FF";
 			this.tileData1RadioButton.UseVisualStyleBackColor = true;
 			// 
 			// tileData0RadioButton
 			// 
-			this.tileData0RadioButton.AutoSize = true;
+			resources.ApplyResources(this.tileData0RadioButton, "tileData0RadioButton");
 			this.tileData0RadioButton.Checked = true;
-			this.tileData0RadioButton.Location = new System.Drawing.Point(6, 19);
 			this.tileData0RadioButton.Name = "tileData0RadioButton";
-			this.tileData0RadioButton.Size = new System.Drawing.Size(76, 17);
-			this.tileData0RadioButton.TabIndex = 0;
 			this.tileData0RadioButton.TabStop = true;
-			this.tileData0RadioButton.Text = "8000-8FFF";
 			this.tileData0RadioButton.UseVisualStyleBackColor = true;
 			this.tileData0RadioButton.CheckedChanged += new System.EventHandler(this.dataRadioButton_CheckedChanged);
 			// 
 			// MapViewerForm
 			// 
 			this.AcceptButton = this.refreshButton;
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.closeButton;
-			this.ClientSize = new System.Drawing.Size(580, 366);
 			this.Controls.Add(this.tabControl);
 			this.Controls.Add(this.closeButton);
 			this.Controls.Add(this.refreshButton);
@@ -520,7 +377,6 @@ namespace CrystalBoy.Emulator
 			this.Name = "MapViewerForm";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
-			this.Text = "Map Viewer";
 			backgroundMapGroupBox.ResumeLayout(false);
 			windowMapGroupBox.ResumeLayout(false);
 			customMapGroupBox.ResumeLayout(false);

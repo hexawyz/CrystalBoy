@@ -22,5 +22,8 @@
     <Setting Name="LimitSpeed" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="HardwareType" Type="CrystalBoy.Emulation.HardwareType" Scope="User">
+      <Value Profile="(Default)">GameBoyColor</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

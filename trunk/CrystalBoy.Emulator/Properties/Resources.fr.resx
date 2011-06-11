@@ -118,58 +118,58 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AssemblyArchitectureErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" is not valid for your system.
-It will be removed from the plugin assembly list.</value>
+    <value>L'assembly de plugins « {0} » n'est pas valide pour votre système.
+Il va être supprimé de la liste des assembly de plugins.</value>
   </data>
   <data name="AssemblyLoadErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" could not be loaded.
-It will be removed from the plugin assembly list.
+    <value>L'assembly de plugins « {0} » n'a pas pu être chargé.
+Il va être supprimé de la liste.
 
-Details:
+Détails :
 {1}</value>
   </data>
   <data name="AssemblyLoadErrorTitle" xml:space="preserve">
-    <value>Plugin assembly loading error</value>
+    <value>Erreur de chargement d'assembly</value>
   </data>
   <data name="AssemblyNotFoundErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" could not be found.
-It will be removed from the plugin assembly list.</value>
+    <value>L'assembly de plugins « {0} » n'a pas été trouvé.
+Il va être supprimé de la liste des assembly de plugins.</value>
   </data>
   <data name="ByteFormat" xml:space="preserve">
-    <value>{0} Bytes</value>
+    <value>{0} Octets</value>
   </data>
   <data name="EmulationResetMessage" xml:space="preserve">
-    <value>The emulation must be reset for changing the emulated hardware.
-Do you agree to reset the emulation ?</value>
+    <value>L'émualtion doit être réinitialisée pour pouvoir chanegr le type de matériel emulé.
+Acceptez-vous de réintilialiser l'émulation ?</value>
   </data>
   <data name="ErrorTitle" xml:space="preserve">
-    <value>Error</value>
+    <value>Erreur</value>
   </data>
   <data name="GenericMessageTitle" xml:space="preserve">
     <value>CrystalBoy</value>
   </data>
   <data name="GigaByteFormat" xml:space="preserve">
-    <value>{0:N2} GB</value>
+    <value>{0:N2} Go</value>
   </data>
   <data name="KiloByteFormat" xml:space="preserve">
-    <value>{0:N2} kB</value>
+    <value>{0:N2} Ko</value>
   </data>
   <data name="MegaByteFormat" xml:space="preserve">
-    <value>{0:N2} MB</value>
+    <value>{0:N2} Mo</value>
   </data>
   <data name="NoRenderMethodErrorMesage" xml:space="preserve">
-    <value>No usable render method found.</value>
+    <value>Aucune méthode de rendu utilisable n'a été trouvé.</value>
   </data>
   <data name="OneByteFormat" xml:space="preserve">
-    <value>{0} Byte</value>
+    <value>{0} Octet</value>
   </data>
   <data name="PausedText" xml:space="preserve">
-    <value>Paused</value>
+    <value>En pause</value>
   </data>
   <data name="RunningText" xml:space="preserve">
-    <value>Running</value>
+    <value>Exécution</value>
   </data>
   <data name="TypeLoadingErrorTitle" xml:space="preserve">
-    <value>Plugin loading error</value>
+    <value>Erreur de chargement de plugin</value>
   </data>
 </root>
