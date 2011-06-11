@@ -112,11 +112,30 @@ namespace CrystalBoy.Emulator.Properties {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The emulation must be reset for changing the emulated hardware.
+        ///Do you agree to reset the emulation ?.
+        /// </summary>
+        internal static string EmulationResetMessage {
+            get {
+                return ResourceManager.GetString("EmulationResetMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Error.
         /// </summary>
         internal static string ErrorTitle {
             get {
                 return ResourceManager.GetString("ErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à CrystalBoy.
+        /// </summary>
+        internal static string GenericMessageTitle {
+            get {
+                return ResourceManager.GetString("GenericMessageTitle", resourceCulture);
             }
         }
         
@@ -162,6 +181,24 @@ namespace CrystalBoy.Emulator.Properties {
         internal static string OneByteFormat {
             get {
                 return ResourceManager.GetString("OneByteFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Paused.
+        /// </summary>
+        internal static string PausedText {
+            get {
+                return ResourceManager.GetString("PausedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Running.
+        /// </summary>
+        internal static string RunningText {
+            get {
+                return ResourceManager.GetString("RunningText", resourceCulture);
             }
         }
         

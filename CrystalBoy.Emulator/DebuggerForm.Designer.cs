@@ -47,6 +47,7 @@ namespace CrystalBoy.Emulator
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.GroupBox registersGroupBox;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DebuggerForm));
 			System.Windows.Forms.Label ieLabel;
 			System.Windows.Forms.Label ifLabel;
 			System.Windows.Forms.Label pcLabel;
@@ -98,7 +99,7 @@ namespace CrystalBoy.Emulator
 			// 
 			// registersGroupBox
 			// 
-			registersGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			resources.ApplyResources(registersGroupBox, "registersGroupBox");
 			registersGroupBox.Controls.Add(this.ieValueLabel);
 			registersGroupBox.Controls.Add(ieLabel);
 			registersGroupBox.Controls.Add(this.ifValueLabel);
@@ -115,352 +116,210 @@ namespace CrystalBoy.Emulator
 			registersGroupBox.Controls.Add(deLabel);
 			registersGroupBox.Controls.Add(bcLabel);
 			registersGroupBox.Controls.Add(afLabel);
-			registersGroupBox.Location = new System.Drawing.Point(316, 13);
 			registersGroupBox.Name = "registersGroupBox";
-			registersGroupBox.Size = new System.Drawing.Size(164, 75);
-			registersGroupBox.TabIndex = 4;
 			registersGroupBox.TabStop = false;
-			registersGroupBox.Text = "Registers";
 			// 
 			// ieValueLabel
 			// 
-			this.ieValueLabel.AutoSize = true;
-			this.ieValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ieValueLabel.Location = new System.Drawing.Point(123, 58);
+			resources.ApplyResources(this.ieValueLabel, "ieValueLabel");
 			this.ieValueLabel.Name = "ieValueLabel";
-			this.ieValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.ieValueLabel.TabIndex = 15;
 			// 
 			// ieLabel
 			// 
-			ieLabel.AutoSize = true;
-			ieLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			ieLabel.Location = new System.Drawing.Point(89, 58);
+			resources.ApplyResources(ieLabel, "ieLabel");
 			ieLabel.Name = "ieLabel";
-			ieLabel.Size = new System.Drawing.Size(28, 14);
-			ieLabel.TabIndex = 14;
-			ieLabel.Text = "IE:";
 			// 
 			// ifValueLabel
 			// 
-			this.ifValueLabel.AutoSize = true;
-			this.ifValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.ifValueLabel.Location = new System.Drawing.Point(40, 58);
+			resources.ApplyResources(this.ifValueLabel, "ifValueLabel");
 			this.ifValueLabel.Name = "ifValueLabel";
-			this.ifValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.ifValueLabel.TabIndex = 13;
 			// 
 			// ifLabel
 			// 
-			ifLabel.AutoSize = true;
-			ifLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			ifLabel.Location = new System.Drawing.Point(6, 58);
+			resources.ApplyResources(ifLabel, "ifLabel");
 			ifLabel.Name = "ifLabel";
-			ifLabel.Size = new System.Drawing.Size(28, 14);
-			ifLabel.TabIndex = 12;
-			ifLabel.Text = "IF:";
 			// 
 			// pcValueLabel
 			// 
-			this.pcValueLabel.AutoSize = true;
-			this.pcValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.pcValueLabel.Location = new System.Drawing.Point(123, 44);
+			resources.ApplyResources(this.pcValueLabel, "pcValueLabel");
 			this.pcValueLabel.Name = "pcValueLabel";
-			this.pcValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.pcValueLabel.TabIndex = 11;
 			// 
 			// spValueLabel
 			// 
-			this.spValueLabel.AutoSize = true;
-			this.spValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.spValueLabel.Location = new System.Drawing.Point(123, 30);
+			resources.ApplyResources(this.spValueLabel, "spValueLabel");
 			this.spValueLabel.Name = "spValueLabel";
-			this.spValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.spValueLabel.TabIndex = 9;
 			// 
 			// hlValueLabel
 			// 
-			this.hlValueLabel.AutoSize = true;
-			this.hlValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.hlValueLabel.Location = new System.Drawing.Point(123, 16);
+			resources.ApplyResources(this.hlValueLabel, "hlValueLabel");
 			this.hlValueLabel.Name = "hlValueLabel";
-			this.hlValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.hlValueLabel.TabIndex = 7;
 			// 
 			// deValueLabel
 			// 
-			this.deValueLabel.AutoSize = true;
-			this.deValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.deValueLabel.Location = new System.Drawing.Point(40, 44);
+			resources.ApplyResources(this.deValueLabel, "deValueLabel");
 			this.deValueLabel.Name = "deValueLabel";
-			this.deValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.deValueLabel.TabIndex = 5;
 			// 
 			// bcValueLabel
 			// 
-			this.bcValueLabel.AutoSize = true;
-			this.bcValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.bcValueLabel.Location = new System.Drawing.Point(40, 30);
+			resources.ApplyResources(this.bcValueLabel, "bcValueLabel");
 			this.bcValueLabel.Name = "bcValueLabel";
-			this.bcValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.bcValueLabel.TabIndex = 3;
 			// 
 			// afValueLabel
 			// 
-			this.afValueLabel.AutoSize = true;
-			this.afValueLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.afValueLabel.Location = new System.Drawing.Point(40, 16);
+			resources.ApplyResources(this.afValueLabel, "afValueLabel");
 			this.afValueLabel.Name = "afValueLabel";
-			this.afValueLabel.Size = new System.Drawing.Size(0, 14);
-			this.afValueLabel.TabIndex = 1;
 			// 
 			// pcLabel
 			// 
-			pcLabel.AutoSize = true;
-			pcLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			pcLabel.Location = new System.Drawing.Point(89, 44);
+			resources.ApplyResources(pcLabel, "pcLabel");
 			pcLabel.Name = "pcLabel";
-			pcLabel.Size = new System.Drawing.Size(28, 14);
-			pcLabel.TabIndex = 10;
-			pcLabel.Text = "PC:";
 			// 
 			// spLabel
 			// 
-			spLabel.AutoSize = true;
-			spLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			spLabel.Location = new System.Drawing.Point(89, 30);
+			resources.ApplyResources(spLabel, "spLabel");
 			spLabel.Name = "spLabel";
-			spLabel.Size = new System.Drawing.Size(28, 14);
-			spLabel.TabIndex = 8;
-			spLabel.Text = "SP:";
 			// 
 			// hlLabel
 			// 
-			hlLabel.AutoSize = true;
-			hlLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			hlLabel.Location = new System.Drawing.Point(89, 16);
+			resources.ApplyResources(hlLabel, "hlLabel");
 			hlLabel.Name = "hlLabel";
-			hlLabel.Size = new System.Drawing.Size(28, 14);
-			hlLabel.TabIndex = 6;
-			hlLabel.Text = "HL:";
 			// 
 			// deLabel
 			// 
-			deLabel.AutoSize = true;
-			deLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			deLabel.Location = new System.Drawing.Point(6, 44);
+			resources.ApplyResources(deLabel, "deLabel");
 			deLabel.Name = "deLabel";
-			deLabel.Size = new System.Drawing.Size(28, 14);
-			deLabel.TabIndex = 4;
-			deLabel.Text = "DE:";
 			// 
 			// bcLabel
 			// 
-			bcLabel.AutoSize = true;
-			bcLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			bcLabel.Location = new System.Drawing.Point(6, 30);
+			resources.ApplyResources(bcLabel, "bcLabel");
 			bcLabel.Name = "bcLabel";
-			bcLabel.Size = new System.Drawing.Size(28, 14);
-			bcLabel.TabIndex = 2;
-			bcLabel.Text = "BC:";
 			// 
 			// afLabel
 			// 
-			afLabel.AutoSize = true;
-			afLabel.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			afLabel.Location = new System.Drawing.Point(6, 16);
+			resources.ApplyResources(afLabel, "afLabel");
 			afLabel.Name = "afLabel";
-			afLabel.Size = new System.Drawing.Size(28, 14);
-			afLabel.TabIndex = 0;
-			afLabel.Text = "AF:";
 			// 
 			// flagsGroupBox
 			// 
-			flagsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			resources.ApplyResources(flagsGroupBox, "flagsGroupBox");
 			flagsGroupBox.Controls.Add(this.imeCheckBox);
 			flagsGroupBox.Controls.Add(this.carryFlagCheckBox);
 			flagsGroupBox.Controls.Add(this.halfCarryFlagCheckBox);
 			flagsGroupBox.Controls.Add(this.negationFlagCheckBox);
 			flagsGroupBox.Controls.Add(this.zeroFlagCheckBox);
-			flagsGroupBox.Location = new System.Drawing.Point(316, 94);
 			flagsGroupBox.Name = "flagsGroupBox";
-			flagsGroupBox.Size = new System.Drawing.Size(164, 65);
-			flagsGroupBox.TabIndex = 5;
 			flagsGroupBox.TabStop = false;
-			flagsGroupBox.Text = "Flags";
 			// 
 			// imeCheckBox
 			// 
+			resources.ApplyResources(this.imeCheckBox, "imeCheckBox");
 			this.imeCheckBox.AutoCheck = false;
-			this.imeCheckBox.AutoSize = true;
-			this.imeCheckBox.Location = new System.Drawing.Point(6, 42);
 			this.imeCheckBox.Name = "imeCheckBox";
-			this.imeCheckBox.Size = new System.Drawing.Size(136, 17);
-			this.imeCheckBox.TabIndex = 4;
-			this.imeCheckBox.Text = "Interrupt Master Enable";
 			this.imeCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// carryFlagCheckBox
 			// 
+			resources.ApplyResources(this.carryFlagCheckBox, "carryFlagCheckBox");
 			this.carryFlagCheckBox.AutoCheck = false;
-			this.carryFlagCheckBox.AutoSize = true;
-			this.carryFlagCheckBox.Location = new System.Drawing.Point(125, 19);
 			this.carryFlagCheckBox.Name = "carryFlagCheckBox";
-			this.carryFlagCheckBox.Size = new System.Drawing.Size(33, 17);
-			this.carryFlagCheckBox.TabIndex = 3;
-			this.carryFlagCheckBox.Text = "C";
 			this.carryFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// halfCarryFlagCheckBox
 			// 
+			resources.ApplyResources(this.halfCarryFlagCheckBox, "halfCarryFlagCheckBox");
 			this.halfCarryFlagCheckBox.AutoCheck = false;
-			this.halfCarryFlagCheckBox.AutoSize = true;
-			this.halfCarryFlagCheckBox.Location = new System.Drawing.Point(85, 19);
 			this.halfCarryFlagCheckBox.Name = "halfCarryFlagCheckBox";
-			this.halfCarryFlagCheckBox.Size = new System.Drawing.Size(34, 17);
-			this.halfCarryFlagCheckBox.TabIndex = 2;
-			this.halfCarryFlagCheckBox.Text = "H";
 			this.halfCarryFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// negationFlagCheckBox
 			// 
+			resources.ApplyResources(this.negationFlagCheckBox, "negationFlagCheckBox");
 			this.negationFlagCheckBox.AutoCheck = false;
-			this.negationFlagCheckBox.AutoSize = true;
-			this.negationFlagCheckBox.Location = new System.Drawing.Point(45, 19);
 			this.negationFlagCheckBox.Name = "negationFlagCheckBox";
-			this.negationFlagCheckBox.Size = new System.Drawing.Size(34, 17);
-			this.negationFlagCheckBox.TabIndex = 1;
-			this.negationFlagCheckBox.Text = "N";
 			this.negationFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// zeroFlagCheckBox
 			// 
+			resources.ApplyResources(this.zeroFlagCheckBox, "zeroFlagCheckBox");
 			this.zeroFlagCheckBox.AutoCheck = false;
-			this.zeroFlagCheckBox.AutoSize = true;
-			this.zeroFlagCheckBox.Location = new System.Drawing.Point(6, 19);
 			this.zeroFlagCheckBox.Name = "zeroFlagCheckBox";
-			this.zeroFlagCheckBox.Size = new System.Drawing.Size(33, 17);
-			this.zeroFlagCheckBox.TabIndex = 0;
-			this.zeroFlagCheckBox.Text = "Z";
 			this.zeroFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// debugGroupBox
 			// 
-			debugGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			resources.ApplyResources(debugGroupBox, "debugGroupBox");
 			debugGroupBox.Controls.Add(this.stepButton);
 			debugGroupBox.Controls.Add(this.runButton);
-			debugGroupBox.Location = new System.Drawing.Point(316, 248);
 			debugGroupBox.Name = "debugGroupBox";
-			debugGroupBox.Size = new System.Drawing.Size(164, 48);
-			debugGroupBox.TabIndex = 7;
 			debugGroupBox.TabStop = false;
-			debugGroupBox.Text = "Debug";
 			// 
 			// stepButton
 			// 
-			this.stepButton.Location = new System.Drawing.Point(83, 19);
+			resources.ApplyResources(this.stepButton, "stepButton");
 			this.stepButton.Name = "stepButton";
-			this.stepButton.Size = new System.Drawing.Size(75, 23);
-			this.stepButton.TabIndex = 1;
-			this.stepButton.Text = "Step";
 			this.stepButton.UseVisualStyleBackColor = true;
 			this.stepButton.Click += new System.EventHandler(this.stepButton_Click);
 			// 
 			// runButton
 			// 
-			this.runButton.Location = new System.Drawing.Point(6, 19);
+			resources.ApplyResources(this.runButton, "runButton");
 			this.runButton.Name = "runButton";
-			this.runButton.Size = new System.Drawing.Size(75, 23);
-			this.runButton.TabIndex = 0;
-			this.runButton.Text = "Run";
 			this.runButton.UseVisualStyleBackColor = true;
 			this.runButton.Click += new System.EventHandler(this.runButton_Click);
 			// 
 			// breakpointsGroupBox
 			// 
-			this.breakpointsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			resources.ApplyResources(this.breakpointsGroupBox, "breakpointsGroupBox");
 			this.breakpointsGroupBox.Controls.Add(this.toggleBreakpointButton);
 			this.breakpointsGroupBox.Controls.Add(this.clearBreakpointsButton);
-			this.breakpointsGroupBox.Location = new System.Drawing.Point(316, 165);
 			this.breakpointsGroupBox.Name = "breakpointsGroupBox";
-			this.breakpointsGroupBox.Size = new System.Drawing.Size(164, 77);
-			this.breakpointsGroupBox.TabIndex = 6;
 			this.breakpointsGroupBox.TabStop = false;
-			this.breakpointsGroupBox.Text = "Breakpoints";
 			// 
 			// toggleBreakpointButton
 			// 
-			this.toggleBreakpointButton.Location = new System.Drawing.Point(6, 19);
+			resources.ApplyResources(this.toggleBreakpointButton, "toggleBreakpointButton");
 			this.toggleBreakpointButton.Name = "toggleBreakpointButton";
-			this.toggleBreakpointButton.Size = new System.Drawing.Size(152, 23);
-			this.toggleBreakpointButton.TabIndex = 0;
-			this.toggleBreakpointButton.Text = "Toggle";
 			this.toggleBreakpointButton.UseVisualStyleBackColor = true;
 			this.toggleBreakpointButton.Click += new System.EventHandler(this.toggleBreakpointButton_Click);
 			// 
 			// clearBreakpointsButton
 			// 
-			this.clearBreakpointsButton.Location = new System.Drawing.Point(6, 48);
+			resources.ApplyResources(this.clearBreakpointsButton, "clearBreakpointsButton");
 			this.clearBreakpointsButton.Name = "clearBreakpointsButton";
-			this.clearBreakpointsButton.Size = new System.Drawing.Size(152, 23);
-			this.clearBreakpointsButton.TabIndex = 1;
-			this.clearBreakpointsButton.Text = "Clear All";
 			this.clearBreakpointsButton.UseVisualStyleBackColor = true;
 			this.clearBreakpointsButton.Click += new System.EventHandler(this.clearBreakpointsButton_Click);
 			// 
 			// gotoLabel
 			// 
-			this.gotoLabel.AutoSize = true;
-			this.gotoLabel.Location = new System.Drawing.Point(12, 15);
+			resources.ApplyResources(this.gotoLabel, "gotoLabel");
 			this.gotoLabel.Name = "gotoLabel";
-			this.gotoLabel.Size = new System.Drawing.Size(51, 13);
-			this.gotoLabel.TabIndex = 0;
-			this.gotoLabel.Text = "Address: ";
 			// 
 			// gotoTextBox
 			// 
-			this.gotoTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.gotoTextBox.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.gotoTextBox.Location = new System.Drawing.Point(164, 12);
-			this.gotoTextBox.MaxLength = 4;
+			resources.ApplyResources(this.gotoTextBox, "gotoTextBox");
 			this.gotoTextBox.Name = "gotoTextBox";
-			this.gotoTextBox.Size = new System.Drawing.Size(100, 20);
-			this.gotoTextBox.TabIndex = 1;
-			this.gotoTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.gotoTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gotoTextBox_KeyDown);
 			// 
 			// gotoButton
 			// 
-			this.gotoButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.gotoButton.Location = new System.Drawing.Point(270, 10);
+			resources.ApplyResources(this.gotoButton, "gotoButton");
 			this.gotoButton.Name = "gotoButton";
-			this.gotoButton.Size = new System.Drawing.Size(39, 23);
-			this.gotoButton.TabIndex = 2;
-			this.gotoButton.Text = "Go";
 			this.gotoButton.UseVisualStyleBackColor = true;
 			this.gotoButton.Click += new System.EventHandler(this.gotoButton_Click);
 			// 
 			// disassemblyView
 			// 
-			this.disassemblyView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.disassemblyView.AutoScrollMinSize = new System.Drawing.Size(0, 1179648);
+			resources.ApplyResources(this.disassemblyView, "disassemblyView");
 			this.disassemblyView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.disassemblyView.Location = new System.Drawing.Point(14, 39);
-			this.disassemblyView.Margin = new System.Windows.Forms.Padding(4);
 			this.disassemblyView.Memory = null;
 			this.disassemblyView.Name = "disassemblyView";
 			this.disassemblyView.ShowCurrentInstruction = true;
-			this.disassemblyView.Size = new System.Drawing.Size(295, 256);
-			this.disassemblyView.TabIndex = 3;
 			this.disassemblyView.DoubleClick += new System.EventHandler(this.disassemblyView_DoubleClick);
 			// 
 			// DebuggerForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(492, 308);
 			this.Controls.Add(this.gotoButton);
 			this.Controls.Add(this.gotoTextBox);
 			this.Controls.Add(this.gotoLabel);
@@ -470,12 +329,10 @@ namespace CrystalBoy.Emulator
 			this.Controls.Add(registersGroupBox);
 			this.Controls.Add(this.disassemblyView);
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(500, 342);
 			this.Name = "DebuggerForm";
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
-			this.Text = "Debugger";
 			registersGroupBox.ResumeLayout(false);
 			registersGroupBox.PerformLayout();
 			flagsGroupBox.ResumeLayout(false);

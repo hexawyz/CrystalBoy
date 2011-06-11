@@ -117,59 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AssemblyArchitectureErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" is not valid for your system.
-It will be removed from the plugin assembly list.</value>
+  <data name="refreshButton.Text" xml:space="preserve">
+    <value>&amp;Rafraîchir</value>
   </data>
-  <data name="AssemblyLoadErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" could not be loaded.
-It will be removed from the plugin assembly list.
-
-Details:
-{1}</value>
+  <data name="tileSet0GroupBox.Text" xml:space="preserve">
+    <value>Banque 0</value>
   </data>
-  <data name="AssemblyLoadErrorTitle" xml:space="preserve">
-    <value>Plugin assembly loading error</value>
+  <data name="tileSet1GroupBox.Text" xml:space="preserve">
+    <value>Banque 1</value>
   </data>
-  <data name="AssemblyNotFoundErrorMessage" xml:space="preserve">
-    <value>The plugin assembly "{0}" could not be found.
-It will be removed from the plugin assembly list.</value>
+  <data name="closeButton.Text" xml:space="preserve">
+    <value>&amp;Fermer</value>
   </data>
-  <data name="ByteFormat" xml:space="preserve">
-    <value>{0} Bytes</value>
-  </data>
-  <data name="EmulationResetMessage" xml:space="preserve">
-    <value>The emulation must be reset for changing the emulated hardware.
-Do you agree to reset the emulation ?</value>
-  </data>
-  <data name="ErrorTitle" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="GenericMessageTitle" xml:space="preserve">
-    <value>CrystalBoy</value>
-  </data>
-  <data name="GigaByteFormat" xml:space="preserve">
-    <value>{0:N2} GB</value>
-  </data>
-  <data name="KiloByteFormat" xml:space="preserve">
-    <value>{0:N2} kB</value>
-  </data>
-  <data name="MegaByteFormat" xml:space="preserve">
-    <value>{0:N2} MB</value>
-  </data>
-  <data name="NoRenderMethodErrorMesage" xml:space="preserve">
-    <value>No usable render method found.</value>
-  </data>
-  <data name="OneByteFormat" xml:space="preserve">
-    <value>{0} Byte</value>
-  </data>
-  <data name="PausedText" xml:space="preserve">
-    <value>Paused</value>
-  </data>
-  <data name="RunningText" xml:space="preserve">
-    <value>Running</value>
-  </data>
-  <data name="TypeLoadingErrorTitle" xml:space="preserve">
-    <value>Plugin loading error</value>
+  <data name="$this.Text" xml:space="preserve">
+    <value>Visualiseur de caractères</value>
   </data>
 </root>

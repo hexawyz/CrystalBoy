@@ -47,6 +47,7 @@ namespace CrystalBoy.Emulator
 		private void InitializeComponent()
 		{
 			System.Windows.Forms.Label gameNameLabel;
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RomInformationForm));
 			System.Windows.Forms.Label makerCodeLabel;
 			System.Windows.Forms.Label makerNameLabel;
 			System.Windows.Forms.GroupBox gameGroupBox;
@@ -81,116 +82,62 @@ namespace CrystalBoy.Emulator
 			// 
 			// gameNameLabel
 			// 
-			gameNameLabel.AutoSize = true;
-			gameNameLabel.Location = new System.Drawing.Point(3, 2);
-			gameNameLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(gameNameLabel, "gameNameLabel");
 			gameNameLabel.Name = "gameNameLabel";
-			gameNameLabel.Size = new System.Drawing.Size(38, 13);
-			gameNameLabel.TabIndex = 0;
-			gameNameLabel.Text = "Name:";
 			// 
 			// makerCodeLabel
 			// 
-			makerCodeLabel.AutoSize = true;
-			makerCodeLabel.Location = new System.Drawing.Point(3, 19);
-			makerCodeLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(makerCodeLabel, "makerCodeLabel");
 			makerCodeLabel.Name = "makerCodeLabel";
-			makerCodeLabel.Size = new System.Drawing.Size(67, 13);
-			makerCodeLabel.TabIndex = 2;
-			makerCodeLabel.Text = "Maker code:";
 			// 
 			// makerNameLabel
 			// 
-			makerNameLabel.AutoSize = true;
-			makerNameLabel.Location = new System.Drawing.Point(3, 36);
-			makerNameLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(makerNameLabel, "makerNameLabel");
 			makerNameLabel.Name = "makerNameLabel";
-			makerNameLabel.Size = new System.Drawing.Size(69, 13);
-			makerNameLabel.TabIndex = 4;
-			makerNameLabel.Text = "Maker name:";
 			// 
 			// gameGroupBox
 			// 
-			gameGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			resources.ApplyResources(gameGroupBox, "gameGroupBox");
 			gameGroupBox.Controls.Add(this.gameTableLayoutPanel);
-			gameGroupBox.Location = new System.Drawing.Point(12, 12);
 			gameGroupBox.Name = "gameGroupBox";
-			gameGroupBox.Size = new System.Drawing.Size(320, 77);
-			gameGroupBox.TabIndex = 0;
 			gameGroupBox.TabStop = false;
-			gameGroupBox.Text = "Game";
 			// 
 			// gameTableLayoutPanel
 			// 
-			this.gameTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gameTableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.gameTableLayoutPanel.ColumnCount = 2;
-			this.gameTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32F));
-			this.gameTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 68F));
+			resources.ApplyResources(this.gameTableLayoutPanel, "gameTableLayoutPanel");
 			this.gameTableLayoutPanel.Controls.Add(this.makerNameValueLabel, 1, 2);
 			this.gameTableLayoutPanel.Controls.Add(makerNameLabel, 0, 2);
 			this.gameTableLayoutPanel.Controls.Add(this.makerCodeValueLabel, 1, 1);
 			this.gameTableLayoutPanel.Controls.Add(this.nameValueLabel, 1, 0);
 			this.gameTableLayoutPanel.Controls.Add(gameNameLabel, 0, 0);
 			this.gameTableLayoutPanel.Controls.Add(makerCodeLabel, 0, 1);
-			this.gameTableLayoutPanel.Location = new System.Drawing.Point(6, 19);
 			this.gameTableLayoutPanel.Name = "gameTableLayoutPanel";
-			this.gameTableLayoutPanel.RowCount = 3;
-			this.gameTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.gameTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.gameTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.gameTableLayoutPanel.Size = new System.Drawing.Size(308, 52);
-			this.gameTableLayoutPanel.TabIndex = 0;
 			// 
 			// makerNameValueLabel
 			// 
-			this.makerNameValueLabel.AutoSize = true;
-			this.makerNameValueLabel.Location = new System.Drawing.Point(101, 36);
-			this.makerNameValueLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.makerNameValueLabel, "makerNameValueLabel");
 			this.makerNameValueLabel.Name = "makerNameValueLabel";
-			this.makerNameValueLabel.Size = new System.Drawing.Size(0, 13);
-			this.makerNameValueLabel.TabIndex = 5;
 			// 
 			// makerCodeValueLabel
 			// 
-			this.makerCodeValueLabel.AutoSize = true;
-			this.makerCodeValueLabel.Location = new System.Drawing.Point(101, 19);
-			this.makerCodeValueLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.makerCodeValueLabel, "makerCodeValueLabel");
 			this.makerCodeValueLabel.Name = "makerCodeValueLabel";
-			this.makerCodeValueLabel.Size = new System.Drawing.Size(0, 13);
-			this.makerCodeValueLabel.TabIndex = 3;
 			// 
 			// nameValueLabel
 			// 
-			this.nameValueLabel.AutoSize = true;
-			this.nameValueLabel.Location = new System.Drawing.Point(101, 2);
-			this.nameValueLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.nameValueLabel, "nameValueLabel");
 			this.nameValueLabel.Name = "nameValueLabel";
-			this.nameValueLabel.Size = new System.Drawing.Size(0, 13);
-			this.nameValueLabel.TabIndex = 1;
 			// 
 			// hardwareGroupBox
 			// 
-			hardwareGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			resources.ApplyResources(hardwareGroupBox, "hardwareGroupBox");
 			hardwareGroupBox.Controls.Add(this.tableLayoutPanel2);
-			hardwareGroupBox.Location = new System.Drawing.Point(12, 95);
 			hardwareGroupBox.Name = "hardwareGroupBox";
-			hardwareGroupBox.Size = new System.Drawing.Size(320, 123);
-			hardwareGroupBox.TabIndex = 1;
 			hardwareGroupBox.TabStop = false;
-			hardwareGroupBox.Text = "Hardware";
 			// 
 			// tableLayoutPanel2
 			// 
-			this.tableLayoutPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.tableLayoutPanel2.ColumnCount = 2;
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32F));
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 68F));
+			resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
 			this.tableLayoutPanel2.Controls.Add(this.ramSizeValueLabel, 1, 2);
 			this.tableLayoutPanel2.Controls.Add(ramSizeLabel, 0, 2);
 			this.tableLayoutPanel2.Controls.Add(this.romSizeValueLabel, 1, 1);
@@ -199,114 +146,65 @@ namespace CrystalBoy.Emulator
 			this.tableLayoutPanel2.Controls.Add(romSizeLabel, 0, 1);
 			this.tableLayoutPanel2.Controls.Add(this.sgbCheckBox, 0, 3);
 			this.tableLayoutPanel2.Controls.Add(this.cgbCheckBox, 0, 4);
-			this.tableLayoutPanel2.Location = new System.Drawing.Point(6, 19);
 			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-			this.tableLayoutPanel2.RowCount = 5;
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(308, 98);
-			this.tableLayoutPanel2.TabIndex = 0;
 			// 
 			// ramSizeValueLabel
 			// 
-			this.ramSizeValueLabel.AutoSize = true;
-			this.ramSizeValueLabel.Location = new System.Drawing.Point(101, 36);
-			this.ramSizeValueLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.ramSizeValueLabel, "ramSizeValueLabel");
 			this.ramSizeValueLabel.Name = "ramSizeValueLabel";
-			this.ramSizeValueLabel.Size = new System.Drawing.Size(0, 13);
-			this.ramSizeValueLabel.TabIndex = 5;
 			// 
 			// ramSizeLabel
 			// 
-			ramSizeLabel.AutoSize = true;
-			ramSizeLabel.Location = new System.Drawing.Point(3, 36);
-			ramSizeLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(ramSizeLabel, "ramSizeLabel");
 			ramSizeLabel.Name = "ramSizeLabel";
-			ramSizeLabel.Size = new System.Drawing.Size(57, 13);
-			ramSizeLabel.TabIndex = 4;
-			ramSizeLabel.Text = "RAM Size:";
 			// 
 			// romSizeValueLabel
 			// 
-			this.romSizeValueLabel.AutoSize = true;
-			this.romSizeValueLabel.Location = new System.Drawing.Point(101, 19);
-			this.romSizeValueLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.romSizeValueLabel, "romSizeValueLabel");
 			this.romSizeValueLabel.Name = "romSizeValueLabel";
-			this.romSizeValueLabel.Size = new System.Drawing.Size(0, 13);
-			this.romSizeValueLabel.TabIndex = 3;
 			// 
 			// romTypeValueLabel
 			// 
-			this.romTypeValueLabel.AutoSize = true;
-			this.romTypeValueLabel.Location = new System.Drawing.Point(101, 2);
-			this.romTypeValueLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(this.romTypeValueLabel, "romTypeValueLabel");
 			this.romTypeValueLabel.Name = "romTypeValueLabel";
-			this.romTypeValueLabel.Size = new System.Drawing.Size(0, 13);
-			this.romTypeValueLabel.TabIndex = 1;
 			// 
 			// romTypeLabel
 			// 
-			romTypeLabel.AutoSize = true;
-			romTypeLabel.Location = new System.Drawing.Point(3, 2);
-			romTypeLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(romTypeLabel, "romTypeLabel");
 			romTypeLabel.Name = "romTypeLabel";
-			romTypeLabel.Size = new System.Drawing.Size(62, 13);
-			romTypeLabel.TabIndex = 0;
-			romTypeLabel.Text = "ROM Type:";
 			// 
 			// romSizeLabel
 			// 
-			romSizeLabel.AutoSize = true;
-			romSizeLabel.Location = new System.Drawing.Point(3, 19);
-			romSizeLabel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+			resources.ApplyResources(romSizeLabel, "romSizeLabel");
 			romSizeLabel.Name = "romSizeLabel";
-			romSizeLabel.Size = new System.Drawing.Size(58, 13);
-			romSizeLabel.TabIndex = 2;
-			romSizeLabel.Text = "ROM Size:";
 			// 
 			// sgbCheckBox
 			// 
+			resources.ApplyResources(this.sgbCheckBox, "sgbCheckBox");
 			this.sgbCheckBox.AutoCheck = false;
-			this.sgbCheckBox.AutoSize = true;
 			this.tableLayoutPanel2.SetColumnSpan(this.sgbCheckBox, 2);
-			this.sgbCheckBox.Location = new System.Drawing.Point(3, 54);
 			this.sgbCheckBox.Name = "sgbCheckBox";
-			this.sgbCheckBox.Size = new System.Drawing.Size(155, 17);
-			this.sgbCheckBox.TabIndex = 6;
-			this.sgbCheckBox.Text = "Super Game Boy Functions";
 			this.sgbCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// cgbCheckBox
 			// 
+			resources.ApplyResources(this.cgbCheckBox, "cgbCheckBox");
 			this.cgbCheckBox.AutoCheck = false;
-			this.cgbCheckBox.AutoSize = true;
 			this.tableLayoutPanel2.SetColumnSpan(this.cgbCheckBox, 2);
-			this.cgbCheckBox.Location = new System.Drawing.Point(3, 77);
 			this.cgbCheckBox.Name = "cgbCheckBox";
-			this.cgbCheckBox.Size = new System.Drawing.Size(151, 17);
-			this.cgbCheckBox.TabIndex = 7;
-			this.cgbCheckBox.Text = "Color Game Boy Functions";
 			this.cgbCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// okButton
 			// 
-			this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.okButton.Location = new System.Drawing.Point(257, 224);
+			resources.ApplyResources(this.okButton, "okButton");
 			this.okButton.Name = "okButton";
-			this.okButton.Size = new System.Drawing.Size(75, 23);
-			this.okButton.TabIndex = 2;
-			this.okButton.Text = "&OK";
 			this.okButton.UseVisualStyleBackColor = true;
 			this.okButton.Click += new System.EventHandler(this.okButton_Click);
 			// 
 			// RomInformationForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(344, 259);
 			this.Controls.Add(this.okButton);
 			this.Controls.Add(hardwareGroupBox);
 			this.Controls.Add(gameGroupBox);
@@ -315,7 +213,6 @@ namespace CrystalBoy.Emulator
 			this.MinimizeBox = false;
 			this.Name = "RomInformationForm";
 			this.ShowInTaskbar = false;
-			this.Text = "ROM Information";
 			gameGroupBox.ResumeLayout(false);
 			this.gameTableLayoutPanel.ResumeLayout(false);
 			this.gameTableLayoutPanel.PerformLayout();

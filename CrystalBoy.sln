@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		AssemblyInfo.Common.cs = AssemblyInfo.Common.cs
 		CrystalBoy.snk = CrystalBoy.snk
+		ReadMe.txt = ReadMe.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{F62946A5-1C11-4934-9A97-86E3D34F6EE4}"
