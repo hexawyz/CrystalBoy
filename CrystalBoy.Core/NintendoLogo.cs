@@ -18,21 +18,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Text;
 
-namespace CrystalBoy.Decompiler
+namespace CrystalBoy.Core
 {
-	static class Program
+	public static class NintendoLogo
 	{
-		/// <summary>
-		/// Point d'entrée principal de l'application.
-		/// </summary>
-		[STAThread]
-		static void Main()
+		internal static readonly byte[] Data = Load();
+
+		private static byte[] Load()
 		{
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
+			using (var stream = typeof(NintendoLogo).Assembly.GetManifestResourceStream(typeof(NintendoLogo), "NintendoLogo"))
+			{
+				byte[] data = new byte[stream.Length];
+
+				stream.Read(data, 0, data.Length);
+
+				return data;
+			}
 		}
+
+		// A static indexer would do a better job, but there is no such thing in C#… :(
+		public static byte Get(int index) { return Data[index]; }
 	}
 }

@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,6 +37,9 @@ namespace CrystalBoy.Emulation
 		MemoryBlock portMemoryBlock;
 		MemoryBlock segmentMemoryBlock;
 		MemoryBlock generalMemoryBlock;
+		MemoryBlock dmgBootMemoryBlock;
+		MemoryBlock sgbBootMemoryBlock;
+		MemoryBlock cgbBootMemoryBlock;
 
 		MemoryWriteHandler[] segmentWriteHandlerArray;
 		unsafe byte** segmentArray;
@@ -47,6 +50,11 @@ namespace CrystalBoy.Emulation
 		unsafe byte* objectAttributeMemory;
 		unsafe byte* trashMemory;
 		unsafe byte* externalPortMemory;
+		unsafe byte* dmgBootMemory;
+		unsafe byte* sgbBootMemory;
+		unsafe byte* cgbBootMemory;
+
+		bool internalRomMapped;
 
 		int lowerRomBank, upperRombank, ramBank, videoRamBank, workRamBank;
 
@@ -83,6 +91,13 @@ namespace CrystalBoy.Emulation
 				generalMemoryBlock = new MemoryBlock(512); // 256 bytes of register memory and 256 bytes of 'trash' memory
 				externalPortMemory = (byte*)generalMemoryBlock.Pointer;
 				trashMemory = (byte*)generalMemoryBlock.Pointer + 256;
+
+				dmgBootMemoryBlock = new MemoryBlock(0x100);
+				dmgBootMemory = (byte*)dmgBootMemoryBlock.Pointer;
+				sgbBootMemoryBlock = new MemoryBlock(0x100);
+				sgbBootMemory = (byte*)sgbBootMemoryBlock.Pointer;
+				cgbBootMemoryBlock = new MemoryBlock(0x800);
+				cgbBootMemory = (byte*)cgbBootMemoryBlock.Pointer;
 			}
 
 			ResetSegments();
@@ -106,6 +121,7 @@ namespace CrystalBoy.Emulation
 
 			videoRamBank = 0;
 			workRamBank = 1;
+			internalRomMapped = false;
 
 			ResetSegments();
 			ResetWriteHandlers();
@@ -118,6 +134,7 @@ namespace CrystalBoy.Emulation
 			MapVideoRamBank();
 			MapStaticWorkRamBank();
 			MapWorkRamBank();
+			if (useBootRom) MapInternalRom();
 			segmentArray[0xFE] = (byte*)objectAttributeMemoryBlock.Pointer;
 			segmentArray[0xFF] = portMemory;
 		}
@@ -213,6 +230,8 @@ namespace CrystalBoy.Emulation
 
 			if (offset < 0x4000)
 			{
+				if (internalRomMapped && (offset < 0x100 || colorHardware && offset >= 0x200 && offset < 0x900))
+					return MemoryType.InternalRom;
 				if (lowerRomBank > 0)
 				{
 					bank = lowerRomBank;
@@ -416,6 +435,40 @@ namespace CrystalBoy.Emulation
 
 		#region Banking
 
+		#region Internal ROM / Bootstrap ROM
+
+		private unsafe void MapInternalRom()
+		{
+			internalRomMapped = true;
+			switch (HardwareType)
+			{
+				case HardwareType.GameBoy:
+				case HardwareType.GameBoyPocket:
+					segmentArray[0] = dmgBootMemory;
+					break;
+				case HardwareType.SuperGameBoy:
+					segmentArray[0] = sgbBootMemory;
+					break;
+				case HardwareType.GameBoyColor:
+					segmentArray[0] = cgbBootMemory;
+					for (int i = 0; i < 8; i++)
+						segmentArray[i + 2] = cgbBootMemory + ((i + 1) << 8);
+					break;
+				default:
+					this.useBootRom = false;
+					break;
+			}
+		}
+
+		private unsafe void UnmapInternalRom()
+		{
+			internalRomMapped = false;
+			if (lowerRomBank >= 0) MapExternalRomBank(false, lowerRomBank);
+			else UnmapExternalRom();
+		}
+
+		#endregion
+
 		#region External ROM
 
 		internal unsafe void UnmapExternalRom()
@@ -424,8 +477,16 @@ namespace CrystalBoy.Emulation
 
 			lowerRomBank = -1;
 			upperRombank = -1;
-			for (int i = 0x80; i != 0; i--)
-				*segment++ = trashMemory;
+			if (internalRomMapped)
+				for (int i = 0; i < 0x80; i++)
+				{
+					if (i >= 0x1 && (!colorHardware || i < 0x2 || i >= 0x9))
+						*segment = trashMemory;
+					segment++;
+				}
+			else
+				for (int i = 0x80; i != 0; i--)
+					*segment++ = trashMemory;
 		}
 
 		internal unsafe void MapExternalRomBank(bool upper, int bankIndex)
@@ -448,8 +509,16 @@ namespace CrystalBoy.Emulation
 				upperRombank = bankIndex;
 			}
 
-			for (int i = 0x40; i != 0; i--, source += 256)
-				*segment++ = source;
+			if (!upper && internalRomMapped)
+				for (int i = 0; i < 0x40; i++, source += 256)
+				{
+					if (i >= 0x1 && (!colorHardware || i < 0x2 || i >= 0x9))
+						*segment = source;
+					segment++;
+				}
+			else
+				for (int i = 0x40; i != 0; i--, source += 256)
+					*segment++ = source;
 		}
 
 		#endregion

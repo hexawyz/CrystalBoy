@@ -69,6 +69,7 @@
     <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="MakerDictionary.cs" />
     <Compile Include="Memory.cs" />
+    <Compile Include="NintendoLogo.cs" />
     <Compile Include="RomType.cs" />
     <Compile Include="MemoryUtility.cs" />
     <Compile Include="IDebuggable.cs" />
@@ -80,6 +81,9 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RomInformation.cs" />
+    <EmbeddedResource Include="NintendoLogo.bin">
+      <DependentUpon>NintendoLogo.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="makers.xml" />

@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,12 +39,12 @@ namespace CrystalBoy.Emulation
 			BuildPaletteLookupTables(out PaletteLookupTable, out FlippedPaletteLookupTable);
 		}
 
-		static uint[] BuildPalette()
+		private static uint[] BuildPalette()
 		{
-			return new uint[] { 0xFFFFFFFF, 0xFFC0C0C0, 0xFF808080, 0xFF000000 };
+			return new uint[] { 0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000 };
 		}
 
-		static void BuildPaletteLookupTables(out ushort[] paletteLookupTable, out ushort[] flippedPaletteLookupTable)
+		private static void BuildPaletteLookupTables(out ushort[] paletteLookupTable, out ushort[] flippedPaletteLookupTable)
 		{
 			paletteLookupTable = new ushort[65536];
 			flippedPaletteLookupTable = new ushort[65536];

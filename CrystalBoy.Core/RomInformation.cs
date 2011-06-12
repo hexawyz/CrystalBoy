@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,15 +24,16 @@ namespace CrystalBoy.Core
 {
 	public sealed class RomInformation
 	{
-		string name, makerCode, makerName;
-		bool regularSupport, cgbSupport, sgbSupport, japanese;
-		bool hasRam, hasBattery, hasTimer, hasRumble;
-		int romSize, ramSize, romBankCount, ramBankCount;
-		RomType romType;
+		private string name, makerCode, makerName;
+		private bool regularSupport, cgbSupport, sgbSupport, japanese;
+		private bool partialLogoCheck, fullLogoCheck;
+		private bool hasRam, hasBattery, hasTimer, hasRumble;
+		private int romSize, ramSize, romBankCount, ramBankCount;
+		private RomType romType;
 
 		public unsafe RomInformation(MemoryBlock memoryBlock)
 		{
-			byte* pMemory;
+			byte* memory;
 			int maxNameLength;
 			byte cgbFlag, sgbFlag;
 			int makerCode;
@@ -40,48 +41,59 @@ namespace CrystalBoy.Core
 			if (memoryBlock == null)
 				throw new ArgumentNullException("memoryBlock");
 
-			pMemory = (byte*)memoryBlock.Pointer;
+			memory = (byte*)memoryBlock.Pointer;
 
-			// Default to black&white compatible
+			// Defaults to black&white compatible
 			regularSupport = true;
 
+			// Logo check
+ 			// Defaults to logo ok
+			partialLogoCheck = fullLogoCheck = true;
+			for (int i = 0; i < NintendoLogo.Data.Length; i++)
+				if (memory[0x104 + i] != NintendoLogo.Data[i])
+				{
+					fullLogoCheck = false;
+					if (i < 0x18) // GBC parses only first 24 bytes of logo data, according to PanDocs
+						partialLogoCheck = false;
+				}
+
 			// Detect CGB support
-			cgbFlag = pMemory[0x143];
+			cgbFlag = memory[0x143];
 			cgbSupport = (cgbFlag & 0x80) != 0;
 			if (cgbSupport && ((cgbFlag & 0x40) != 0))
 				regularSupport = false;
 
 			// Detect SGB support
-			sgbFlag = pMemory[0x146];
+			sgbFlag = memory[0x146];
 			if (sgbFlag == 0x3)
 				sgbSupport = true;
 
 			// Read the name
-			if (cgbSupport)
-				maxNameLength = 15;
-			else
-				maxNameLength = 16;
+			if (cgbSupport) maxNameLength = 15;
+			else maxNameLength = 16;
 
 			name = "";
 
 			for (int i = 0; i < maxNameLength; i++)
 			{
-				byte c = pMemory[0x134 + i];
+				byte c = memory[0x134 + i];
 
 				if (c == 0) break;
 				else name += (char)c;
 			}
 
 			// Read the licensee code
-			makerCode = pMemory[0x14B];
-			if (makerCode == 0x33)
-				this.makerCode = string.Intern(((char)pMemory[0x144]).ToString() + ((char)pMemory[0x145]).ToString());
-			else
-				this.makerCode = string.Intern(makerCode.ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+			makerCode = memory[0x14B];
+			this.makerCode = string.Intern
+			(
+				makerCode == 0x33 ?
+					((char)memory[0x144]).ToString() + ((char)memory[0x145]).ToString() :
+					makerCode.ToString("X2", System.Globalization.CultureInfo.InvariantCulture)
+			);
 			makerName = MakerDictionary.GetMakerName(this.makerCode);
 
 			// Read the cartidge type
-			switch (romType = (RomType)pMemory[0x147])
+			switch (romType = (RomType)memory[0x147])
 			{
 				case RomType.RomMbc3TimerRamBattery:
 					hasRam = true;
@@ -123,8 +135,8 @@ namespace CrystalBoy.Core
 			}
 
 			// Read the ROM size
-			romBankCount = GetRomBankCount(pMemory[0x148]);
-			romSize = GetRomSize(pMemory[0x148]);
+			romBankCount = GetRomBankCount(memory[0x148]);
+			romSize = GetRomSize(memory[0x148]);
 			// Read the RAM size
 			if (romType == RomType.RomMbc2 || romType == RomType.RomMbc2Battery)
 			{
@@ -134,12 +146,12 @@ namespace CrystalBoy.Core
 			}
 			else
 			{
-				ramBankCount = GetRamBankCount(pMemory[0x149]);
-				ramSize = GetRamSize(pMemory[0x149]);
+				ramBankCount = GetRamBankCount(memory[0x149]);
+				ramSize = GetRamSize(memory[0x149]);
 			}
 
 			// Read the region flag
-			japanese = (pMemory[0x150] == 0); // Should be 0x01 for non-japanese
+			japanese = (memory[0x150] == 0); // Should be 0x01 for non-japanese
 		}
 
 		private static int GetRomBankCount(int sizeFlag)
@@ -219,6 +231,10 @@ namespace CrystalBoy.Core
 		public bool ColorGameBoySupport { get { return cgbSupport; } }
 
 		public bool SuperGameBoySupport { get { return sgbSupport; } }
+
+		public bool PartialLogoCheck { get { return partialLogoCheck; } }
+
+		public bool FullLogoCheck { get { return fullLogoCheck; } }
 
 		public RomType RomType { get { return romType; } }
 
