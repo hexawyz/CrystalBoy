@@ -121,6 +121,12 @@
   <data name="toolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
     <value>232, 6</value>
   </data>
+  <data name="toolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>116, 17</value>
+  </data>
+  <data name="emulationStatusToolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>60, 17</value>
+  </data>
   <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>54, 20</value>
   </data>
@@ -203,18 +209,6 @@
   <data name="zoomToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>172, 22</value>
   </data>
-  <data name="zoom100toolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="zoom200toolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="zoom300toolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="zoom400toolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
   <data name="renderMethodToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>172, 22</value>
   </data>
@@ -236,7 +230,7 @@
   <data name="joypadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>248, 22</value>
   </data>
-  <data name="toolStripMenuItem6.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="toolStripMenuItem7.Size" type="System.Drawing.Size, System.Drawing">
     <value>245, 6</value>
   </data>
   <data name="optionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
@@ -249,13 +243,13 @@
     <value>Ou&amp;tils</value>
   </data>
   <data name="debuggerToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>202, 22</value>
+    <value>204, 22</value>
   </data>
   <data name="debuggerToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Debogueur</value>
   </data>
   <data name="memoryViewerToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>202, 22</value>
+    <value>204, 22</value>
   </data>
   <data name="memoryViewerToolStripMenuItem.Text" xml:space="preserve">
     <value>Visualiseur de &amp;mémoire</value>

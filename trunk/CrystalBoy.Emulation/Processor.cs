@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,22 +45,15 @@ namespace CrystalBoy.Emulation
 
 		internal void Reset()
 		{
-			if (bus.HardwareType == HardwareType.GameBoyPocket)
-				AF = 0xFFB0;
-			else if (bus.HardwareType == HardwareType.GameBoyColor || bus.HardwareType == HardwareType.GameBoyAdvance)
-				AF = 0x11B0;
-			else
-				AF = 0x01B0;
+			// Processor starts at zero
 
-			if (bus.HardwareType == HardwareType.GameBoyAdvance)
-				BC = 0x0113;
-			else
-				BC = 0x0013;
-
-			DE = 0x00D8;
-			HL = 0x014D;
-			SP = 0xFFFE;
-			PC = 0x0100;
+			AF = 0x0000;
+			BC = 0x0000;
+			DE = 0x0000;
+			HL = 0x0000;
+			SP = 0x0000;
+			PC = 0x0000;
+			InterruptMasterEnable = false;
 
 			status = ProcessorStatus.Running;
 		}

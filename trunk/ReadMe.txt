@@ -18,6 +18,11 @@ Préréquisites:
 
 Since the Direct2D render method has been quite enhanced compared to others, I suggest you use it *if you have Windows 7*.
 
+Changes for version 1.4
+	* Now supports loading the DMG, SGB and GBC bootstrap ROMs
+	* Better GBC hardware emulation (now supports switching to fake B&W mode)
+		- Using GBC bootstrap ROM allows to play B&W games with automatic color palette
+
 Changes for version 1.3
 	* More accurate CPU emulation (according to the tests, all instructions now compute 100% exact… Only HALT and STOP may need reworking)
 	* Direct2D render method with SlimDX (March 2011)
@@ -31,4 +36,4 @@ Changes for version 1.3
 		* Added fr-FR localization
 	* Better detection of invalid plugins, which should prevent crashes.
 	* Hardware Type can now be changed using UI (Menu items previously did nothing…)
-	* Various chanegs in emulation for hardware type switching. (Quite logically, changing hardware now requires the emulation to be reset)
+	* Various changes in emulation for hardware type switching. (Quite logically, changing hardware now requires the emulation to be reset)

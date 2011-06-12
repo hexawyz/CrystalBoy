@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -511,9 +511,9 @@ namespace CrystalBoy.Emulator
 		{
 			// The tags have been set by manually editing the designed form code.
 			// This should work fine as long as the tag isn't modified in the Windows Forms editor.
-			foreach (ToolStripMenuItem item in hardwareToolStripMenuItem.DropDownItems)
+			foreach (ToolStripItem item in hardwareToolStripMenuItem.DropDownItems)
 				if (item.Tag is HardwareType)
-					item.Checked = (HardwareType)item.Tag == emulatedGameBoy.HardwareType;
+					(item as ToolStripMenuItem).Checked = (HardwareType)item.Tag == emulatedGameBoy.HardwareType;
 		}
 
 		private void gameBoyToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoy); }

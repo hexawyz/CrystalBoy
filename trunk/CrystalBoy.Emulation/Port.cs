@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -67,18 +67,18 @@ namespace CrystalBoy.Emulation
 		WX = 0x4B,
 		KEY1 = 0x4D,
 		VBK = 0x4F,
-		BLCK = 0x50, // Boot ROM Lock register
+		BLCK = 0x50, // Boot ROM Lock register (Also WRAM banking register ?)
 		HDMA1 = 0x51,
 		HDMA2 = 0x52,
 		HDMA3 = 0x53,
 		HDMA4 = 0x54,
 		HDMA5 = 0x55,
 		RP = 0x56,
-		BGPI = 0x68,
-		BGPD = 0x69,
-		OBPI = 0x6A,
-		OBPD = 0x6B,
-		PLCK = 0x6C, // Palette Lock Register ? (Seems to be more complex than just that :( )
+		BCPS = 0x68,
+		BCPD = 0x69,
+		OCPS = 0x6A,
+		OCPD = 0x6B,
+		PMAP = 0x6C, // Palette Mapping register
 		SVBK = 0x70,
 		U72 = 0x72,
 		U73 = 0x73,

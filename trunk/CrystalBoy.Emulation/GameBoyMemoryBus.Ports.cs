@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,7 +37,8 @@ namespace CrystalBoy.Emulation
 
 		int bgpIndex, obpIndex;
 		bool bgpInc, obpInc;
-		bool paletteLocked;
+		bool usePaletteMapping;
+		bool workRamBanked;
 
 		byte hdmaSourceHigh, hdmaSourceLow, hdmaDestinationHigh, hdmaDestinationLow;
 		// For Horizontal Blank DMA
@@ -64,8 +65,11 @@ namespace CrystalBoy.Emulation
 		partial void ResetPorts()
 		{
 			hdmaActive = false;
+			// This value will have been set correctly according to wether we are using the GBC bootstrap ROM or not
+			workRamBanked = colorMode;
+			usePaletteMapping = colorHardware && !useBootRom;
 
-			WritePort(Port.JOYP, 0x30); // Reset the joypad
+			WritePort(Port.JOYP, useBootRom ? (byte)0x00 : (byte)0x30); // Reset the joypad
 
 			WritePort(Port.TIMA, 0);
 			WritePort(Port.TMA, 0);
@@ -73,6 +77,7 @@ namespace CrystalBoy.Emulation
 
 			WritePort(Port.IF, 0x00);
 
+			// Those probably start at 0 on boot too…
 			WritePort(Port.NR10, 0x80);
 			WritePort(Port.NR11, 0xBF);
 			WritePort(Port.NR12, 0xF3);
@@ -92,19 +97,19 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.NR51, 0xF3);
 			WritePort(Port.NR52, 0xF1);
 
-			WritePort(Port.LCDC, 0x91);
+			WritePort(Port.LCDC, useBootRom ? (byte)0x00 : (byte)0x91);
 			WritePort(Port.LY, 0x00);
 			WritePort(Port.SCY, 0x00);
 			WritePort(Port.SCX, 0x00);
 			WritePort(Port.LYC, 0x00);
-			WritePort(Port.BGP, 0xFC);
-			WritePort(Port.OBP0, 0xFF);
-			WritePort(Port.OBP1, 0xFF);
+			WritePort(Port.BGP, useBootRom ? (byte)0x00 : (byte)0xFC);
+			WritePort(Port.OBP0, useBootRom ? (byte)0x00 : (byte)0xFF);
+			WritePort(Port.OBP1, useBootRom ? (byte)0x00 : (byte)0xFF);
 			WritePort(Port.WY, 0x00);
 			WritePort(Port.WX, 0x00);
 			WritePort(Port.IE, 0x00);
 
-			WritePort(Port.PLCK, 0xFE);
+			if (colorHardware) WritePort(Port.PMAP, 0xFE);
 			WritePort(Port.U72, 0x00);
 			WritePort(Port.U73, 0x00);
 			WritePort(Port.U74, 0x00);
@@ -163,19 +168,21 @@ namespace CrystalBoy.Emulation
 				case 0x4D: // KEY1
 					if (colorMode) prepareSpeedSwitch = (value & 0x1) != 0;
 					break;
-				case 0x4F: // VBK
-					value &= 0x1;
-					if (colorMode && videoRamBank != value)
+				case 0x50: // BLCK
+					// Disables the boot ROM when 0x01 is written, and never re-enable it again.
+					if (internalRomMapped)
 					{
-						videoRamBank = value;
-						MapVideoRamBank();
+						if ((value & 0x1) != 0)
+							UnmapInternalRom();
+						// The most logical guess is that bit 4 controls ability to change the work RAM bank
+						workRamBanked = (value & 0x10) != 0;
 					}
 					break;
 				case 0x70: // SVBK
 					value &= 0x7;
 					if (value == 0)
 						value = 1;
-					if (colorMode && workRamBank != value)
+					if (workRamBanked && workRamBank != value)
 					{
 						workRamBank = value;
 						MapWorkRamBank();
@@ -215,12 +222,17 @@ namespace CrystalBoy.Emulation
 					if (colorHardware)
 					{
 						// This port will be set at boot time with the value of the compatibility byte in the ROM header
+						// Bit 7 indicates color game boy functions
+						colorMode = (value & 0x80) != 0;
+						// Bit 3 indicates something too (used to enable B&W mode), but no idea about that yet.
 					}
 					break;
-				case 0x50: // BLCK
-					// Disables the boot ROM when 0x01 is written, and never re-enable it again.
-					if ((value & 0x1) != 0)
+				case 0x4F: // VBK
+					value &= 0x1;
+					if (colorMode && videoRamBank != value)
 					{
+						videoRamBank = value;
+						MapVideoRamBank();
 					}
 					break;
 				case 0x51: // HDMA1
@@ -261,12 +273,13 @@ namespace CrystalBoy.Emulation
 							HandleDma(hdmaDestinationHigh, hdmaDestinationLow, hdmaSourceHigh, hdmaSourceLow, (byte)(value & 0x7F));
 					}
 					break;
-				// Undocumented port used for palette data locking
-				case 0x6C: // PLCK
+				// Undocumented port used for palette synchronization
+				case 0x6C: // PMAP
 					if (colorHardware)
 					{
 						// Information from the GBC BIOS disassembly suggests than more than being a R/W register,
-						// The R/W bit would control the palette data locking… (But this seems to be a bit more complicated)
+						// The R/W bit probably controls the color palette to grey palette mapping…
+						usePaletteMapping = (value & 0x1) != 0;
 						portMemory[0x6C] = (byte)(0xFE | value & 0x01);
 					}
 					break;
@@ -280,33 +293,35 @@ namespace CrystalBoy.Emulation
 						videoPortAccessList.Add(new PortAccess(cycleCount, port, value)); // Keep track of the write
 					break;
 				// Only in cgb mode
-				case 0x68: // BGPI
-					if (colorMode)
+				case 0x68: // BCPS / BGPI
+					if (colorHardware)
 					{
 						bgpInc = (value & 0x80) != 0;
 						bgpIndex = value & 0x3F;
 					}
 					break;
-				case 0x69: // BGPD
-					if (colorMode)
+				case 0x69: // BCPD / BGPD
+					if (colorHardware)
 					{
 						paletteMemory[bgpIndex] = value;
+						if (usePaletteMapping) greyPaletteUpdated = true;
 						paletteAccessList.Add(new PaletteAccess(cycleCount, (byte)bgpIndex, value));
 						if (bgpInc)
 							bgpIndex = (bgpIndex + 1) & 0x3F;
 					}
 					break;
-				case 0x6A: // OBPI
-					if (colorMode)
+				case 0x6A: // OCPS / OBPI
+					if (colorHardware)
 					{
 						obpInc = (value & 0x80) != 0;
 						obpIndex = value & 0x3F;
 					}
 					break;
-				case 0x6B: // OBPD
-					if (colorMode)
+				case 0x6B: // OCPD / OBPD
+					if (colorHardware)
 					{
 						paletteMemory[0x40 | obpIndex] = value;
+						if (usePaletteMapping) greyPaletteUpdated = true;
 						paletteAccessList.Add(new PaletteAccess(cycleCount, (byte)(0x40 | obpIndex), value));
 						if (obpInc)
 							obpIndex = (obpIndex + 1) & 0x3F;
@@ -373,6 +388,8 @@ namespace CrystalBoy.Emulation
 					return (byte)((doubleSpeed ? 0x80 : 0x00) | (prepareSpeedSwitch ? 0x01 : 0x00));
 				case 0x4F: // VBK
 					return (byte)videoRamBank;
+				case 0x50: // BLCK
+					return (byte)(0xFE & (internalRomMapped ? 1 : 0));
 				case 0x51: // HDMA1
 					return hdmaDestinationHigh;
 				case 0x52: // HDMA2

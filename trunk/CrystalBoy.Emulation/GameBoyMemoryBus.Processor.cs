@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,6 +56,25 @@ namespace CrystalBoy.Emulation
 		partial void ResetProcessor()
 		{
 			processor.Reset();
+
+			// Simulate Boot ROM behavior
+			if (!useBootRom)
+			{
+				if (hardwareType == HardwareType.GameBoyPocket)
+					processor.AF = 0xFFB0;
+				else if (hardwareType == HardwareType.GameBoyColor || hardwareType == HardwareType.GameBoyAdvance)
+					processor.AF = 0x11B0;
+				else processor.AF = 0x01B0;
+
+				if (hardwareType == HardwareType.GameBoyAdvance)
+					processor.BC = 0x0113;
+				else processor.BC = 0x0013;
+
+				processor.DE = 0x00D8;
+				processor.HL = 0x014D;
+				processor.SP = 0xFFFE;
+				processor.PC = 0x0100; // 0x100 is the start address after the boot ROM has executed
+			}
 		}
 
 		#endregion

@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,9 +27,10 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		HardwareType hardwareType;
-		bool colorHardware;
-		bool colorMode;
+		private HardwareType hardwareType;
+		private bool colorHardware;
+		private bool colorMode;
+		private bool useBootRom;
 
 		#endregion
 
@@ -70,12 +71,14 @@ namespace CrystalBoy.Emulation
 		partial void DisposeTimer();
 		partial void DisposeInterrupt();
 		partial void DisposeMemory();
+		partial void DisposeBootRom();
 		partial void DisposeRom();
 		partial void DisposeVideo();
 		partial void DisposeJoypad();
 		partial void DisposePorts();
 		partial void DisposeRendering();
 		partial void DisposeDebug();
+		partial void DisposeSnapshot();
 
 		public void Dispose()
 		{
@@ -92,12 +95,14 @@ namespace CrystalBoy.Emulation
 				DisposeTimer();
 				DisposeInterrupt();
 				DisposeMemory();
+				DisposeBootRom();
 				DisposeRom();
 				DisposeVideo();
 				DisposeJoypad();
 				DisposePorts();
 				DisposeRendering();
 				DisposeDebug();
+				DisposeSnapshot();
 			}
 		}
 
@@ -113,12 +118,14 @@ namespace CrystalBoy.Emulation
 		partial void InitializeTimer();
 		partial void InitializeInterrupt();
 		partial void InitializeMemory();
+		partial void InitializeBootRom();
 		partial void InitializeRom();
 		partial void InitializeVideo();
 		partial void InitializeJoypad();
 		partial void InitializePorts();
 		partial void InitializeRendering();
 		partial void InitializeDebug();
+		partial void InitializeSnapshot();
 
 		private void Initialize()
 		{
@@ -129,12 +136,14 @@ namespace CrystalBoy.Emulation
 			InitializeTimer();
 			InitializeInterrupt();
 			InitializeMemory();
+			InitializeBootRom();
 			InitializeRom();
 			InitializeVideo();
 			InitializeJoypad();
 			InitializePorts();
 			InitializeRendering();
 			InitializeDebug();
+			InitializeSnapshot();
 		}
 
 		#endregion
@@ -147,33 +156,58 @@ namespace CrystalBoy.Emulation
 		partial void ResetTimer();
 		partial void ResetInterrupt();
 		partial void ResetMemory();
+		partial void ResetBootRom();
 		partial void ResetRom();
 		partial void ResetVideo();
 		partial void ResetJoypad();
 		partial void ResetPorts();
 		partial void ResetRendering();
 		partial void ResetDebug();
+		partial void ResetSnapshot();
 
 		// The main reset function calls all module reset functions
-		public void Reset() { Reset(hardwareType); }
-
-		// The main reset function calls all module reset functions
-		public void Reset(HardwareType hardwareType)
+		public void Reset() { Reset(hardwareType, true); }
+		public void Reset(HardwareType hardwareType) { Reset(hardwareType, true); }
+		public void Reset(bool useBootRom) { Reset(hardwareType, useBootRom); }
+		public void Reset(HardwareType hardwareType, bool useBootRom)
 		{
-			// From now on, the hardware type can only be chanegd after a "hard" reset of the emulated machine
+			// From now on, the hardware type can only be changed after a "hard" reset of the emulated machine
 			HardwareType = hardwareType;
+
+			// Determine whether to use the boot ROM.
+			// We only choose to use the boot ROM if it has been loaded for the corresponding hardware…
+			if (useBootRom)
+				switch (HardwareType)
+				{
+					case HardwareType.GameBoy:
+						this.useBootRom = dmgBootRomLoaded;
+						break;
+					case HardwareType.SuperGameBoy:
+						this.useBootRom = sgbBootRomLoaded;
+						break;
+					case HardwareType.GameBoyColor:
+						if (this.useBootRom = cgbBootRomLoaded)
+							this.colorMode = true; // Always start in color mode if emulating a GBC with bootstrap ROM
+						break;
+					default:
+						this.useBootRom = false;
+						break;
+				}
+			else this.useBootRom = false;
 			
 			ResetProcessor();
 			ResetTiming();
 			ResetTimer();
 			ResetInterrupt();
 			ResetMemory();
+			ResetBootRom();
 			ResetRom();
 			ResetVideo();
 			ResetJoypad();
 			ResetPorts();
 			ResetRendering();
 			ResetDebug();
+			ResetSnapshot();
 		}
 
 		#endregion
@@ -201,6 +235,8 @@ namespace CrystalBoy.Emulation
 		public bool ColorHardware { get { return colorHardware; } }
 
 		public bool ColorMode { get { return colorMode; } }
+
+		public bool UseBootRom { get { return useBootRom; } }
 
 		#endregion
 	}

@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,11 +26,17 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		RenderMethod renderMethod;
-		MemoryBlock renderPaletteMemoryBlock;
+		private RenderMethod renderMethod;
+		private MemoryBlock renderPaletteMemoryBlock;
 
-		unsafe uint** backgroundPalettes32, spritePalettes32;
-		unsafe ushort** backgroundPalettes16, spritePalettes16;
+		private unsafe uint** backgroundPalettes32, spritePalettes32;
+		private unsafe ushort** backgroundPalettes16, spritePalettes16;
+
+		private uint[] backgroundPalette;
+		private uint[] objectPalette1;
+		private uint[] objectPalette2;
+
+		private bool greyPaletteUpdated;
 
 		#endregion
 
@@ -54,12 +60,28 @@ namespace CrystalBoy.Emulation
 					pointerTable[i] = paletteTable + 4 * i; // Each palette is 4 uint wide
 
 				backgroundPalettes32 = pointerTable; // First 8 pointers are for the 8 background palettes
-				spritePalettes32 = pointerTable + 8; // Other 8 pointers are for the 8 sprite palettes
+				spritePalettes32 = backgroundPalettes32 + 8; // Other 8 pointers are for the 8 sprite palettes
 
 				// We'll use the same memory for 16 and 32 bit palettes, because only one will be used at once
 				backgroundPalettes16 = (ushort**)backgroundPalettes32;
 				spritePalettes16 = backgroundPalettes16 + 8;
 			}
+
+			backgroundPalette = new uint[4];
+			objectPalette1 = new uint[4];
+			objectPalette2 = new uint[4];
+		}
+
+		#endregion
+
+		#region Reset
+
+		partial void ResetRendering()
+		{
+			greyPaletteUpdated = false;
+			Buffer.BlockCopy(LookupTables.GrayPalette, 0, backgroundPalette, 0, 4 * sizeof(uint));
+			Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette1, 0, 4 * sizeof(uint));
+			Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette2, 0, 4 * sizeof(uint));
 		}
 
 		#endregion
@@ -109,9 +131,22 @@ namespace CrystalBoy.Emulation
 					FillPalettes32((ushort*)videoStatusSnapshot.paletteMemory);
 					DrawColorFrame32(buffer, stride);
 				}
-				else DrawFrame32(buffer, stride);
-			else
-				ClearBuffer32(buffer, stride, 0xFFFFFFFF);
+				else
+				{
+					if (greyPaletteUpdated)
+					{
+						FillPalettes32((ushort*)paletteMemory);
+						for (int i = 0; i < backgroundPalette.Length; i++)
+							backgroundPalette[i] = backgroundPalettes32[0][i];
+						for (int i = 0; i < objectPalette1.Length; i++)
+							objectPalette1[i] = spritePalettes32[0][i];
+						for (int i = 0; i < objectPalette2.Length; i++)
+							objectPalette2[i] = spritePalettes32[1][i];
+						greyPaletteUpdated = false;
+					}
+					DrawFrame32(buffer, stride);
+				}
+			else ClearBuffer32(buffer, stride, 0xFFFFFFFF);
 
 			renderMethod.UnlockBuffer();
 
@@ -537,19 +572,19 @@ namespace CrystalBoy.Emulation
 				data1 = videoStatusSnapshot.BGP;
 				for (i = 0; i < 4; i++)
 				{
-					tilePalette[i] = LookupTables.GrayPalette[data1 & 3];
+					tilePalette[i] = backgroundPalette[data1 & 3];
 					data1 >>= 2;
 				}
 				data1 = videoStatusSnapshot.OBP0;
 				for (j = 0; j < 4; j++)
 				{
-					objPalettes[0][j] = LookupTables.GrayPalette[data1 & 3];
+					objPalettes[0][j] = objectPalette1[data1 & 3];
 					data1 >>= 2;
 				}
 				data1 = videoStatusSnapshot.OBP1;
 				for (j = 0; j < 4; j++)
 				{
-					objPalettes[1][j] = LookupTables.GrayPalette[data1 & 3];
+					objPalettes[1][j] = objectPalette2[data1 & 3];
 					data1 >>= 2;
 				}
 
@@ -584,7 +619,7 @@ namespace CrystalBoy.Emulation
 								data1 = videoPortAccessList[pi].Value;
 								for (j = 0; j < 4; j++)
 								{
-									tilePalette[j] = LookupTables.GrayPalette[data1 & 3];
+									tilePalette[j] = backgroundPalette[data1 & 3];
 									data1 >>= 2;
 								}
 								break;
@@ -592,7 +627,7 @@ namespace CrystalBoy.Emulation
 								data1 = videoPortAccessList[pi].Value;
 								for (j = 0; j < 4; j++)
 								{
-									objPalettes[0][j] = LookupTables.GrayPalette[data1 & 3];
+									objPalettes[0][j] = objectPalette1[data1 & 3];
 									data1 >>= 2;
 								}
 								break;
@@ -600,7 +635,7 @@ namespace CrystalBoy.Emulation
 								data1 = videoPortAccessList[pi].Value;
 								for (j = 0; j < 4; j++)
 								{
-									objPalettes[1][j] = LookupTables.GrayPalette[data1 & 3];
+									objPalettes[1][j] = objectPalette2[data1 & 3];
 									data1 >>= 2;
 								}
 								break;

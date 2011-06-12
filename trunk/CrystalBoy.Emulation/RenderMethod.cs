@@ -1,6 +1,6 @@
 ﻿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright (C) 2008 Fabien Barbier
+// Copyright © 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,13 +34,7 @@ namespace CrystalBoy.Emulation
 		public abstract void UnlockBuffer();
 		public abstract void Render();
 
-		public virtual bool SupportsInterpolation
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public virtual bool SupportsInterpolation { get { return true; } }
 
 		protected virtual void OnInterpolationChanged(EventArgs e)
 		{
@@ -50,10 +44,7 @@ namespace CrystalBoy.Emulation
 
 		public bool Interpolation
 		{
-			get
-			{
-				return interpolation;
-			}
+			get { return interpolation; }
 			set
 			{
 				if (SupportsInterpolation && value != interpolation) // Can have a weird behavior if SupportsInterpolation is dynamic, but I assume you know what you do if you make it dynamic...
@@ -78,12 +69,6 @@ namespace CrystalBoy.Emulation
 			this.renderObject = renderObject;
 		}
 
-		public T RenderObject
-		{
-			get
-			{
-				return renderObject;
-			}
-		}
+		public T RenderObject { get { return renderObject; } }
 	}
 }
