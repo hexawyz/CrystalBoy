@@ -50,21 +50,9 @@ namespace CrystalBoy.Emulation
 
 		#region ROM Information
 
-		public RomInformation RomInformation
-		{
-			get
-			{
-				return romInformation;
-			}
-		}
+		public RomInformation RomInformation { get { return romInformation; } }
 
-		public bool RomLoaded
-		{
-			get
-			{
-				return romLoaded;
-			}
-		}
+		public bool RomLoaded { get { return romLoaded; } }
 
 		#endregion
 
@@ -136,6 +124,9 @@ namespace CrystalBoy.Emulation
 				this.colorMode = ColorHardware;
 				Reset();
 			}
+#if WITH_DEBUGGING
+			ClearBreakpoints();
+#endif
 		}
 
 		#endregion

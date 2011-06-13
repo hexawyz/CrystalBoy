@@ -116,10 +116,7 @@ namespace CrystalBoy.Emulation
 				return;
 			}
 
-			if (notifyCoincidence && cycleCount < lycMinCycle)
-				coincidence = lycMinCycle;
-			else
-				coincidence = FrameDuration + lycMinCycle;
+			coincidence = notifyCoincidence ? cycleCount < lycMinCycle ? lycMinCycle : FrameDuration + lycMinCycle : int.MaxValue;
 
 			if (notifyMode0 || notifyMode2)
 			{
@@ -162,10 +159,9 @@ namespace CrystalBoy.Emulation
 				mode0 = int.MaxValue;
 				mode2 = int.MaxValue;
 			}
-			if (notifyMode1) // Mode 1 is Vertical Blank (same as VBI)
-				mode1 = FrameDuration - VerticalBlankDuration;
-			else
-				mode1 = int.MaxValue;
+
+			// Mode 1 is Vertical Blank (same as VBI)
+			mode1 = notifyMode1 ? (cycleCount < FrameDuration - VerticalBlankDuration ? 0 : FrameDuration) + FrameDuration - VerticalBlankDuration : int.MaxValue;
 
 			// The stat interrupt cycle is the minimum of all potential interrupt cycles
 			statInterruptCycle = Math.Min(Math.Min(coincidence, mode0), Math.Min(mode1, mode2));

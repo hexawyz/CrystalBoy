@@ -50,7 +50,7 @@ namespace CrystalBoy.Emulation
 
 		partial void ResetTiming()
 		{
-			cycleCount = 0;
+			cycleCount = 60;
 			doubleSpeed = false;
 			prepareSpeedSwitch = false;
 		}
@@ -63,6 +63,9 @@ namespace CrystalBoy.Emulation
 
 		public bool AddCycles(int count)
 		{
+#if WITH_DEBUGGING
+			debugCycleCount += count;
+#endif
 			cycleCount += doubleSpeed ? count >> 1 : count;
 
 			if (hdmaActive && lcdEnabled && cycleCount >= hdmaNextCycle)
@@ -79,7 +82,7 @@ namespace CrystalBoy.Emulation
 		private void AdjustTimings()
 		{
 			// Reset LY
-			lyOffset = 0;
+			lyOffset = -4;
 			// Resume LCD drawing (after VBlank)
 			lcdDrawing = lcdEnabled;
 			// Update the reference timer shift
@@ -122,8 +125,7 @@ namespace CrystalBoy.Emulation
 				doubleSpeed = !doubleSpeed;
 				return 0;
 			}
-			else
-				return WaitForInterrupts();
+			else return WaitForInterrupts();
 		}
 
 		#endregion

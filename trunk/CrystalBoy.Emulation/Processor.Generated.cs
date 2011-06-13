@@ -1279,8 +1279,8 @@ namespace CrystalBoy.Emulation
 							if (((f & ZFlag) == 0))
 							{
 								bus[--sp] = (byte)(pc >> 8);
-							bus[--sp] = (byte)pc;
-							pc = __temp16;
+								bus[--sp] = (byte)pc;
+								pc = __temp16;
 								cycleCount = 24;
 							}
 							else cycleCount = 12;
@@ -2545,8 +2545,8 @@ namespace CrystalBoy.Emulation
 							if (((f & ZFlag) != 0))
 							{
 								bus[--sp] = (byte)(pc >> 8);
-							bus[--sp] = (byte)pc;
-							pc = __temp16;
+								bus[--sp] = (byte)pc;
+								pc = __temp16;
 								cycleCount = 24;
 							}
 							else cycleCount = 12;
@@ -2606,8 +2606,8 @@ namespace CrystalBoy.Emulation
 							if (((f & CFlag) == 0))
 							{
 								bus[--sp] = (byte)(pc >> 8);
-							bus[--sp] = (byte)pc;
-							pc = __temp16;
+								bus[--sp] = (byte)pc;
+								pc = __temp16;
 								cycleCount = 24;
 							}
 							else cycleCount = 12;
@@ -2657,8 +2657,8 @@ namespace CrystalBoy.Emulation
 							if (((f & CFlag) != 0))
 							{
 								bus[--sp] = (byte)(pc >> 8);
-							bus[--sp] = (byte)pc;
-							pc = __temp16;
+								bus[--sp] = (byte)pc;
+								pc = __temp16;
 								cycleCount = 24;
 							}
 							else cycleCount = 12;

@@ -43,13 +43,7 @@ namespace CrystalBoy.Emulator
 			this.emulatedGameBoy.NewFrame += OnNewFrameInternal;
 		}
 
-		protected EmulatedGameBoy EmulatedGameBoy
-		{
-			get
-			{
-				return emulatedGameBoy;
-			}
-		}
+		protected EmulatedGameBoy EmulatedGameBoy { get { return emulatedGameBoy; } }
 
 		protected override void OnFormClosing(FormClosingEventArgs e)
 		{

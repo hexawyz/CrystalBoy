@@ -34,6 +34,7 @@ namespace CrystalBoy.Emulator
 			InitializeComponent();
 			OnRomChanged(EventArgs.Empty);
 #if !WITH_DEBUGGING
+			cycleCounterGroupBox.Visible = false;
 			breakpointsGroupBox.Visible = false;
 #endif
 		}
@@ -43,24 +44,25 @@ namespace CrystalBoy.Emulator
 			Processor processor = EmulatedGameBoy.Processor;
 			CultureInfo invariantCulture = CultureInfo.InvariantCulture;
 
-			if (!(initialized && EmulatedGameBoy.RomLoaded))
+			if (!(initialized && (EmulatedGameBoy.RomLoaded || EmulatedGameBoy.Bus.UseBootRom)))
 			{
-				disassemblyView.SelectedOffset = 0;
-				disassemblyView.ScrollSelectionIntoView();
-				afValueLabel.Text = "0000";
-				bcValueLabel.Text = "0000";
-				deValueLabel.Text = "0000";
-				hlValueLabel.Text = "0000";
-				spValueLabel.Text = "0000";
-				pcValueLabel.Text = "0000";
-				ieValueLabel.Text = "00";
-				ifValueLabel.Text = "00";
-				zeroFlagCheckBox.Checked = false;
-				negationFlagCheckBox.Checked = false;
-				halfCarryFlagCheckBox.Checked = false;
-				carryFlagCheckBox.Checked = false;
-				imeCheckBox.Checked = false;
-				initialized = true;
+			    disassemblyView.SelectedOffset = 0;
+			    disassemblyView.ScrollSelectionIntoView();
+			    afValueLabel.Text = "0000";
+			    bcValueLabel.Text = "0000";
+			    deValueLabel.Text = "0000";
+			    hlValueLabel.Text = "0000";
+			    spValueLabel.Text = "0000";
+			    pcValueLabel.Text = "0000";
+			    ieValueLabel.Text = "00";
+			    ifValueLabel.Text = "00";
+			    zeroFlagCheckBox.Checked = false;
+			    negationFlagCheckBox.Checked = false;
+			    halfCarryFlagCheckBox.Checked = false;
+			    carryFlagCheckBox.Checked = false;
+			    imeCheckBox.Checked = false;
+				cycleCounterValueLabel.Text = "0";
+			    initialized = true;
 			}
 			else if (EmulatedGameBoy.EmulationStatus == EmulationStatus.Paused)
 			{
@@ -80,6 +82,9 @@ namespace CrystalBoy.Emulator
 				halfCarryFlagCheckBox.Checked = processor.HalfCarryFlag;
 				carryFlagCheckBox.Checked = processor.CarryFlag;
 				imeCheckBox.Checked = processor.InterruptMasterEnable;
+#if WITH_DEBUGGING
+				cycleCounterValueLabel.Text = (EmulatedGameBoy.Bus.DebugCycleCount % 1000).ToString();
+#endif
 			}
 		}
 
@@ -91,32 +96,25 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnRomChanged(EventArgs e)
 		{
-			if (EmulatedGameBoy.RomLoaded)
-				disassemblyView.Memory = EmulatedGameBoy.Bus;
-			else
-				disassemblyView.Memory = null;
+			disassemblyView.Memory = EmulatedGameBoy.RomLoaded || EmulatedGameBoy.Bus.UseBootRom ? EmulatedGameBoy.Bus : null;
 			UpdateInformation();
 		}
 
 		protected override void OnVisibleChanged(EventArgs e)
 		{
-			if (Visible)
-				UpdateInformation();
+			if (Visible) UpdateInformation();
 			base.OnVisibleChanged(e);
 		}
 
 		protected override void OnPaused(EventArgs e)
 		{
-			if (Visible)
-				UpdateInformation();
+			if (Visible) UpdateInformation();
 		}
 
 		protected override void OnBreak(EventArgs e)
 		{
-			if (Visible)
-				UpdateInformation();
-			else
-				Show(Owner);
+			if (Visible) UpdateInformation();
+			else Show(Owner);
 		}
 
 		private void stepButton_Click(object sender, EventArgs e)
@@ -161,14 +159,7 @@ namespace CrystalBoy.Emulator
 				disassemblyView.ScrollSelectionIntoView();
 				return true;
 			}
-			catch (FormatException)
-			{
-				return false;
-			}
-			catch
-			{
-				throw;
-			}
+			catch (FormatException) { return false; }
 		}
 
 		private void gotoTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -187,6 +178,14 @@ namespace CrystalBoy.Emulator
 				SystemSounds.Beep.Play();
 				gotoTextBox.Focus();
 			}
+		}
+
+		private void cycleCounterResetButton_Click(object sender, EventArgs e)
+		{
+#if WITH_DEBUGGING
+			EmulatedGameBoy.Bus.ResetDebugCycleCounter();
+			cycleCounterValueLabel.Text = "0";
+#endif
 		}
 	}
 }
