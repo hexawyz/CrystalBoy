@@ -35,21 +35,82 @@ namespace CrystalBoy.Emulation
 		private bool sgbBootRomLoaded;
 		private bool cgbBootRomLoaded;
 
+		private bool useBootRom;
+		private bool tryUsingBootRom;
+
+		#region Initialize
+
+		/// <summary>Initializes the bootstrap ROM module.</summary>
+		/// <remarks>This will be called by the main <see cref="Initialize"/> method.</remarks>
 		partial void InitializeBootRom()
 		{
-			TryLoadRom(HardwareType.GameBoy, "dmg_rom");
-			TryLoadRom(HardwareType.SuperGameBoy, "sgb_rom");
-			TryLoadRom(HardwareType.GameBoyColor, "cgb_rom");
+			TryLoadingRom(HardwareType.GameBoy, "dmg.rom");
+			TryLoadingRom(HardwareType.SuperGameBoy, "sgb.rom");
+			TryLoadingRom(HardwareType.GameBoyColor, "cgb.rom");
 		}
+
+		#endregion
+
+		#region Reset
+
+		/// <summary>Resets the bootstrap ROM module.</summary>
+		/// <remarks>This will be called by the main <see cref="Reset(HardwareType)"/> method.</remarks>
+		partial void ResetBootRom()
+		{
+			// Determine whether to use the boot ROM.
+			// We only choose to use the boot ROM if it has been loaded for the corresponding hardware…
+			if (tryUsingBootRom)
+				switch (HardwareType)
+				{
+					case HardwareType.GameBoy:
+						useBootRom = dmgBootRomLoaded;
+						break;
+					case HardwareType.SuperGameBoy:
+						useBootRom = sgbBootRomLoaded;
+						break;
+					case HardwareType.GameBoyColor:
+						if (useBootRom = cgbBootRomLoaded)
+							this.colorMode = true; // Always start in color mode if emulating a GBC with bootstrap ROM
+						break;
+					default:
+						useBootRom = false;
+						break;
+				}
+			else this.useBootRom = false;
+		}
+
+		#endregion
+
+		#region ROM Loading
 
 		/// <summary>Tries to load the specified bootsrap ROM from assembly resources.</summary>
 		/// <remarks>
-		/// The various known bootstrap ROMs can be embedded in the executable image.
-		/// However, they will not be distributed with the emulator.
+		/// The various known bootstrap ROMs can be embedded in the executable image during compilation.
+		/// By default, the emulator will look for resources with these names:
+		/// <list type="table">
+		/// <listheader>
+		/// <term>Hardware</term>
+		/// <description>Bootstrap ROM file name</description>
+		/// </listheader>
+		/// <item>
+		/// <term>Game Boy</term>
+		/// <description>dmg.rom</description>
+		/// </item>
+		/// <item>
+		/// <term>Super Game Boy</term>
+		/// <description>sgb.rom</description>
+		/// </item>
+		/// <item>
+		/// <term>Game Boy Color</term>
+		/// <description>cgb.rom</description>
+		/// </item>
+		/// </list>
+		/// Embedding these ROMs post-build should be possible with the help of an external tool,
+		/// but the easiest solution is probably to rebuild everything after having put the ROMs in the correct place.
 		/// </remarks>
 		/// <param name="hardwareType">Hardware whose bootstrap ROM should be loaded.</param>
 		/// <param name="resourceName">Name of the resource which contain the ROM data.</param>
-		private void TryLoadRom(HardwareType hardwareType, string resourceName)
+		private void TryLoadingRom(HardwareType hardwareType, string resourceName)
 		{
 			var stream = typeof(GameBoyMemoryBus).Assembly.GetManifestResourceStream(typeof(GameBoyMemoryBus), resourceName);
 
@@ -70,7 +131,7 @@ namespace CrystalBoy.Emulation
 		/// <param name="hardwareType">Hardware whose bootstrap ROM should be loaded.</param>
 		/// <param name="data">Data of the specified bootstrap ROM.</param>
 		/// <exception cref="ArgumentOutOfRangeException">The value provided for harware type is not a valid one.</exception>
-		/// <exception cref="NotSupportedException">Loading the bootstrap ROM the specified hardware type is not supported.</exception>
+		/// <exception cref="NotSupportedException">Loading the bootstrap ROM the specified hardware is not supported.</exception>
 		/// <exception cref="InvalidDataException">Data integrity check failed.</exception>
 		public unsafe void LoadBootRom(HardwareType hardwareType, byte[] data)
 		{
@@ -129,6 +190,11 @@ namespace CrystalBoy.Emulation
 			__refvalue(romLoadedField, bool) = true;
 		}
 
+		/// <summary>Compares two byte arrays for equality.</summary>
+		/// <remarks>This method is used to compare the MD5 hashes of the various bootstrap ROM.</remarks>
+		/// <param name="a">First byte array to compare.</param>
+		/// <param name="b">Second byte array to compare.</param>
+		/// <returns><c>true</c> if the two arrays are equals;  otherwise, <c>false</c>.</returns>
 		private bool Equals(byte[] a, byte[] b)
 		{
 			if (a == null && b != null || b == null || a.Length != b.Length) return false;
@@ -138,5 +204,37 @@ namespace CrystalBoy.Emulation
 
 			return true;
 		}
+
+		/// <summary>Determines whether the bootstrap ROM for the specified hardware has been loaded.</summary>
+		/// <param name="hardwareType">Type of hardware.</param>
+		/// <returns><c>true</c> if the bootstrap ROM for the specified hardware has been loaded; otherwise, <c>false</c>.</returns>
+		public bool IsBootRomLoaded(HardwareType hardwareType)
+		{
+			switch (hardwareType)
+			{
+				case HardwareType.GameBoy: return dmgBootRomLoaded;
+				case HardwareType.SuperGameBoy: return sgbBootRomLoaded;
+				case HardwareType.GameBoyColor: return cgbBootRomLoaded;
+				default: return false;
+			}
+		}
+
+		#endregion
+
+		#region Properties
+
+		/// <summary>Gets a value indicating whether a bootstrap ROM is being used.</summary>
+		/// <value><c>true</c> if a bootstrap ROM is being used; otherwise, <c>false</c>.</value>
+		public bool UseBootRom { get { return useBootRom; } }
+
+		/// <summary>Gets or sets a value indicating whether a bootstrap ROM should be used when available.</summary>
+		/// <value><c>true</c> if available bootstrap ROMs should be used; otherwise, <c>false</c>.</value>
+		public bool TryUsingBootRom
+		{
+			get { return tryUsingBootRom; }
+			set { tryUsingBootRom = value; }
+		}
+
+		#endregion
 	}
 }

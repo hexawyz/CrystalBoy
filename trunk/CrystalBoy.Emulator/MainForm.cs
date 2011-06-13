@@ -48,6 +48,7 @@ namespace CrystalBoy.Emulator
 		{
 			InitializeComponent();
 			emulatedGameBoy = new EmulatedGameBoy();
+			emulatedGameBoy.TryUsingBootRom = Settings.Default.UseBootstrapRom;
 			emulatedGameBoy.EnableFramerateLimiter = Settings.Default.LimitSpeed;
 			emulatedGameBoy.RomChanged += OnRomChanged;
 			emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
@@ -55,7 +56,7 @@ namespace CrystalBoy.Emulator
 			try { emulatedGameBoy.Reset(Settings.Default.HardwareType); }
 			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
 			AdjustSize(Settings.Default.RenderSize);
-			ResetEmulationMenuItems(false);
+			ResetEmulationMenuItems(emulatedGameBoy.Bus.UseBootRom);
 			UpdateEmulationStatus();
 			UpdateFrameRate();
 			SetStatusTextHandler();
@@ -509,12 +510,15 @@ namespace CrystalBoy.Emulator
 
 		private void hardwareToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
+			useBootstrapRomToolStripMenuItem.Checked = emulatedGameBoy.TryUsingBootRom;
 			// The tags have been set by manually editing the designed form code.
 			// This should work fine as long as the tag isn't modified in the Windows Forms editor.
 			foreach (ToolStripItem item in hardwareToolStripMenuItem.DropDownItems)
 				if (item.Tag is HardwareType)
 					(item as ToolStripMenuItem).Checked = (HardwareType)item.Tag == emulatedGameBoy.HardwareType;
 		}
+
+		private void useBootstrapRomToolStripMenuItem_Click(object sender, EventArgs e) { Settings.Default.UseBootstrapRom = emulatedGameBoy.TryUsingBootRom = !emulatedGameBoy.TryUsingBootRom; }
 
 		private void gameBoyToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoy); }
 

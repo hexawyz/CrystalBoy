@@ -42,7 +42,7 @@ namespace CrystalBoy.Emulation
 
 		/// <summary>Occurs when the external RAM has been updated.</summary>
 		/// <remarks>
-		/// Subclasses handling raw writes by themselves must carefully call the <see cref="M:RamWritten"/> method when needed in order for this event to get triggered.
+		/// Subclasses handling raw writes by themselves must carefully call the <see cref="RamWritten"/> method when needed in order for this event to get triggered.
 		/// Other subclasses will get the default automatic detection behavior, which should work fine in most, if not all cases.
 		/// </remarks>
 		public event EventHandler RamUpdated;
@@ -218,7 +218,7 @@ namespace CrystalBoy.Emulation
 		/// <remarks>
 		/// The default implementation of HandleRamWrite does nothing.
 		/// If you impelement your own version, do not bother calling the base implementation (the one in Mapper) because it is useless.
-		/// However, please call the <see cref="M:RamWriten"/> method if you write directly to the external RAM.
+		/// However, please call the <see cref="RamWriten"/> method if you write directly to the external RAM.
 		/// </remarks>
 		public virtual void HandleRamWrite(byte offsetLow, byte offsetHigh, byte value) { }
 	}

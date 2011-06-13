@@ -26,13 +26,13 @@ namespace CrystalBoy.Emulator
 {
 	sealed class EmulatedGameBoy : IDisposable
 	{
-		GameBoyMemoryBus bus;
-		EmulationStatus emulationStatus;
-		Stopwatch frameStopwatch;
-		Stopwatch frameRateStopwatch;
-		long[] tickCounts;
-		int tickIndex;
-		bool enableFramerateLimiter;
+		private GameBoyMemoryBus bus;
+		private EmulationStatus emulationStatus;
+		private Stopwatch frameStopwatch;
+		private Stopwatch frameRateStopwatch;
+		private long[] tickCounts;
+		private int tickIndex;
+		private bool enableFramerateLimiter;
 
 		public event EventHandler RomChanged;
 		public event EventHandler Paused;
@@ -47,13 +47,19 @@ namespace CrystalBoy.Emulator
 			frameStopwatch = new Stopwatch();
 			frameRateStopwatch = new Stopwatch();
 			Application.Idle += OnApplicationIdle;
+			emulationStatus = bus.UseBootRom ? EmulationStatus.Paused : EmulationStatus.Stopped;
 		}
 
 		public void Dispose() { bus.Dispose(); }
 
-		public void Reset() { bus.Reset(); }
+		public void Reset() { Reset(bus.HardwareType); }
 
-		public void Reset(HardwareType hardwareType) { bus.Reset(hardwareType); }
+		public void Reset(HardwareType hardwareType)
+		{
+			bus.Reset(hardwareType);
+			if (emulationStatus == EmulationStatus.Stopped && bus.UseBootRom)
+				emulationStatus = EmulationStatus.Paused;
+		}
 
 		public void LoadRom(MemoryBlock rom)
 		{
@@ -67,6 +73,13 @@ namespace CrystalBoy.Emulator
 		{
 			emulationStatus = EmulationStatus.Stopped;
 			bus.UnloadRom();
+			emulationStatus = bus.UseBootRom ? EmulationStatus.Paused : EmulationStatus.Stopped;
+		}
+
+		public bool TryUsingBootRom
+		{
+			get { return bus.TryUsingBootRom; }
+			set { bus.TryUsingBootRom = value; }
 		}
 
 		public HardwareType HardwareType { get { return bus.HardwareType; } }
@@ -85,10 +98,7 @@ namespace CrystalBoy.Emulator
 
 		public EmulationStatus EmulationStatus
 		{
-			get
-			{
-				return emulationStatus;
-			}
+			get { return emulationStatus; }
 			private set
 			{
 				if (value != emulationStatus)
@@ -182,10 +192,8 @@ namespace CrystalBoy.Emulator
 
 			frameRateStopwatch.Stop();
 
-			if (breakpoint)
-				OnBreak(EventArgs.Empty);
-			else
-				OnPause(EventArgs.Empty);
+			if (breakpoint) OnBreak(EventArgs.Empty);
+			else OnPause(EventArgs.Empty);
 		}
 
 		public GameBoyKeys PressedKeys

@@ -82,7 +82,7 @@ namespace CrystalBoy.Emulation
 		private void AdjustTimings()
 		{
 			// Reset LY
-			lyOffset = -4;
+			lyOffset = 0;
 			// Resume LCD drawing (after VBlank)
 			lcdDrawing = lcdEnabled;
 			// Update the reference timer shift

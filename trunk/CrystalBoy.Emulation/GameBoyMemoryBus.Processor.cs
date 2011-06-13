@@ -26,7 +26,7 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		Processor processor;
+		private Processor processor;
 
 		#endregion
 
