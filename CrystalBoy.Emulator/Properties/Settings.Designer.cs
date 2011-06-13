@@ -99,5 +99,17 @@ namespace CrystalBoy.Emulator.Properties {
                 this["HardwareType"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseBootstrapRom {
+            get {
+                return ((bool)(this["UseBootstrapRom"]));
+            }
+            set {
+                this["UseBootstrapRom"] = value;
+            }
+        }
     }
 }

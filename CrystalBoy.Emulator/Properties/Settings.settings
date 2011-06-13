@@ -25,5 +25,8 @@
     <Setting Name="HardwareType" Type="CrystalBoy.Emulation.HardwareType" Scope="User">
       <Value Profile="(Default)">GameBoyColor</Value>
     </Setting>
+    <Setting Name="UseBootstrapRom" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

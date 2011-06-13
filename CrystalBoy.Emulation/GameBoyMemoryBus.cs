@@ -23,6 +23,7 @@ using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
+	/// <summary>Represents the memory bus of a Game Boy system, with all its attached devices.</summary>
 	public sealed partial class GameBoyMemoryBus : IDisposable
 	{
 		#region Variables
@@ -30,17 +31,20 @@ namespace CrystalBoy.Emulation
 		private HardwareType hardwareType;
 		private bool colorHardware;
 		private bool colorMode;
-		private bool useBootRom;
+		private bool disposed;
 
 		#endregion
 
 		#region Constructors
 
+		/// <summary>Initializes a new instance of the <see cref="GameBoyMemoryBus"/> class.</summary>
 		public GameBoyMemoryBus()
 		{
 			Initialize();
 		}
 
+		/// <summary>Initializes a new instance of the <see cref="GameBoyMemoryBus"/> class, preloaded with an external ROM.</summary>
+		/// <param name="externalRom">The external ROM to load.</param>
 		public GameBoyMemoryBus(MemoryBlock externalRom)
 		{
 			try
@@ -48,30 +52,28 @@ namespace CrystalBoy.Emulation
 				Initialize();
 				LoadRom(externalRom);
 			}
-			catch
-			{
-				Dispose();
-			}
+			catch { Dispose(); }
 		}
 
 		#endregion
 
 		#region Destructors
 
-		~GameBoyMemoryBus()
-		{
-			Dispose(false);
-		}
+		/// <summary>
+		/// Releases unmanaged resources and performs other cleanup operations before the
+		/// <see cref="GameBoyMemoryBus"/> is reclaimed by garbage collection.
+		/// </summary>
+		~GameBoyMemoryBus() { Dispose(false); }
 
 		#region Dispose
 
 		// Define a Dispose function for each module
+		partial void DisposeBootRom();
 		partial void DisposeProcessor();
 		partial void DisposeTiming();
 		partial void DisposeTimer();
 		partial void DisposeInterrupt();
 		partial void DisposeMemory();
-		partial void DisposeBootRom();
 		partial void DisposeRom();
 		partial void DisposeVideo();
 		partial void DisposeJoypad();
@@ -80,22 +82,22 @@ namespace CrystalBoy.Emulation
 		partial void DisposeDebug();
 		partial void DisposeSnapshot();
 
-		public void Dispose()
-		{
-			Dispose(true);
-		}
+		/// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+		public void Dispose() { Dispose(true); }
 
+		/// <summary>Releases unmanaged and - optionally - managed resources.</summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
 		private void Dispose(bool disposing)
 		{
-			if (disposing)
+			if (disposing && !disposed)
 			{
-				GC.SuppressFinalize(this);
+				disposed = true;
+				DisposeBootRom();
 				DisposeProcessor();
 				DisposeTiming();
 				DisposeTimer();
 				DisposeInterrupt();
 				DisposeMemory();
-				DisposeBootRom();
 				DisposeRom();
 				DisposeVideo();
 				DisposeJoypad();
@@ -103,6 +105,7 @@ namespace CrystalBoy.Emulation
 				DisposeRendering();
 				DisposeDebug();
 				DisposeSnapshot();
+				GC.SuppressFinalize(this);
 			}
 		}
 
@@ -127,9 +130,12 @@ namespace CrystalBoy.Emulation
 		partial void InitializeDebug();
 		partial void InitializeSnapshot();
 
+		/// <summary>Initializes the emulated system.</summary>
+		/// <remarks>This will call the initialization methods for all modules.</remarks>
 		private void Initialize()
 		{
 			HardwareType = HardwareType.GameBoyColor;
+			tryUsingBootRom = true;
 
 			InitializeProcessor();
 			InitializeTiming();
@@ -144,6 +150,8 @@ namespace CrystalBoy.Emulation
 			InitializeRendering();
 			InitializeDebug();
 			InitializeSnapshot();
+
+			Reset();
 		}
 
 		#endregion
@@ -151,12 +159,12 @@ namespace CrystalBoy.Emulation
 		#region Reset
 
 		// Define a Reset function for each module
+		partial void ResetBootRom();
 		partial void ResetProcessor();
 		partial void ResetTiming();
 		partial void ResetTimer();
 		partial void ResetInterrupt();
 		partial void ResetMemory();
-		partial void ResetBootRom();
 		partial void ResetRom();
 		partial void ResetVideo();
 		partial void ResetJoypad();
@@ -166,41 +174,24 @@ namespace CrystalBoy.Emulation
 		partial void ResetSnapshot();
 
 		// The main reset function calls all module reset functions
-		public void Reset() { Reset(hardwareType, true); }
-		public void Reset(HardwareType hardwareType) { Reset(hardwareType, true); }
-		public void Reset(bool useBootRom) { Reset(hardwareType, useBootRom); }
-		public void Reset(HardwareType hardwareType, bool useBootRom)
+
+		/// <summary>Resets the emulated system.</summary>
+		public void Reset() { Reset(hardwareType); }
+
+		/// <summary>Resets the emulated system and emulate a specific hardware.</summary>
+		/// <remarks>In order to chaneg the emulated hardware, the emulation has to be reset.</remarks>
+		/// <param name="hardwareType">Hardware to emulate.</param>
+		public void Reset(HardwareType hardwareType)
 		{
 			// From now on, the hardware type can only be changed after a "hard" reset of the emulated machine
 			HardwareType = hardwareType;
 
-			// Determine whether to use the boot ROM.
-			// We only choose to use the boot ROM if it has been loaded for the corresponding hardware…
-			if (useBootRom)
-				switch (HardwareType)
-				{
-					case HardwareType.GameBoy:
-						this.useBootRom = dmgBootRomLoaded;
-						break;
-					case HardwareType.SuperGameBoy:
-						this.useBootRom = sgbBootRomLoaded;
-						break;
-					case HardwareType.GameBoyColor:
-						if (this.useBootRom = cgbBootRomLoaded)
-							this.colorMode = true; // Always start in color mode if emulating a GBC with bootstrap ROM
-						break;
-					default:
-						this.useBootRom = false;
-						break;
-				}
-			else this.useBootRom = false;
-			
+			ResetBootRom();
 			ResetProcessor();
 			ResetTiming();
 			ResetTimer();
 			ResetInterrupt();
 			ResetMemory();
-			ResetBootRom();
 			ResetRom();
 			ResetVideo();
 			ResetJoypad();
@@ -214,6 +205,8 @@ namespace CrystalBoy.Emulation
 
 		#region Properties
 
+		/// <summary>Gets the emulated hardware.</summary>
+		/// <value>The emulated hardware.</value>
 		public HardwareType HardwareType
 		{
 			get { return hardwareType; }
@@ -232,11 +225,24 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
+		/// <summary>Gets a value indicating whether the emulated hardware supports Game Boy Color functions.</summary>
+		/// <remarks>
+		/// The only harware supporting Game Boy Color functions are:
+		/// <list type="bullet">
+		/// <item><description>Game Boy Color</description></item>
+		/// <item><description>Game Boy Advance</description></item>
+		/// </list>
+		/// </remarks>
+		/// <value><c>true</c> if the emulated harware supports color functions; otherwise, <c>false</c>.</value>
 		public bool ColorHardware { get { return colorHardware; } }
 
+		/// <summary>Gets a value indicating whether the emulated system is running in color mode.</summary>
+		/// <remarks>
+		/// When using the Game Boy Color bootstrap ROM, the emulation always starts in color mode.
+		/// However, the bootstrap ROM will switch the system to a pseudo-black-and-white mode if the inserted game doesn't support Game Boy Color functions.
+		/// </remarks>
+		/// <value><c>true</c> if the emulated system is running in color mode; otherwise, <c>false</c>.</value>
 		public bool ColorMode { get { return colorMode; } }
-
-		public bool UseBootRom { get { return useBootRom; } }
 
 		#endregion
 	}

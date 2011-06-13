@@ -44,6 +44,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\CrystalBoy.Emulation.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -54,6 +55,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\CrystalBoy.Emulation.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -164,10 +166,13 @@
     <None Include="..\CrystalBoy.snk">
       <Link>CrystalBoy.snk</Link>
     </None>
+    <EmbeddedResource Condition="Exists('$(ProjectDir)cgb.rom')" Include="cgb.rom" />
+    <EmbeddedResource Condition="Exists('$(ProjectDir)dmg.rom')" Include="dmg.rom" />
     <None Include="Processor.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Processor.Generated.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Condition="Exists('$(ProjectDir)sgb.rom')" Include="sgb.rom" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

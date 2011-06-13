@@ -28,6 +28,8 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
+		Random random;
+
 		MemoryBlock externalRomBlock;
 		MemoryBlock externalRamBlock;
 		MemoryBlock videoMemoryBlock;
@@ -64,6 +66,9 @@ namespace CrystalBoy.Emulation
 
 		partial void InitializeMemory()
 		{
+			// Use a RNG for uninitialized RAM simulation
+			random = new Random();
+
 			unsafe
 			{
 				segmentWriteHandlerArray = new MemoryWriteHandler[256];
@@ -117,7 +122,16 @@ namespace CrystalBoy.Emulation
 				externalRamBlock = new MemoryBlock(mapper.RamSize);
 			}
 
-			unsafe { MemoryBlock.Set((void*)videoMemory, 0, (uint)videoMemoryBlock.Length); }
+			unsafe
+			{
+				// Fill the video RAM with random data if the bootstrap ROM is used
+				if (useBootRom) RandomFill(videoMemory, videoMemoryBlock.Length);
+				// The boostrap ROM clears the video RAM, so we need to emulate this behavior when not using the bootstrap ROM
+				else MemoryBlock.Set((void*)videoMemory, 0, (uint)videoMemoryBlock.Length);
+				RandomFill(objectAttributeMemory, objectAttributeMemoryBlock.Length);
+
+				RandomFill(trashMemory, 256);
+			}
 
 			videoRamBank = 0;
 			workRamBank = 1;
@@ -160,6 +174,12 @@ namespace CrystalBoy.Emulation
 
 			for (int i = 0xA0; i < 0xC0; i++)
 				segmentWriteHandlerArray[i] = handler;
+		}
+
+		private unsafe void RandomFill(byte* memory, int length)
+		{
+			for (; length != 0; length--)
+				*memory++ = (byte)random.Next(256);
 		}
 
 		#endregion
@@ -287,6 +307,8 @@ namespace CrystalBoy.Emulation
 
 		#region Memory Accesses
 
+		/// <summary>Reads or writes a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
+		/// <value><see cref="System.Byte"/> value.</value>
 		[CLSCompliant(false)]
 		public byte this[ushort offset]
 		{
@@ -294,23 +316,35 @@ namespace CrystalBoy.Emulation
 			set { WriteByte(offset, value); }
 		}
 
+		/// <summary>Reads or writes a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
+		/// <value><see cref="System.Byte"/> value.</value>
 		public byte this[byte offsetLow, byte offsetHigh]
 		{
 			get { return ReadByte(offsetLow, offsetHigh); }
 			set { WriteByte(offsetLow, offsetHigh, value); }
 		}
 
+		/// <summary>Reads a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
+		/// <param name="offset">The offset.</param>
+		/// <returns><see cref="System.Byte"/> representing the value at the specified offset.</returns>
 		[CLSCompliant(false)]
 		public unsafe byte ReadByte(ushort offset)
 		{
 			return offset < 0xFF00 ? segmentArray[offset >> 8][offset & 0xFF] : ReadPort((byte)offset);
 		}
 
+		/// <summary>Reads a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
+		/// <param name="offsetLow">The low byte of the offset.</param>
+		/// <param name="offsetHigh">The high byte of the offset.</param>
+		/// <returns><see cref="System.Byte"/> representing the value at the specified offset.</returns>
 		public unsafe byte ReadByte(byte offsetLow, byte offsetHigh)
 		{
 			return offsetHigh < 0xFF ? segmentArray[offsetHigh][offsetLow] : ReadPort(offsetLow);
 		}
 
+		/// <summary>Writes a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
+		/// <param name="offset">The offset.</param>
+		/// <param name="value">The value to write.</param>
 		[CLSCompliant(false)]
 		public unsafe void WriteByte(ushort offset, byte value)
 		{
@@ -320,6 +354,10 @@ namespace CrystalBoy.Emulation
 			else segmentArray[offset >> 8][offset & 0xFF] = value;
 		}
 
+		/// <summary>Writes a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
+		/// <param name="offsetLow">The low byte of the offset.</param>
+		/// <param name="offsetHigh">The high byte of the offset.</param>
+		/// <param name="value">The value to write.</param>
 		public unsafe void WriteByte(byte offsetLow, byte offsetHigh, byte value)
 		{
 			MemoryWriteHandler handler = segmentWriteHandlerArray[offsetHigh];
@@ -328,13 +366,30 @@ namespace CrystalBoy.Emulation
 			else segmentArray[offsetHigh][offsetLow] = value;
 		}
 
-		internal unsafe void RamWritePassthrough(byte offsetLow, byte offsetHigh, byte value)
+		/// <summary>Safely writes a <see cref="System.Byte"/> directly to the external RAM area.</summary>
+		/// <remarks>
+		/// This method will only write data to the external RAM area, bypassing any write handler.
+		/// External RAM won't be affected if not mapped.
+		/// </remarks>
+		/// <param name="offsetLow">The low byte of the offset.</param>
+		/// <param name="offsetHigh">The high byte of the offset.</param>
+		/// <param name="value">The byte value to write.</param>
+		public unsafe void RamWritePassthrough(byte offsetLow, byte offsetHigh, byte value)
 		{
 			// Ensures the write only goes to the external RAM area…
-			if (offsetHigh >= 0xA0 && offsetHigh < 0xC0)
+			if (ramBank >= 0 && offsetHigh >= 0xA0 && offsetHigh < 0xC0)
 				segmentArray[offsetHigh][offsetLow] = value;
 		}
 
+		/// <summary>Writes a <see cref="System.Byte"/> to the specified port memory offset.</summary>
+		/// <remarks>
+		/// High byte of port memory always is 0xFF.
+		/// This method is only here to serve as a memory write handler for port memory.
+		/// Regular port memory accesses should use the <see cref="WritePort(byte, byte)"/> method.
+		/// </remarks>
+		/// <param name="offsetLow">The offset low.</param>
+		/// <param name="offsetHigh">The offset high. This parameter is ignored.</param>
+		/// <param name="value">The value.</param>
 		private void WritePort(byte offsetLow, byte offsetHigh, byte value) { WritePort(offsetLow, value); }
 
 		#region DMA
