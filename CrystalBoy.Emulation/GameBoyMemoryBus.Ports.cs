@@ -103,8 +103,8 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.SCX, 0x00);
 			WritePort(Port.LYC, 0x00);
 			WritePort(Port.BGP, useBootRom ? (byte)0x00 : (byte)0xFC);
-			WritePort(Port.OBP0, useBootRom ? (byte)0x00 : (byte)0xFF);
-			WritePort(Port.OBP1, useBootRom ? (byte)0x00 : (byte)0xFF);
+			WritePort(Port.OBP0, 0xFF);
+			WritePort(Port.OBP1, 0xFF);
 			WritePort(Port.WY, 0x00);
 			WritePort(Port.WX, 0x00);
 			WritePort(Port.IE, 0x00);
@@ -203,13 +203,14 @@ namespace CrystalBoy.Emulation
 					UpdateVideoStatusInterrupt();
 					break;
 				case 0x44: // LY
-					lyOffset = cycleCount / -HorizontalLineDuration; // We use a negative offset here...
+					// We use a negative offset here...
+					// -4 allows the interrupt to happen 4 cycles beforce the new line
+					lyOffset = cycleCount / -HorizontalLineDuration - 4;
 					break;
 				case 0x45: // LYC
 					if (value < 154) // Valid values are between 0 and 153
-						lycMinCycle = value * HorizontalLineDuration;
-					else
-						lycMinCycle = -1;
+						lycMinCycle = lyOffset + value * HorizontalLineDuration;
+					else lycMinCycle = -4;
 					if (notifyCoincidence)
 						UpdateVideoStatusInterrupt();
 					portMemory[0x45] = value;
@@ -381,7 +382,7 @@ namespace CrystalBoy.Emulation
 					return (byte)(portMemory[0x41] & 0x78 | temp);
 				case 0x44: // LY
 					if (lcdEnabled)
-						return (byte)(lyOffset + cycleCount / HorizontalLineDuration);
+						return (byte)(lyOffset + (cycleCount + 4) / HorizontalLineDuration);
 					else
 						return 0;
 				case 0x4D:

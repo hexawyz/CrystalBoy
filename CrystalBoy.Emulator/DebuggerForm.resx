@@ -117,973 +117,1081 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="gotoButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>270, 10</value>
-  </data>
-  <data name="&gt;&gt;hlValueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;afLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="&gt;&gt;halfCarryFlagCheckBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="ifLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
-  </data>
+  <metadata name="registersGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="gotoButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+  <data name="registersGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
-  </data>
-  <data name="&gt;&gt;afLabel.Name" xml:space="preserve">
-    <value>afLabel</value>
-  </data>
-  <data name="&gt;&gt;afLabel.ZOrder" xml:space="preserve">
-    <value>15</value>
-  </data>
-  <data name="&gt;&gt;zeroFlagCheckBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="imeCheckBox.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="&gt;&gt;zeroFlagCheckBox.Parent" xml:space="preserve">
-    <value>flagsGroupBox</value>
-  </data>
-  <data name="bcLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
-  </data>
-  <data name="disassemblyView.AutoScrollMinSize" type="System.Drawing.Size, System.Drawing">
-    <value>0, 1179648</value>
-  </data>
-  <data name="gotoButton.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="breakpointsGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>316, 165</value>
-  </data>
-  <data name="deLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 44</value>
-  </data>
-  <data name="&gt;&gt;debugGroupBox.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;gotoLabel.Name" xml:space="preserve">
-    <value>gotoLabel</value>
-  </data>
-  <data name="&gt;&gt;negationFlagCheckBox.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;deValueLabel.ZOrder" xml:space="preserve">
-    <value>7</value>
-  </data>
-  <data name="gotoTextBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="&gt;&gt;clearBreakpointsButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;deLabel.ZOrder" xml:space="preserve">
-    <value>13</value>
-  </data>
-  <data name="bcValueLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="clearBreakpointsButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 48</value>
-  </data>
-  <data name="hlLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="&gt;&gt;ifValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="runButton.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="bcLabel.AutoSize" type="System.Boolean, mscorlib">
+  <data name="ieValueLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="&gt;&gt;bcValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="ieValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
   </data>
-  <data name="&gt;&gt;ifLabel.Name" xml:space="preserve">
-    <value>ifLabel</value>
-  </data>
-  <data name="breakpointsGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
+  <data name="ieValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>123, 58</value>
   </data>
   <data name="ieValueLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>0, 14</value>
   </data>
-  <data name="hlLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
+  <data name="ieValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
   </data>
-  <data name="afLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
+  <data name="&gt;&gt;ieValueLabel.Name" xml:space="preserve">
+    <value>ieValueLabel</value>
   </data>
-  <data name="&gt;&gt;gotoTextBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gotoTextBox.Name" xml:space="preserve">
-    <value>gotoTextBox</value>
-  </data>
-  <data name="&gt;&gt;pcLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="&gt;&gt;imeCheckBox.Parent" xml:space="preserve">
-    <value>flagsGroupBox</value>
-  </data>
-  <data name="bcValueLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>0, 14</value>
-  </data>
-  <data name="&gt;&gt;toggleBreakpointButton.Name" xml:space="preserve">
-    <value>toggleBreakpointButton</value>
-  </data>
-  <data name="&gt;&gt;afValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="pcLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
-  </data>
-  <data name="gotoLabel.Text" xml:space="preserve">
-    <value>Address: </value>
-  </data>
-  <data name="&gt;&gt;debugGroupBox.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;imeCheckBox.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="$this.Text" xml:space="preserve">
-    <value>Debugger</value>
-  </data>
-  <data name="bcLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="&gt;&gt;stepButton.Name" xml:space="preserve">
-    <value>stepButton</value>
-  </data>
-  <data name="imeCheckBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 17</value>
-  </data>
-  <data name="breakpointsGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>164, 77</value>
-  </data>
-  <data name="carryFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="halfCarryFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>85, 19</value>
-  </data>
-  <data name="&gt;&gt;toggleBreakpointButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="pcLabel.Text" xml:space="preserve">
-    <value>PC:</value>
-  </data>
-  <data name="&gt;&gt;hlLabel.Type" xml:space="preserve">
+  <data name="&gt;&gt;ieValueLabel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;gotoTextBox.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;ieValueLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;ieValueLabel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="ieLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="ieLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="ieLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="ieLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>89, 58</value>
+  </data>
+  <data name="ieLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
+  </data>
+  <data name="ieLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="ieLabel.Text" xml:space="preserve">
+    <value>IE:</value>
+  </data>
+  <data name="&gt;&gt;ieLabel.Name" xml:space="preserve">
+    <value>ieLabel</value>
+  </data>
+  <data name="&gt;&gt;ieLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ieLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;ieLabel.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="deValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="ifValueLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="ifValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="ifValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 58</value>
+  </data>
+  <data name="ifValueLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>0, 14</value>
   </data>
   <data name="ifValueLabel.TabIndex" type="System.Int32, mscorlib">
     <value>13</value>
   </data>
-  <data name="zeroFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 19</value>
-  </data>
-  <data name="&gt;&gt;carryFlagCheckBox.Parent" xml:space="preserve">
-    <value>flagsGroupBox</value>
-  </data>
-  <data name="&gt;&gt;toggleBreakpointButton.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="gotoLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>51, 13</value>
-  </data>
-  <data name="&gt;&gt;ieValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="&gt;&gt;flagsGroupBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="negationFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>45, 19</value>
-  </data>
-  <data name="halfCarryFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="ifValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="toggleBreakpointButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 23</value>
-  </data>
-  <data name="flagsGroupBox.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
-  </data>
-  <data name="registersGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>164, 75</value>
-  </data>
-  <data name="clearBreakpointsButton.Text" xml:space="preserve">
-    <value>Clear All</value>
-  </data>
-  <data name="&gt;&gt;ieValueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;registersGroupBox.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="bcValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;breakpointsGroupBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;disassemblyView.Name" xml:space="preserve">
-    <value>disassemblyView</value>
-  </data>
-  <data name="hlLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="clearBreakpointsButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 23</value>
-  </data>
-  <data name="disassemblyView.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
-  <data name="pcLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
-  </data>
-  <data name="&gt;&gt;gotoLabel.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;afValueLabel.ZOrder" xml:space="preserve">
-    <value>9</value>
-  </data>
-  <data name="&gt;&gt;deLabel.Name" xml:space="preserve">
-    <value>deLabel</value>
-  </data>
-  <data name="afValueLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="spLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
-  </data>
-  <data name="runButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>75, 23</value>
-  </data>
-  <data name="debugGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>164, 48</value>
-  </data>
-  <data name="&gt;&gt;clearBreakpointsButton.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;zeroFlagCheckBox.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="spLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>89, 30</value>
-  </data>
-  <data name="disassemblyView.Location" type="System.Drawing.Point, System.Drawing">
-    <value>14, 39</value>
-  </data>
-  <data name="deValueLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="ieLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="stepButton.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>CrystalBoy.Emulator.EmulatorForm, CrystalBoy, Version=1.3.0.0, Culture=neutral, PublicKeyToken=e773e4429ed56e30</value>
-  </data>
-  <data name="&gt;&gt;halfCarryFlagCheckBox.Parent" xml:space="preserve">
-    <value>flagsGroupBox</value>
-  </data>
-  <data name="&gt;&gt;gotoLabel.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="bcValueLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;bcLabel.Name" xml:space="preserve">
-    <value>bcLabel</value>
-  </data>
-  <data name="&gt;&gt;disassemblyView.Type" xml:space="preserve">
-    <value>CrystalBoy.Disassembly.Windows.Forms.DisassemblyView, CrystalBoy.Disassembly.Windows.Forms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e773e4429ed56e30</value>
-  </data>
-  <data name="&gt;&gt;halfCarryFlagCheckBox.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="gotoButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>39, 23</value>
-  </data>
-  <data name="&gt;&gt;ieLabel.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="halfCarryFlagCheckBox.Text" xml:space="preserve">
-    <value>H</value>
-  </data>
-  <data name="pcValueLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>0, 14</value>
-  </data>
-  <data name="flagsGroupBox.Text" xml:space="preserve">
-    <value>Flags</value>
-  </data>
-  <data name="&gt;&gt;ieLabel.Name" xml:space="preserve">
-    <value>ieLabel</value>
-  </data>
-  <data name="flagsGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>316, 94</value>
-  </data>
-  <data name="&gt;&gt;runButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="afLabel.Text" xml:space="preserve">
-    <value>AF:</value>
-  </data>
-  <data name="breakpointsGroupBox.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;afValueLabel.Name" xml:space="preserve">
-    <value>afValueLabel</value>
-  </data>
-  <data name="&gt;&gt;bcValueLabel.Name" xml:space="preserve">
-    <value>bcValueLabel</value>
-  </data>
-  <data name="&gt;&gt;clearBreakpointsButton.Parent" xml:space="preserve">
-    <value>breakpointsGroupBox</value>
-  </data>
-  <data name="hlLabel.Text" xml:space="preserve">
-    <value>HL:</value>
-  </data>
-  <data name="spValueLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>0, 14</value>
-  </data>
-  <data name="ieValueLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="toggleBreakpointButton.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="spValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;halfCarryFlagCheckBox.Name" xml:space="preserve">
-    <value>halfCarryFlagCheckBox</value>
-  </data>
-  <data name="&gt;&gt;pcValueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
-    <value>500, 342</value>
-  </data>
-  <data name="&gt;&gt;carryFlagCheckBox.Name" xml:space="preserve">
-    <value>carryFlagCheckBox</value>
-  </data>
-  <data name="&gt;&gt;flagsGroupBox.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="afLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="&gt;&gt;hlValueLabel.Name" xml:space="preserve">
-    <value>hlValueLabel</value>
-  </data>
-  <data name="ieLabel.Text" xml:space="preserve">
-    <value>IE:</value>
-  </data>
-  <data name="&gt;&gt;disassemblyView.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="toggleBreakpointButton.Text" xml:space="preserve">
-    <value>Toggle</value>
-  </data>
-  <data name="ifLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;spLabel.Name" xml:space="preserve">
-    <value>spLabel</value>
-  </data>
-  <data name="ieLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
   <data name="&gt;&gt;ifValueLabel.Name" xml:space="preserve">
     <value>ifValueLabel</value>
-  </data>
-  <data name="ifLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>12</value>
-  </data>
-  <data name="hlValueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>123, 16</value>
-  </data>
-  <data name="debugGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Right</value>
-  </data>
-  <data name="afValueLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>0, 14</value>
-  </data>
-  <data name="pcValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="carryFlagCheckBox.Text" xml:space="preserve">
-    <value>C</value>
-  </data>
-  <data name="&gt;&gt;flagsGroupBox.Name" xml:space="preserve">
-    <value>flagsGroupBox</value>
-  </data>
-  <data name="&gt;&gt;gotoButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="registersGroupBox.Text" xml:space="preserve">
-    <value>Registers</value>
-  </data>
-  <data name="&gt;&gt;hlLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="&gt;&gt;gotoButton.Name" xml:space="preserve">
-    <value>gotoButton</value>
-  </data>
-  <data name="negationFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>34, 17</value>
-  </data>
-  <data name="afLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;gotoButton.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="imeCheckBox.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;pcValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="deLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="ieValueLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>15</value>
-  </data>
-  <data name="spLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="&gt;&gt;hlValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="gotoLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="disassemblyView.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="afLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
-  </data>
-  <data name="ieLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>89, 58</value>
-  </data>
-  <data name="&gt;&gt;bcLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;registersGroupBox.ZOrder" xml:space="preserve">
-    <value>6</value>
-  </data>
-  <data name="deValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="breakpointsGroupBox.Text" xml:space="preserve">
-    <value>Breakpoints</value>
-  </data>
-  <data name="&gt;&gt;bcValueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="pcValueLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>11</value>
-  </data>
-  <data name="clearBreakpointsButton.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;spValueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="gotoTextBox.TextAlign" type="System.Windows.Forms.HorizontalAlignment, System.Windows.Forms">
-    <value>Right</value>
-  </data>
-  <data name="deLabel.Text" xml:space="preserve">
-    <value>DE:</value>
-  </data>
-  <data name="zeroFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="bcLabel.Text" xml:space="preserve">
-    <value>BC:</value>
-  </data>
-  <data name="&gt;&gt;breakpointsGroupBox.Name" xml:space="preserve">
-    <value>breakpointsGroupBox</value>
-  </data>
-  <data name="pcValueLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="&gt;&gt;pcLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;runButton.Name" xml:space="preserve">
-    <value>runButton</value>
-  </data>
-  <data name="flagsGroupBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>164, 65</value>
-  </data>
-  <data name="ifLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 58</value>
-  </data>
-  <data name="ieLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="gotoLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="carryFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>33, 17</value>
-  </data>
-  <data name="deLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="ieValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="zeroFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>33, 17</value>
-  </data>
-  <data name="pcLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="&gt;&gt;ifValueLabel.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="disassemblyView.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
-  </data>
-  <data name="afValueLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="ieLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
-  </data>
-  <data name="&gt;&gt;spLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="debugGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>316, 248</value>
-  </data>
-  <data name="hlValueLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>0, 14</value>
-  </data>
-  <data name="gotoTextBox.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="deLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="&gt;&gt;breakpointsGroupBox.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="&gt;&gt;afValueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;bcValueLabel.ZOrder" xml:space="preserve">
-    <value>8</value>
-  </data>
-  <data name="&gt;&gt;ifLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;breakpointsGroupBox.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;spValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="stepButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>83, 19</value>
-  </data>
-  <data name="halfCarryFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="deValueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>40, 44</value>
-  </data>
-  <data name="&gt;&gt;pcLabel.Name" xml:space="preserve">
-    <value>pcLabel</value>
-  </data>
-  <data name="spValueLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
-  </data>
-  <data name="flagsGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="&gt;&gt;carryFlagCheckBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="spValueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>123, 30</value>
-  </data>
-  <data name="gotoLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 15</value>
-  </data>
-  <data name="&gt;&gt;clearBreakpointsButton.Name" xml:space="preserve">
-    <value>clearBreakpointsButton</value>
-  </data>
-  <data name="deValueLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
-  </data>
-  <data name="&gt;&gt;spValueLabel.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="hlLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>89, 16</value>
-  </data>
-  <data name="&gt;&gt;gotoButton.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>DebuggerForm</value>
-  </data>
-  <data name="&gt;&gt;ieValueLabel.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;afLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;negationFlagCheckBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="spValueLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="ifValueLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>0, 14</value>
-  </data>
-  <data name="deLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
-  </data>
-  <data name="&gt;&gt;ieValueLabel.Name" xml:space="preserve">
-    <value>ieValueLabel</value>
-  </data>
-  <data name="afValueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>40, 16</value>
-  </data>
-  <data name="hlValueLabel.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Courier New, 8.25pt</value>
-  </data>
-  <data name="&gt;&gt;spLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;ifValueLabel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="debugGroupBox.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
+  <data name="&gt;&gt;ifValueLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
   </data>
-  <data name="&gt;&gt;stepButton.Parent" xml:space="preserve">
-    <value>debugGroupBox</value>
+  <data name="&gt;&gt;ifValueLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
   </data>
-  <data name="&gt;&gt;ifLabel.ZOrder" xml:space="preserve">
-    <value>3</value>
+  <metadata name="ifLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="ifLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
   </data>
-  <data name="negationFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="ifValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+  <data name="ifLabel.Font" type="System.Drawing.Font, System.Drawing">
     <value>Courier New, 8.25pt</value>
   </data>
-  <data name="&gt;&gt;debugGroupBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="ifLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 58</value>
   </data>
-  <data name="spLabel.Text" xml:space="preserve">
-    <value>SP:</value>
+  <data name="ifLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
   </data>
-  <data name="&gt;&gt;pcValueLabel.Name" xml:space="preserve">
-    <value>pcValueLabel</value>
-  </data>
-  <data name="&gt;&gt;deValueLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;zeroFlagCheckBox.Name" xml:space="preserve">
-    <value>zeroFlagCheckBox</value>
-  </data>
-  <data name="debugGroupBox.Text" xml:space="preserve">
-    <value>Debug</value>
-  </data>
-  <data name="&gt;&gt;carryFlagCheckBox.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;registersGroupBox.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;runButton.Parent" xml:space="preserve">
-    <value>debugGroupBox</value>
-  </data>
-  <data name="&gt;&gt;pcValueLabel.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="gotoTextBox.MaxLength" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="gotoTextBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>164, 12</value>
-  </data>
-  <data name="&gt;&gt;hlValueLabel.ZOrder" xml:space="preserve">
-    <value>6</value>
-  </data>
-  <data name="zeroFlagCheckBox.Text" xml:space="preserve">
-    <value>Z</value>
-  </data>
-  <data name="bcValueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>40, 30</value>
-  </data>
-  <data name="&gt;&gt;stepButton.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;runButton.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;deLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="&gt;&gt;debugGroupBox.Name" xml:space="preserve">
-    <value>debugGroupBox</value>
-  </data>
-  <data name="imeCheckBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 42</value>
-  </data>
-  <data name="&gt;&gt;registersGroupBox.Name" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="registersGroupBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>316, 13</value>
-  </data>
-  <data name="afValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;bcLabel.ZOrder" xml:space="preserve">
-    <value>14</value>
-  </data>
-  <data name="gotoTextBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>100, 20</value>
-  </data>
-  <data name="zeroFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="ieValueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>123, 58</value>
-  </data>
-  <data name="runButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 19</value>
-  </data>
-  <data name="&gt;&gt;deLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="negationFlagCheckBox.Text" xml:space="preserve">
-    <value>N</value>
-  </data>
-  <data name="pcLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>89, 44</value>
-  </data>
-  <data name="negationFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="hlValueLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;stepButton.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;ieLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="disassemblyView.Size" type="System.Drawing.Size, System.Drawing">
-    <value>295, 256</value>
+  <data name="ifLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
   </data>
   <data name="ifLabel.Text" xml:space="preserve">
     <value>IF:</value>
   </data>
-  <data name="&gt;&gt;negationFlagCheckBox.Name" xml:space="preserve">
-    <value>negationFlagCheckBox</value>
+  <data name="&gt;&gt;ifLabel.Name" xml:space="preserve">
+    <value>ifLabel</value>
   </data>
-  <data name="&gt;&gt;gotoLabel.Type" xml:space="preserve">
+  <data name="&gt;&gt;ifLabel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="afLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 16</value>
+  <data name="&gt;&gt;ifLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
   </data>
-  <data name="ifLabel.Font" type="System.Drawing.Font, System.Drawing">
+  <data name="&gt;&gt;ifLabel.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="pcValueLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="pcValueLabel.Font" type="System.Drawing.Font, System.Drawing">
     <value>Courier New, 8.25pt</value>
   </data>
   <data name="pcValueLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>123, 44</value>
   </data>
-  <data name="&gt;&gt;ieLabel.Parent" xml:space="preserve">
+  <data name="pcValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>0, 14</value>
+  </data>
+  <data name="pcValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="&gt;&gt;pcValueLabel.Name" xml:space="preserve">
+    <value>pcValueLabel</value>
+  </data>
+  <data name="&gt;&gt;pcValueLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;pcValueLabel.Parent" xml:space="preserve">
     <value>registersGroupBox</value>
   </data>
-  <data name="gotoButton.Text" xml:space="preserve">
-    <value>Go</value>
+  <data name="&gt;&gt;pcValueLabel.ZOrder" xml:space="preserve">
+    <value>4</value>
   </data>
-  <data name="&gt;&gt;imeCheckBox.Name" xml:space="preserve">
-    <value>imeCheckBox</value>
-  </data>
-  <data name="bcLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="spLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
-  </data>
-  <data name="&gt;&gt;hlLabel.ZOrder" xml:space="preserve">
-    <value>12</value>
-  </data>
-  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>492, 308</value>
-  </data>
-  <data name="&gt;&gt;bcLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
-  </data>
-  <data name="&gt;&gt;gotoTextBox.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;negationFlagCheckBox.Parent" xml:space="preserve">
-    <value>flagsGroupBox</value>
-  </data>
-  <data name="pcLabel.AutoSize" type="System.Boolean, mscorlib">
+  <data name="spValueLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="&gt;&gt;deValueLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
+  <data name="spValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
   </data>
-  <data name="halfCarryFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>34, 17</value>
+  <data name="spValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>123, 30</value>
   </data>
-  <data name="&gt;&gt;ifLabel.Parent" xml:space="preserve">
-    <value>registersGroupBox</value>
+  <data name="spValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>0, 14</value>
   </data>
-  <data name="runButton.Text" xml:space="preserve">
-    <value>Run</value>
-  </data>
-  <data name="hlValueLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="&gt;&gt;hlLabel.Name" xml:space="preserve">
-    <value>hlLabel</value>
+  <data name="spValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
   </data>
   <data name="&gt;&gt;spValueLabel.Name" xml:space="preserve">
     <value>spValueLabel</value>
   </data>
-  <data name="ifValueLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>40, 58</value>
+  <data name="&gt;&gt;spValueLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="stepButton.Text" xml:space="preserve">
-    <value>Step</value>
+  <data name="&gt;&gt;spValueLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;spValueLabel.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="hlValueLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="hlValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="hlValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>123, 16</value>
+  </data>
+  <data name="hlValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>0, 14</value>
+  </data>
+  <data name="hlValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;hlValueLabel.Name" xml:space="preserve">
+    <value>hlValueLabel</value>
+  </data>
+  <data name="&gt;&gt;hlValueLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;hlValueLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;hlValueLabel.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="deValueLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="deValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="deValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 44</value>
+  </data>
+  <data name="deValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>0, 14</value>
+  </data>
+  <data name="deValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;deValueLabel.Name" xml:space="preserve">
+    <value>deValueLabel</value>
+  </data>
+  <data name="&gt;&gt;deValueLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;deValueLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;deValueLabel.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="bcValueLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="bcValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="bcValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 30</value>
+  </data>
+  <data name="bcValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>0, 14</value>
+  </data>
+  <data name="bcValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;bcValueLabel.Name" xml:space="preserve">
+    <value>bcValueLabel</value>
+  </data>
+  <data name="&gt;&gt;bcValueLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;bcValueLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;bcValueLabel.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="afValueLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="afValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="afValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 16</value>
+  </data>
+  <data name="afValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>0, 14</value>
+  </data>
+  <data name="afValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;afValueLabel.Name" xml:space="preserve">
+    <value>afValueLabel</value>
+  </data>
+  <data name="&gt;&gt;afValueLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;afValueLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;afValueLabel.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <metadata name="pcLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="pcLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="pcLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="pcLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>89, 44</value>
+  </data>
+  <data name="pcLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
+  </data>
+  <data name="pcLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="pcLabel.Text" xml:space="preserve">
+    <value>PC:</value>
+  </data>
+  <data name="&gt;&gt;pcLabel.Name" xml:space="preserve">
+    <value>pcLabel</value>
+  </data>
+  <data name="&gt;&gt;pcLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;pcLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;pcLabel.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <metadata name="spLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="spLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="spLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="spLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>89, 30</value>
+  </data>
+  <data name="spLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
+  </data>
+  <data name="spLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="spLabel.Text" xml:space="preserve">
+    <value>SP:</value>
+  </data>
+  <data name="&gt;&gt;spLabel.Name" xml:space="preserve">
+    <value>spLabel</value>
+  </data>
+  <data name="&gt;&gt;spLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;spLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;spLabel.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <metadata name="hlLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="hlLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="hlLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="hlLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>89, 16</value>
+  </data>
+  <data name="hlLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
+  </data>
+  <data name="hlLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="hlLabel.Text" xml:space="preserve">
+    <value>HL:</value>
+  </data>
+  <data name="&gt;&gt;hlLabel.Name" xml:space="preserve">
+    <value>hlLabel</value>
+  </data>
+  <data name="&gt;&gt;hlLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;hlLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;hlLabel.ZOrder" xml:space="preserve">
+    <value>12</value>
+  </data>
+  <metadata name="deLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="deLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="deLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="deLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 44</value>
+  </data>
+  <data name="deLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
+  </data>
+  <data name="deLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="deLabel.Text" xml:space="preserve">
+    <value>DE:</value>
+  </data>
+  <data name="&gt;&gt;deLabel.Name" xml:space="preserve">
+    <value>deLabel</value>
+  </data>
+  <data name="&gt;&gt;deLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;deLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;deLabel.ZOrder" xml:space="preserve">
+    <value>13</value>
+  </data>
+  <metadata name="bcLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="bcLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="bcLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
   </data>
   <data name="bcLabel.Location" type="System.Drawing.Point, System.Drawing">
     <value>6, 30</value>
   </data>
+  <data name="bcLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
+  </data>
+  <data name="bcLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="bcLabel.Text" xml:space="preserve">
+    <value>BC:</value>
+  </data>
+  <data name="&gt;&gt;bcLabel.Name" xml:space="preserve">
+    <value>bcLabel</value>
+  </data>
+  <data name="&gt;&gt;bcLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;bcLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;bcLabel.ZOrder" xml:space="preserve">
+    <value>14</value>
+  </data>
+  <metadata name="afLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="afLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="afLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="afLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 16</value>
+  </data>
+  <data name="afLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>28, 14</value>
+  </data>
+  <data name="afLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="afLabel.Text" xml:space="preserve">
+    <value>AF:</value>
+  </data>
+  <data name="&gt;&gt;afLabel.Name" xml:space="preserve">
+    <value>afLabel</value>
+  </data>
+  <data name="&gt;&gt;afLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;afLabel.Parent" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;afLabel.ZOrder" xml:space="preserve">
+    <value>15</value>
+  </data>
+  <data name="registersGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>316, 13</value>
+  </data>
+  <data name="registersGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>164, 75</value>
+  </data>
   <data name="registersGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="registersGroupBox.Text" xml:space="preserve">
+    <value>Registers</value>
+  </data>
+  <data name="&gt;&gt;registersGroupBox.Name" xml:space="preserve">
+    <value>registersGroupBox</value>
+  </data>
+  <data name="&gt;&gt;registersGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;registersGroupBox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;registersGroupBox.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <metadata name="flagsGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="flagsGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="imeCheckBox.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="imeCheckBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 42</value>
+  </data>
+  <data name="imeCheckBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>136, 17</value>
+  </data>
+  <data name="imeCheckBox.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
   </data>
   <data name="imeCheckBox.Text" xml:space="preserve">
     <value>Interrupt Master Enable</value>
   </data>
-  <data name="registersGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="carryFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;spLabel.ZOrder" xml:space="preserve">
-    <value>11</value>
-  </data>
-  <data name="toggleBreakpointButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 19</value>
-  </data>
-  <data name="gotoTextBox.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="carryFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>125, 19</value>
-  </data>
-  <data name="&gt;&gt;deValueLabel.Name" xml:space="preserve">
-    <value>deValueLabel</value>
-  </data>
-  <data name="spLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;disassemblyView.ZOrder" xml:space="preserve">
-    <value>7</value>
-  </data>
-  <data name="&gt;&gt;flagsGroupBox.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;pcLabel.ZOrder" xml:space="preserve">
-    <value>10</value>
-  </data>
-  <data name="stepButton.Size" type="System.Drawing.Size, System.Drawing">
-    <value>75, 23</value>
+  <data name="&gt;&gt;imeCheckBox.Name" xml:space="preserve">
+    <value>imeCheckBox</value>
   </data>
   <data name="&gt;&gt;imeCheckBox.Type" xml:space="preserve">
     <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="hlLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>28, 14</value>
+  <data name="&gt;&gt;imeCheckBox.Parent" xml:space="preserve">
+    <value>flagsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;imeCheckBox.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="carryFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="carryFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>125, 19</value>
+  </data>
+  <data name="carryFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>33, 17</value>
+  </data>
+  <data name="carryFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="carryFlagCheckBox.Text" xml:space="preserve">
+    <value>C</value>
+  </data>
+  <data name="&gt;&gt;carryFlagCheckBox.Name" xml:space="preserve">
+    <value>carryFlagCheckBox</value>
+  </data>
+  <data name="&gt;&gt;carryFlagCheckBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;carryFlagCheckBox.Parent" xml:space="preserve">
+    <value>flagsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;carryFlagCheckBox.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="halfCarryFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="halfCarryFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>85, 19</value>
+  </data>
+  <data name="halfCarryFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>34, 17</value>
+  </data>
+  <data name="halfCarryFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="halfCarryFlagCheckBox.Text" xml:space="preserve">
+    <value>H</value>
+  </data>
+  <data name="&gt;&gt;halfCarryFlagCheckBox.Name" xml:space="preserve">
+    <value>halfCarryFlagCheckBox</value>
+  </data>
+  <data name="&gt;&gt;halfCarryFlagCheckBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;halfCarryFlagCheckBox.Parent" xml:space="preserve">
+    <value>flagsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;halfCarryFlagCheckBox.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="negationFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="negationFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>45, 19</value>
+  </data>
+  <data name="negationFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>34, 17</value>
+  </data>
+  <data name="negationFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="negationFlagCheckBox.Text" xml:space="preserve">
+    <value>N</value>
+  </data>
+  <data name="&gt;&gt;negationFlagCheckBox.Name" xml:space="preserve">
+    <value>negationFlagCheckBox</value>
+  </data>
+  <data name="&gt;&gt;negationFlagCheckBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;negationFlagCheckBox.Parent" xml:space="preserve">
+    <value>flagsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;negationFlagCheckBox.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="zeroFlagCheckBox.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="zeroFlagCheckBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 19</value>
+  </data>
+  <data name="zeroFlagCheckBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>33, 17</value>
+  </data>
+  <data name="zeroFlagCheckBox.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="zeroFlagCheckBox.Text" xml:space="preserve">
+    <value>Z</value>
+  </data>
+  <data name="&gt;&gt;zeroFlagCheckBox.Name" xml:space="preserve">
+    <value>zeroFlagCheckBox</value>
+  </data>
+  <data name="&gt;&gt;zeroFlagCheckBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;zeroFlagCheckBox.Parent" xml:space="preserve">
+    <value>flagsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;zeroFlagCheckBox.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="flagsGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>316, 94</value>
+  </data>
+  <data name="flagsGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>164, 65</value>
+  </data>
+  <data name="flagsGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="flagsGroupBox.Text" xml:space="preserve">
+    <value>Flags</value>
+  </data>
+  <data name="&gt;&gt;flagsGroupBox.Name" xml:space="preserve">
+    <value>flagsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;flagsGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;flagsGroupBox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;flagsGroupBox.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <metadata name="debugGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="debugGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="stepButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>83, 19</value>
+  </data>
+  <data name="stepButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="stepButton.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="stepButton.Text" xml:space="preserve">
+    <value>&amp;Step</value>
+  </data>
+  <data name="&gt;&gt;stepButton.Name" xml:space="preserve">
+    <value>stepButton</value>
+  </data>
+  <data name="&gt;&gt;stepButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;stepButton.Parent" xml:space="preserve">
+    <value>debugGroupBox</value>
+  </data>
+  <data name="&gt;&gt;stepButton.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="runButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 19</value>
+  </data>
+  <data name="runButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="runButton.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="runButton.Text" xml:space="preserve">
+    <value>&amp;Run</value>
+  </data>
+  <data name="&gt;&gt;runButton.Name" xml:space="preserve">
+    <value>runButton</value>
+  </data>
+  <data name="&gt;&gt;runButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;runButton.Parent" xml:space="preserve">
+    <value>debugGroupBox</value>
+  </data>
+  <data name="&gt;&gt;runButton.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="debugGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>316, 302</value>
+  </data>
+  <data name="debugGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>164, 48</value>
+  </data>
+  <data name="debugGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="debugGroupBox.Text" xml:space="preserve">
+    <value>Debug</value>
+  </data>
+  <data name="&gt;&gt;debugGroupBox.Name" xml:space="preserve">
+    <value>debugGroupBox</value>
+  </data>
+  <data name="&gt;&gt;debugGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;debugGroupBox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;debugGroupBox.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="breakpointsGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="toggleBreakpointButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 19</value>
+  </data>
+  <data name="toggleBreakpointButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 23</value>
+  </data>
+  <data name="toggleBreakpointButton.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="toggleBreakpointButton.Text" xml:space="preserve">
+    <value>&amp;Toggle</value>
+  </data>
+  <data name="&gt;&gt;toggleBreakpointButton.Name" xml:space="preserve">
+    <value>toggleBreakpointButton</value>
+  </data>
+  <data name="&gt;&gt;toggleBreakpointButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;toggleBreakpointButton.Parent" xml:space="preserve">
     <value>breakpointsGroupBox</value>
   </data>
-  <metadata name="flagsGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="afLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="hlLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="ieLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="spLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="deLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="pcLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="registersGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
+  <data name="&gt;&gt;toggleBreakpointButton.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="clearBreakpointsButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 48</value>
+  </data>
+  <data name="clearBreakpointsButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 23</value>
+  </data>
+  <data name="clearBreakpointsButton.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="clearBreakpointsButton.Text" xml:space="preserve">
+    <value>&amp;Clear All</value>
+  </data>
+  <data name="&gt;&gt;clearBreakpointsButton.Name" xml:space="preserve">
+    <value>clearBreakpointsButton</value>
+  </data>
+  <data name="&gt;&gt;clearBreakpointsButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;clearBreakpointsButton.Parent" xml:space="preserve">
+    <value>breakpointsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;clearBreakpointsButton.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="breakpointsGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>316, 165</value>
+  </data>
+  <data name="breakpointsGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>164, 77</value>
+  </data>
+  <data name="breakpointsGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="breakpointsGroupBox.Text" xml:space="preserve">
+    <value>Breakpoints</value>
+  </data>
+  <data name="&gt;&gt;breakpointsGroupBox.Name" xml:space="preserve">
+    <value>breakpointsGroupBox</value>
+  </data>
+  <data name="&gt;&gt;breakpointsGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;breakpointsGroupBox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;breakpointsGroupBox.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="gotoLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="gotoLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 15</value>
+  </data>
+  <data name="gotoLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>51, 13</value>
+  </data>
+  <data name="gotoLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="gotoLabel.Text" xml:space="preserve">
+    <value>Address: </value>
+  </data>
+  <data name="&gt;&gt;gotoLabel.Name" xml:space="preserve">
+    <value>gotoLabel</value>
+  </data>
+  <data name="&gt;&gt;gotoLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gotoLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gotoLabel.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="gotoTextBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="gotoTextBox.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="gotoTextBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>164, 12</value>
+  </data>
+  <data name="gotoTextBox.MaxLength" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="gotoTextBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>100, 20</value>
+  </data>
+  <data name="gotoTextBox.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="gotoTextBox.TextAlign" type="System.Windows.Forms.HorizontalAlignment, System.Windows.Forms">
+    <value>Right</value>
+  </data>
+  <data name="&gt;&gt;gotoTextBox.Name" xml:space="preserve">
+    <value>gotoTextBox</value>
+  </data>
+  <data name="&gt;&gt;gotoTextBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gotoTextBox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gotoTextBox.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="gotoButton.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="gotoButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>270, 10</value>
+  </data>
+  <data name="gotoButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>39, 23</value>
+  </data>
+  <data name="gotoButton.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="gotoButton.Text" xml:space="preserve">
+    <value>Go</value>
+  </data>
+  <data name="&gt;&gt;gotoButton.Name" xml:space="preserve">
+    <value>gotoButton</value>
+  </data>
+  <data name="&gt;&gt;gotoButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gotoButton.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;gotoButton.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="disassemblyView.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="disassemblyView.AutoScrollMinSize" type="System.Drawing.Size, System.Drawing">
+    <value>0, 1179648</value>
+  </data>
+  <data name="disassemblyView.Location" type="System.Drawing.Point, System.Drawing">
+    <value>14, 39</value>
+  </data>
+  <data name="disassemblyView.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
+  </data>
+  <data name="disassemblyView.Size" type="System.Drawing.Size, System.Drawing">
+    <value>295, 310</value>
+  </data>
+  <data name="disassemblyView.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;disassemblyView.Name" xml:space="preserve">
+    <value>disassemblyView</value>
+  </data>
+  <data name="&gt;&gt;disassemblyView.Type" xml:space="preserve">
+    <value>CrystalBoy.Disassembly.Windows.Forms.DisassemblyView, CrystalBoy.Disassembly.Windows.Forms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e773e4429ed56e30</value>
+  </data>
+  <data name="&gt;&gt;disassemblyView.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;disassemblyView.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="cycleCounterGroupBox.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="cycleCountLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="cycleCountLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 24</value>
+  </data>
+  <data name="cycleCountLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>41, 13</value>
+  </data>
+  <data name="cycleCountLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="cycleCountLabel.Text" xml:space="preserve">
+    <value>Count: </value>
+  </data>
+  <data name="&gt;&gt;cycleCountLabel.Name" xml:space="preserve">
+    <value>cycleCountLabel</value>
+  </data>
+  <data name="&gt;&gt;cycleCountLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cycleCountLabel.Parent" xml:space="preserve">
+    <value>cycleCounterGroupBox</value>
+  </data>
+  <data name="&gt;&gt;cycleCountLabel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="cycleCounterValueLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="cycleCounterValueLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Courier New, 8.25pt</value>
+  </data>
+  <data name="cycleCounterValueLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="cycleCounterValueLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>53, 24</value>
+  </data>
+  <data name="cycleCounterValueLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>0, 14</value>
+  </data>
+  <data name="cycleCounterValueLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterValueLabel.Name" xml:space="preserve">
+    <value>cycleCounterValueLabel</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterValueLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterValueLabel.Parent" xml:space="preserve">
+    <value>cycleCounterGroupBox</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterValueLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="cycleCounterResetButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>83, 19</value>
+  </data>
+  <data name="cycleCounterResetButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="cycleCounterResetButton.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="cycleCounterResetButton.Text" xml:space="preserve">
+    <value>R&amp;eset</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterResetButton.Name" xml:space="preserve">
+    <value>cycleCounterResetButton</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterResetButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterResetButton.Parent" xml:space="preserve">
+    <value>cycleCounterGroupBox</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterResetButton.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="cycleCounterGroupBox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>316, 248</value>
+  </data>
+  <data name="cycleCounterGroupBox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>164, 48</value>
+  </data>
+  <data name="cycleCounterGroupBox.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="cycleCounterGroupBox.Text" xml:space="preserve">
+    <value>Cycle Counter</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterGroupBox.Name" xml:space="preserve">
+    <value>cycleCounterGroupBox</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterGroupBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterGroupBox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;cycleCounterGroupBox.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="ifLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="debugGroupBox.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="bcLabel.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>492, 362</value>
+  </data>
+  <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
+    <value>500, 400</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>Debugger</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>DebuggerForm</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>CrystalBoy.Emulator.EmulatorForm, CrystalBoy, Version=1.4.0.0, Culture=neutral, PublicKeyToken=e773e4429ed56e30</value>
+  </data>
 </root>

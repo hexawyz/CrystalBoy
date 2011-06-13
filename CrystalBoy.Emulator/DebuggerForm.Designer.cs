@@ -80,6 +80,10 @@ namespace CrystalBoy.Emulator
 			this.gotoTextBox = new System.Windows.Forms.TextBox();
 			this.gotoButton = new System.Windows.Forms.Button();
 			this.disassemblyView = new CrystalBoy.Disassembly.Windows.Forms.DisassemblyView();
+			this.cycleCounterGroupBox = new System.Windows.Forms.GroupBox();
+			this.cycleCountLabel = new System.Windows.Forms.Label();
+			this.cycleCounterValueLabel = new System.Windows.Forms.Label();
+			this.cycleCounterResetButton = new System.Windows.Forms.Button();
 			registersGroupBox = new System.Windows.Forms.GroupBox();
 			ieLabel = new System.Windows.Forms.Label();
 			ifLabel = new System.Windows.Forms.Label();
@@ -95,6 +99,7 @@ namespace CrystalBoy.Emulator
 			flagsGroupBox.SuspendLayout();
 			debugGroupBox.SuspendLayout();
 			this.breakpointsGroupBox.SuspendLayout();
+			this.cycleCounterGroupBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// registersGroupBox
@@ -212,36 +217,36 @@ namespace CrystalBoy.Emulator
 			// 
 			// imeCheckBox
 			// 
-			resources.ApplyResources(this.imeCheckBox, "imeCheckBox");
 			this.imeCheckBox.AutoCheck = false;
+			resources.ApplyResources(this.imeCheckBox, "imeCheckBox");
 			this.imeCheckBox.Name = "imeCheckBox";
 			this.imeCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// carryFlagCheckBox
 			// 
-			resources.ApplyResources(this.carryFlagCheckBox, "carryFlagCheckBox");
 			this.carryFlagCheckBox.AutoCheck = false;
+			resources.ApplyResources(this.carryFlagCheckBox, "carryFlagCheckBox");
 			this.carryFlagCheckBox.Name = "carryFlagCheckBox";
 			this.carryFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// halfCarryFlagCheckBox
 			// 
-			resources.ApplyResources(this.halfCarryFlagCheckBox, "halfCarryFlagCheckBox");
 			this.halfCarryFlagCheckBox.AutoCheck = false;
+			resources.ApplyResources(this.halfCarryFlagCheckBox, "halfCarryFlagCheckBox");
 			this.halfCarryFlagCheckBox.Name = "halfCarryFlagCheckBox";
 			this.halfCarryFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// negationFlagCheckBox
 			// 
-			resources.ApplyResources(this.negationFlagCheckBox, "negationFlagCheckBox");
 			this.negationFlagCheckBox.AutoCheck = false;
+			resources.ApplyResources(this.negationFlagCheckBox, "negationFlagCheckBox");
 			this.negationFlagCheckBox.Name = "negationFlagCheckBox";
 			this.negationFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// zeroFlagCheckBox
 			// 
-			resources.ApplyResources(this.zeroFlagCheckBox, "zeroFlagCheckBox");
 			this.zeroFlagCheckBox.AutoCheck = false;
+			resources.ApplyResources(this.zeroFlagCheckBox, "zeroFlagCheckBox");
 			this.zeroFlagCheckBox.Name = "zeroFlagCheckBox";
 			this.zeroFlagCheckBox.UseVisualStyleBackColor = true;
 			// 
@@ -316,10 +321,37 @@ namespace CrystalBoy.Emulator
 			this.disassemblyView.ShowCurrentInstruction = true;
 			this.disassemblyView.DoubleClick += new System.EventHandler(this.disassemblyView_DoubleClick);
 			// 
+			// cycleCounterGroupBox
+			// 
+			resources.ApplyResources(this.cycleCounterGroupBox, "cycleCounterGroupBox");
+			this.cycleCounterGroupBox.Controls.Add(this.cycleCountLabel);
+			this.cycleCounterGroupBox.Controls.Add(this.cycleCounterValueLabel);
+			this.cycleCounterGroupBox.Controls.Add(this.cycleCounterResetButton);
+			this.cycleCounterGroupBox.Name = "cycleCounterGroupBox";
+			this.cycleCounterGroupBox.TabStop = false;
+			// 
+			// cycleCountLabel
+			// 
+			resources.ApplyResources(this.cycleCountLabel, "cycleCountLabel");
+			this.cycleCountLabel.Name = "cycleCountLabel";
+			// 
+			// cycleCounterValueLabel
+			// 
+			resources.ApplyResources(this.cycleCounterValueLabel, "cycleCounterValueLabel");
+			this.cycleCounterValueLabel.Name = "cycleCounterValueLabel";
+			// 
+			// cycleCounterResetButton
+			// 
+			resources.ApplyResources(this.cycleCounterResetButton, "cycleCounterResetButton");
+			this.cycleCounterResetButton.Name = "cycleCounterResetButton";
+			this.cycleCounterResetButton.UseVisualStyleBackColor = true;
+			this.cycleCounterResetButton.Click += new System.EventHandler(this.cycleCounterResetButton_Click);
+			// 
 			// DebuggerForm
 			// 
 			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.cycleCounterGroupBox);
 			this.Controls.Add(this.gotoButton);
 			this.Controls.Add(this.gotoTextBox);
 			this.Controls.Add(this.gotoLabel);
@@ -339,6 +371,8 @@ namespace CrystalBoy.Emulator
 			flagsGroupBox.PerformLayout();
 			debugGroupBox.ResumeLayout(false);
 			this.breakpointsGroupBox.ResumeLayout(false);
+			this.cycleCounterGroupBox.ResumeLayout(false);
+			this.cycleCounterGroupBox.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -368,5 +402,9 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.GroupBox breakpointsGroupBox;
 		private System.Windows.Forms.Label ieValueLabel;
 		private System.Windows.Forms.Label ifValueLabel;
+		private System.Windows.Forms.GroupBox cycleCounterGroupBox;
+		private System.Windows.Forms.Button cycleCounterResetButton;
+		private System.Windows.Forms.Label cycleCountLabel;
+		private System.Windows.Forms.Label cycleCounterValueLabel;
 	}
 }

@@ -28,6 +28,7 @@ namespace CrystalBoy.Emulation
 		#region Variables
 
 		List<int> breakPointList;
+		int debugCycleCount;
 
 		#endregion
 
@@ -36,6 +37,15 @@ namespace CrystalBoy.Emulation
 		partial void InitializeDebug()
 		{
 			breakPointList = new List<int>();
+		}
+
+		#endregion
+
+		#region Reset
+
+		partial void ResetDebug()
+		{
+			debugCycleCount = 0;
 		}
 
 		#endregion
@@ -161,6 +171,14 @@ namespace CrystalBoy.Emulation
 					return offset;
 			}
 		}
+
+		#endregion
+
+		#region Debug Cycle Counter
+
+		public int DebugCycleCount { get { return debugCycleCount; } }
+
+		public void ResetDebugCycleCounter() { debugCycleCount = 0; }
 
 		#endregion
 	}

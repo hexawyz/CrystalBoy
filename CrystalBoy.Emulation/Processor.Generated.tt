@@ -345,7 +345,11 @@ private void WriteOpcodeStub(OpcodeInfo opcodeInfo)
 #>
 if (<#= operand1 #>)
 {
-	<#+ CallTemplate(opcodeInfo.Operation.ToString(), operand2, null); #>
+<#+
+			PushIndent("\t");
+			CallTemplate(opcodeInfo.Operation.ToString(), operand2, null);
+			PopIndent();
+#>
 	cycleCount = <#= opcodeInfo.BaseCycleCount + opcodeInfo.ConditionalCycleCount #>;
 }
 else cycleCount = <#= opcodeInfo.BaseCycleCount #>;
