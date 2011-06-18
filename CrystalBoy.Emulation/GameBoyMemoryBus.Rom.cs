@@ -90,6 +90,10 @@ namespace CrystalBoy.Emulation
 				case RomType.RomMbc1RamBattery:
 					mapper = new Mappers.MemoryBankController1(this);
 					break;
+				case RomType.RomMbc2:
+				case RomType.RomMbc2Battery:
+					mapper = new Mappers.MemoryBankController2(this);
+					break;
 				case RomType.RomMbc3:
 				case RomType.RomMbc3Ram:
 				case RomType.RomMbc3RamBattery:
@@ -110,6 +114,10 @@ namespace CrystalBoy.Emulation
 			}
 
 			Reset();
+
+			// Fills the external RAM with random data.
+			// It can be loaded with real data later.
+			unsafe { RandomFill((byte*)externalRamBlock.Pointer, externalRamBlock.Length); }
 
 			romLoaded = true;
 		}

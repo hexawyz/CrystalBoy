@@ -56,7 +56,6 @@ namespace CrystalBoy.Emulator
 			try { emulatedGameBoy.Reset(Settings.Default.HardwareType); }
 			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
 			AdjustSize(Settings.Default.RenderSize);
-			ResetEmulationMenuItems(emulatedGameBoy.Bus.UseBootRom);
 			UpdateEmulationStatus();
 			UpdateFrameRate();
 			SetStatusTextHandler();
@@ -353,12 +352,6 @@ namespace CrystalBoy.Emulator
 				menuItem.Checked = (menuItem == zoomItem);
 		}
 
-		private void ResetEmulationMenuItems(bool enable)
-		{
-			pauseToolStripMenuItem.Enabled = enable;
-			resetToolStripMenuItem.Enabled = enable;
-		}
-
 		private void UpdateEmulationStatus() { emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus == EmulationStatus.Running ? Resources.RunningText : Resources.PausedText; }
 
 		private void UpdateFrameRate()
@@ -387,7 +380,7 @@ namespace CrystalBoy.Emulator
 			base.OnClosed(e);
 		}
 
-		private void OnRomChanged(object sender, EventArgs e) { ResetEmulationMenuItems(emulatedGameBoy.RomLoaded); }
+		private void OnRomChanged(object sender, EventArgs e) { }
 
 		private void OnEmulationStatusChanged(object sender, EventArgs e) { UpdateEmulationStatus(); }
 
@@ -433,6 +426,8 @@ namespace CrystalBoy.Emulator
 
 		private void emulationToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
+			pauseToolStripMenuItem.Enabled = emulatedGameBoy.EmulationStatus != EmulationStatus.Stopped;
+			resetToolStripMenuItem.Enabled = emulatedGameBoy.EmulationStatus != EmulationStatus.Stopped;
 			pauseToolStripMenuItem.Checked = emulatedGameBoy.EmulationStatus == EmulationStatus.Paused;
 			limitSpeedToolStripMenuItem.Checked = emulatedGameBoy.EnableFramerateLimiter;
 		}
@@ -518,7 +513,12 @@ namespace CrystalBoy.Emulator
 					(item as ToolStripMenuItem).Checked = (HardwareType)item.Tag == emulatedGameBoy.HardwareType;
 		}
 
-		private void useBootstrapRomToolStripMenuItem_Click(object sender, EventArgs e) { Settings.Default.UseBootstrapRom = emulatedGameBoy.TryUsingBootRom = !emulatedGameBoy.TryUsingBootRom; }
+		private void useBootstrapRomToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Settings.Default.UseBootstrapRom = emulatedGameBoy.TryUsingBootRom = !emulatedGameBoy.TryUsingBootRom;
+			if (!emulatedGameBoy.RomLoaded || emulatedGameBoy.EmulationStatus == EmulationStatus.Stopped)
+				emulatedGameBoy.Reset();
+		}
 
 		private void gameBoyToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoy); }
 

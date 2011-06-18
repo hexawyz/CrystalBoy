@@ -33,8 +33,10 @@ namespace CrystalBoy.Emulator
 		{
 			InitializeComponent();
 			OnRomChanged(EventArgs.Empty);
-#if !WITH_DEBUGGING
+#if !WITH_DEBUGGING || !DEBUG_CYCLE_COUNTER
 			cycleCounterGroupBox.Visible = false;
+#endif
+#if !WITH_DEBUGGING
 			breakpointsGroupBox.Visible = false;
 #endif
 		}
@@ -82,7 +84,7 @@ namespace CrystalBoy.Emulator
 				halfCarryFlagCheckBox.Checked = processor.HalfCarryFlag;
 				carryFlagCheckBox.Checked = processor.CarryFlag;
 				imeCheckBox.Checked = processor.InterruptMasterEnable;
-#if WITH_DEBUGGING
+#if WITH_DEBUGGING && DEBUG_CYCLE_COUNTER
 				cycleCounterValueLabel.Text = (EmulatedGameBoy.Bus.DebugCycleCount % 1000).ToString();
 #endif
 			}
@@ -94,10 +96,15 @@ namespace CrystalBoy.Emulator
 			base.OnShown(e);
 		}
 
-		protected override void OnRomChanged(EventArgs e)
+		protected override void OnReset(EventArgs e)
 		{
 			disassemblyView.Memory = EmulatedGameBoy.RomLoaded || EmulatedGameBoy.Bus.UseBootRom ? EmulatedGameBoy.Bus : null;
 			UpdateInformation();
+		}
+
+		protected override void OnRomChanged(EventArgs e)
+		{
+			OnReset(e);
 		}
 
 		protected override void OnVisibleChanged(EventArgs e)
@@ -182,7 +189,7 @@ namespace CrystalBoy.Emulator
 
 		private void cycleCounterResetButton_Click(object sender, EventArgs e)
 		{
-#if WITH_DEBUGGING
+#if WITH_DEBUGGING && DEBUG_CYCLE_COUNTER
 			EmulatedGameBoy.Bus.ResetDebugCycleCounter();
 			cycleCounterValueLabel.Text = "0";
 #endif

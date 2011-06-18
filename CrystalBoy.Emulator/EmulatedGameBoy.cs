@@ -34,6 +34,7 @@ namespace CrystalBoy.Emulator
 		private int tickIndex;
 		private bool enableFramerateLimiter;
 
+		public event EventHandler AfterReset;
 		public event EventHandler RomChanged;
 		public event EventHandler Paused;
 		public event EventHandler Break;
@@ -59,6 +60,7 @@ namespace CrystalBoy.Emulator
 			bus.Reset(hardwareType);
 			if (emulationStatus == EmulationStatus.Stopped && bus.UseBootRom)
 				emulationStatus = EmulationStatus.Paused;
+			OnAfterReset(EventArgs.Empty);
 		}
 
 		public void LoadRom(MemoryBlock rom)
@@ -160,7 +162,7 @@ namespace CrystalBoy.Emulator
 
 		public void Run()
 		{
-			if (EmulationStatus != EmulationStatus.Running)
+			if (EmulationStatus == EmulationStatus.Paused)
 			{
 				ResetCounter();
 				EmulationStatus = EmulationStatus.Running;
@@ -295,6 +297,12 @@ namespace CrystalBoy.Emulator
 		{
 			if (Break != null)
 				Break(this, e);
+		}
+
+		private void OnAfterReset(EventArgs e)
+		{
+			if (AfterReset != null)
+				AfterReset(this, e);
 		}
 
 		private void OnEmulationStatusChanged(EventArgs e)

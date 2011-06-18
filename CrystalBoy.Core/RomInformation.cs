@@ -17,26 +17,25 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CrystalBoy.Core
 {
 	public sealed class RomInformation
 	{
 		private string name, makerCode, makerName;
+		private int romSize, ramSize, romBankCount, ramBankCount;
 		private bool regularSupport, cgbSupport, sgbSupport, japanese;
 		private bool partialLogoCheck, fullLogoCheck;
 		private bool hasRam, hasBattery, hasTimer, hasRumble;
-		private int romSize, ramSize, romBankCount, ramBankCount;
+		private byte automaticColorPaletteIndex;
 		private RomType romType;
 
 		public unsafe RomInformation(MemoryBlock memoryBlock)
 		{
 			byte* memory;
 			int maxNameLength;
-			byte cgbFlag, sgbFlag;
 			int makerCode;
+			byte cgbFlag, sgbFlag;
 
 			if (memoryBlock == null)
 				throw new ArgumentNullException("memoryBlock");
@@ -91,6 +90,17 @@ namespace CrystalBoy.Core
 					makerCode.ToString("X2", System.Globalization.CultureInfo.InvariantCulture)
 			);
 			makerName = MakerDictionary.GetMakerName(this.makerCode);
+
+			// Automatic palette detection
+			if (!cgbSupport)
+			{
+				byte titleChecksum = 0;
+
+				for (int i = 0; i < 16; i++) titleChecksum += memory[0x134 + i];
+
+				automaticColorPaletteIndex = PaletteData.FindPaletteIndex(this.makerCode, titleChecksum, memory[0x137]);
+			}
+			else automaticColorPaletteIndex = 192;
 
 			// Read the cartidge type
 			switch (romType = (RomType)memory[0x147])
@@ -225,6 +235,10 @@ namespace CrystalBoy.Core
 		public string MakerCode { get { return makerCode; } }
 
 		public string MakerName { get { return makerName; } }
+
+		public byte? AutomaticColorPaletteIndex { get { return automaticColorPaletteIndex < 192 ? automaticColorPaletteIndex : (byte?)null; } }
+
+		public FixedColorPalette? AutomaticColorPalette { get { return automaticColorPaletteIndex < 192 ? PaletteData.GetPalette(automaticColorPaletteIndex) : (FixedColorPalette?)null; } }
 
 		public bool RegularGameBoySupport { get { return regularSupport; } }
 
