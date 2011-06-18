@@ -78,10 +78,13 @@ namespace CrystalBoy.Emulation
 
 		partial void ResetRendering()
 		{
-			greyPaletteUpdated = false;
-			Buffer.BlockCopy(LookupTables.GrayPalette, 0, backgroundPalette, 0, 4 * sizeof(uint));
-			Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette1, 0, 4 * sizeof(uint));
-			Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette2, 0, 4 * sizeof(uint));
+			if (!colorHardware || useBootRom)
+			{
+				greyPaletteUpdated = false;
+				Buffer.BlockCopy(LookupTables.GrayPalette, 0, backgroundPalette, 0, 4 * sizeof(uint));
+				Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette1, 0, 4 * sizeof(uint));
+				Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette2, 0, 4 * sizeof(uint));
+			}
 		}
 
 		#endregion
@@ -256,9 +259,6 @@ namespace CrystalBoy.Emulation
 		/// </summary>
 		/// <param name="buffer">Destination pixel buffer</param>
 		/// <param name="stride">Buffer line stride</param>
-		/// <param name="videoRam">Source video data</param>
-		/// <param name="videoPortSnapshot">Initial snapshot of the video ports</param>
-		/// <param name="portAccesses"></param>
 		private unsafe void DrawColorFrame32(byte* buffer, int stride)
 		{
 			// WARNING: Very looooooooooong code :D
@@ -517,9 +517,6 @@ namespace CrystalBoy.Emulation
 		/// </summary>
 		/// <param name="buffer">Destination pixel buffer</param>
 		/// <param name="stride">Buffer line stride</param>
-		/// <param name="videoRam">Source video data</param>
-		/// <param name="videoPortSnapshot">Initial snapshot of the video ports</param>
-		/// <param name="portAccesses"></param>
 		private unsafe void DrawFrame32(byte* buffer, int stride)
 		{
 			// WARNING: Very looooooooooong code :D

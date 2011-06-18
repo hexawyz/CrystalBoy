@@ -37,9 +37,11 @@ namespace CrystalBoy.Emulator
 			if (emulatedGameBoy == null)
 				throw new ArgumentNullException("emulatedGameBoy");
 			this.emulatedGameBoy = emulatedGameBoy;
+			this.emulatedGameBoy.AfterReset += OnAfterResetInternal;
 			this.emulatedGameBoy.RomChanged += OnRomChangedInternal;
 			this.emulatedGameBoy.Paused += OnPausedInternal;
 			this.emulatedGameBoy.Break += OnBreakInternal;
+			this.emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChangedInternal;
 			this.emulatedGameBoy.NewFrame += OnNewFrameInternal;
 		}
 
@@ -53,6 +55,11 @@ namespace CrystalBoy.Emulator
 				e.Cancel = true;
 			}
 			base.OnFormClosing(e);
+		}
+
+		private void OnAfterResetInternal(object sender, EventArgs e)
+		{
+			OnReset(e);
 		}
 
 		private void OnRomChangedInternal(object sender, EventArgs e)
@@ -70,9 +77,18 @@ namespace CrystalBoy.Emulator
 			OnBreak(e);
 		}
 
+		private void OnEmulationStatusChangedInternal(object sender, EventArgs e)
+		{
+			OnEmulationStatusChanged(e);
+		}
+
 		private void OnNewFrameInternal(object sender, EventArgs e)
 		{
 			OnNewFrame(e);
+		}
+
+		protected virtual void OnReset(EventArgs e)
+		{
 		}
 
 		protected virtual void OnRomChanged(EventArgs e)
@@ -88,6 +104,10 @@ namespace CrystalBoy.Emulator
 		}
 
 		protected virtual void OnNewFrame(EventArgs e)
+		{
+		}
+
+		protected virtual void OnEmulationStatusChanged(EventArgs e)
 		{
 		}
 	}

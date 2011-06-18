@@ -98,16 +98,18 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.NR52, 0xF1);
 
 			WritePort(Port.LCDC, useBootRom ? (byte)0x00 : (byte)0x91);
-			WritePort(Port.LY, 0x00);
+			//WritePort(Port.LY, 0x00);
 			WritePort(Port.SCY, 0x00);
 			WritePort(Port.SCX, 0x00);
 			WritePort(Port.LYC, 0x00);
-			WritePort(Port.BGP, useBootRom ? (byte)0x00 : (byte)0xFC);
+			WritePort(Port.BGP, useBootRom ? (byte)0xFF : (byte)0xFC);
 			WritePort(Port.OBP0, 0xFF);
 			WritePort(Port.OBP1, 0xFF);
 			WritePort(Port.WY, 0x00);
 			WritePort(Port.WX, 0x00);
 			WritePort(Port.IE, 0x00);
+
+			if (colorHardware && !useBootRom) ApplyAutomaticPalette();
 
 			if (colorHardware) WritePort(Port.PMAP, 0xFE);
 			WritePort(Port.U72, 0x00);
@@ -120,6 +122,31 @@ namespace CrystalBoy.Emulation
 			audioPortAccessList.Clear();
 
 			videoStatusSnapshot.Capture();
+		}
+
+		private void ApplyAutomaticPalette()
+		{
+			if (romInformation == null || romInformation.AutomaticColorPalette == null) return;
+
+			var palette = RomInformation.AutomaticColorPalette.Value;
+
+			WritePort(Port.BCPS, 0x80);
+			WritePort(Port.OCPS, 0x80);
+
+			WritePalette(Port.BCPD, palette.BackgroundPalette);
+			WritePalette(Port.OCPD, palette.ObjectPalette0);
+			WritePalette(Port.OCPD, palette.ObjectPalette1);
+		}
+
+		private void WritePalette(Port port, ColorPalette palette)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				short value = palette[i];
+
+				WritePort(port, (byte)value);
+				WritePort(port, (byte)(value >> 8));
+			}
 		}
 
 		#endregion

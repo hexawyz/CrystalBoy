@@ -63,7 +63,7 @@ namespace CrystalBoy.Emulation
 
 		public bool AddCycles(int count)
 		{
-#if WITH_DEBUGGING
+#if WITH_DEBUGGING && DEBUG_CYCLE_COUNTER
 			debugCycleCount += count;
 #endif
 			cycleCount += doubleSpeed ? count >> 1 : count;

@@ -66,6 +66,7 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
+    <Compile Include="Mappers\MemoryBankController2.cs" />
     <Compile Include="Mappers\MemoryBankController3.cs" />
     <Compile Include="Mappers\MemoryBankController1.cs" />
     <Compile Include="Mappers\RomController.cs" />

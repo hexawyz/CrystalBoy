@@ -31,6 +31,106 @@ namespace CrystalBoy.Emulator
 {
 	internal static class Program
 	{
+		#region ErrorStream Class
+
+		private sealed class ErrorStream : Stream
+		{
+			private Stream standardErrorStream;
+			private Stream fileStream;
+			private string logFileName;
+			private bool fileStreamCreationFailed;
+
+			public ErrorStream(Stream standardErrorStream, string logFileName)
+			{
+				this.standardErrorStream = standardErrorStream;
+				this.logFileName = Path.IsPathRooted(logFileName) ? logFileName : Path.Combine(Environment.CurrentDirectory, logFileName);
+			}
+
+			protected override void Dispose(bool disposing)
+			{
+				if (disposing)
+				{
+					if (standardErrorStream != null) standardErrorStream.Dispose();
+					standardErrorStream = null;
+					if (fileStream != null) fileStream.Close();
+					fileStream = null;
+				}
+				base.Dispose(disposing);
+			}
+
+			public override bool CanRead { get { return false; } }
+			public override bool CanSeek { get { return false; } }
+			public override bool CanWrite { get { return true; } }
+			public override void Flush()
+			{
+				if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
+				standardErrorStream.Flush();
+				if (fileStream != null) fileStream.Flush();
+			}
+
+			public override long Length
+			{
+				get
+				{
+					if (fileStreamCreationFailed) throw new NotSupportedException();
+					if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
+					return fileStream != null ? fileStream.Length : 0;
+				}
+			}
+
+			public override long Position
+			{
+				get { throw new NotSupportedException(); }
+				set { throw new NotSupportedException(); }
+			}
+
+			public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state) { throw new NotSupportedException(); }
+			public override int Read(byte[] buffer, int offset, int count) { throw new NotSupportedException(); }
+			public override int ReadByte() { throw new NotSupportedException(); }
+
+			public override long Seek(long offset, SeekOrigin origin) { throw new NotSupportedException(); }
+			public override void SetLength(long value) { throw new NotSupportedException(); }
+
+			public override void Write(byte[] buffer, int offset, int count)
+			{
+				if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
+
+				// First write to the standard error stream (which may already have been redirected, but we don't care, really)
+				standardErrorStream.Write(buffer, offset, count);
+
+				// Then attempt to write to the error log file (which may fail *once* and print an error on its own)
+				if (fileStream == null) TryCreateFileStream();
+
+				if (fileStream != null)
+					try { fileStream.Write(buffer, offset, count); }
+					catch (IOException ex)
+					{
+						fileStreamCreationFailed = true;
+						try { fileStream.Close(); }
+						finally { fileStream = null; }
+						// Writes the exception to the error stream (the Write method will be re-entered…)
+						Console.Error.WriteLine(ex);
+					}
+			}
+
+			private void TryCreateFileStream()
+			{
+				// Only try to create the stream once.
+				if (fileStreamCreationFailed) return;
+
+				try { fileStream = File.Create(logFileName, 4096, FileOptions.SequentialScan); }
+				catch (Exception ex)
+				{
+					// Set the fail flag first
+					fileStreamCreationFailed = true;
+					// Then write to the error stream (the Write method wil be re-entered, but that shouldn't be a problem…)
+					Console.Error.WriteLine(ex);
+				}
+			}
+		}
+
+		#endregion
+
 		private static readonly List<Assembly> pluginAssemblyList = new List<Assembly>();
 		private static readonly Dictionary<Type, string> renderMethodDictionary = new Dictionary<Type, string>();
 
@@ -55,13 +155,15 @@ namespace CrystalBoy.Emulator
 
 					pluginAssemblies.Add(pluginAssembly);
 				}
-				catch (FileNotFoundException)
+				catch (FileNotFoundException ex)
 				{
+					Console.Error.WriteLine(ex);
 					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyNotFoundErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 					updateNeeded = true;
 				}
-				catch (BadImageFormatException)
+				catch (BadImageFormatException ex)
 				{
+					Console.Error.WriteLine(ex);
 					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyArchitectureErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 					updateNeeded = true;
 				}
@@ -95,15 +197,17 @@ namespace CrystalBoy.Emulator
 					}
 					catch (TypeLoadException ex)
 					{
-						MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 						Console.Error.WriteLine(ex);
+						MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 					}
 				}
 			}
 			catch (ReflectionTypeLoadException ex)
 			{
-				MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				Console.Error.WriteLine(ex);
+				foreach (Exception lex in ex.LoaderExceptions)
+					Console.Error.WriteLine(lex);
+				MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 			}
 		}
 
@@ -121,6 +225,8 @@ namespace CrystalBoy.Emulator
 		[STAThread]
 		private static void Main()
 		{
+			Console.SetError(new StreamWriter(new ErrorStream(Console.OpenStandardError(), "CrystalBoy.Emulator.log")) { AutoFlush = true });
+
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 

@@ -218,7 +218,7 @@ namespace CrystalBoy.Emulation
 		/// <remarks>
 		/// The default implementation of HandleRamWrite does nothing.
 		/// If you impelement your own version, do not bother calling the base implementation (the one in Mapper) because it is useless.
-		/// However, please call the <see cref="RamWriten"/> method if you write directly to the external RAM.
+		/// However, please call the <see cref="RamWritten"/> method if you write directly to the external RAM.
 		/// </remarks>
 		public virtual void HandleRamWrite(byte offsetLow, byte offsetHigh, byte value) { }
 	}

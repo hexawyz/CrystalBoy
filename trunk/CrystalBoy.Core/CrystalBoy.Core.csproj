@@ -68,10 +68,13 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
+    <Compile Include="ColorPalette.cs" />
     <Compile Include="ExtensionAttribute.cs" />
+    <Compile Include="FixedColorPalette.cs" />
     <Compile Include="MakerDictionary.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="NintendoLogo.cs" />
+    <Compile Include="PaletteData.cs" />
     <Compile Include="RomType.cs" />
     <Compile Include="MemoryUtility.cs" />
     <Compile Include="IDebuggable.cs" />
@@ -85,6 +88,9 @@
     <Compile Include="RomInformation.cs" />
     <EmbeddedResource Include="NintendoLogo.bin">
       <DependentUpon>NintendoLogo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaletteData.bin">
+      <DependentUpon>PaletteData.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
