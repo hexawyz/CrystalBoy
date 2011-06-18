@@ -30,8 +30,11 @@ namespace CrystalBoy.Emulator
 		private EmulationStatus emulationStatus;
 		private Stopwatch frameStopwatch;
 		private Stopwatch frameRateStopwatch;
-		private long[] tickCounts;
-		private int tickIndex;
+		//private long[] tickCounts;
+		//private int sampleCount;
+		//private int tickIndex;
+		private double lastFrameTime;
+		private double currentFrameTime;
 		private bool enableFramerateLimiter;
 
 		public event EventHandler AfterReset;
@@ -44,7 +47,7 @@ namespace CrystalBoy.Emulator
 		public EmulatedGameBoy()
 		{
 			bus = new GameBoyMemoryBus();
-			tickCounts = new long[60];
+			//tickCounts = new long[60];
 			frameStopwatch = new Stopwatch();
 			frameRateStopwatch = new Stopwatch();
 			Application.Idle += OnApplicationIdle;
@@ -116,13 +119,15 @@ namespace CrystalBoy.Emulator
 			get
 			{
 				if (emulationStatus == EmulationStatus.Running)
-				{
-					long delta = tickIndex == 0 ?
-						 tickCounts[tickCounts.Length - 1] - tickCounts[0] :
-						 tickCounts[tickIndex - 1] - tickCounts[tickIndex];
+					return 1000d / (currentFrameTime - lastFrameTime);
+				//{
+				//    long delta = sampleCount == 60 ? tickIndex == 0 ?
+				//         tickCounts[tickCounts.Length - 1] - tickCounts[0] :
+				//         tickCounts[tickIndex - 1] - tickCounts[tickIndex] :
+				//         tickCounts[tickIndex - 1];
 
-					return delta > 0 ? (double)(1000 * tickCounts.Length) / delta : 0;
-				}
+				//    return delta > 0 ? (double)(1000 * sampleCount) / delta : 0;
+				//}
 				else return 0;
 			}
 		}
@@ -132,13 +137,15 @@ namespace CrystalBoy.Emulator
 			get
 			{
 				if (emulationStatus == EmulationStatus.Running)
-				{
-					long delta = tickIndex == 0 ?
-						tickCounts[tickCounts.Length - 1] - tickCounts[0] :
-						tickCounts[tickIndex - 1] - tickCounts[tickIndex];
+					return (int)Math.Round(1000 / (currentFrameTime - lastFrameTime), 0);
+				//{
+				//    long delta = sampleCount == 60 ? tickIndex == 0 ?
+				//         tickCounts[tickCounts.Length - 1] - tickCounts[0] :
+				//         tickCounts[tickIndex - 1] - tickCounts[tickIndex] :
+				//         tickCounts[tickIndex - 1];
 
-					return delta > 0 ? (int)(1000 * tickCounts.Length / delta) : 0;
-				}
+				//    return delta > 0 ? (int)(1000 * sampleCount / delta) : 0;
+				//}
 				else return 0;
 			}
 		}
@@ -177,10 +184,14 @@ namespace CrystalBoy.Emulator
 
 		private void ResetCounter()
 		{
-			for (int i = 0; i < tickCounts.Length; i++)
-				tickCounts[i] = 0;
+			//for (int i = 0; i < tickCounts.Length; i++)
+			//    tickCounts[i] = 0;
 
-			tickIndex = 0;
+			//sampleCount = 0;
+			//tickIndex = 0;
+
+			lastFrameTime = 0;
+			currentFrameTime = 0;
 
 			frameRateStopwatch.Reset();
 			frameRateStopwatch.Start();
@@ -268,9 +279,12 @@ namespace CrystalBoy.Emulator
 						while (frameStopwatch.Elapsed.TotalMilliseconds < (1000d / 60d)) ;
 					}
 				}
-				
-				tickCounts[tickIndex++] = frameRateStopwatch.ElapsedMilliseconds;
-				if (tickIndex >= tickCounts.Length) tickIndex = 0;
+
+				lastFrameTime = currentFrameTime;
+				currentFrameTime = frameRateStopwatch.Elapsed.TotalMilliseconds;
+				//tickCounts[tickIndex++] = frameRateStopwatch.ElapsedMilliseconds;
+				//if (sampleCount < 60) sampleCount++;
+				//if (tickIndex >= tickCounts.Length) tickIndex = 0;
 
 				frameStopwatch.Reset();
 				frameStopwatch.Start();

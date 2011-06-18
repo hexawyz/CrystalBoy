@@ -38,7 +38,7 @@ namespace CrystalBoy.Emulator
 		private EmulatedGameBoy emulatedGameBoy;
 		private RenderMethod renderMethod;
 		private Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
-		private bool pausedForResizing;
+		private bool pausedTemporarily;
 		private BinaryWriter ramSaveWriter;
 		private BinaryReader ramSaveReader;
 
@@ -336,9 +336,9 @@ namespace CrystalBoy.Emulator
 			ClientSize = newSize;
 		}
 
-		protected override void OnResizeBegin(EventArgs e) { if (pausedForResizing = emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause(); }
+		protected override void OnResizeBegin(EventArgs e) { if (pausedTemporarily = emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause(); }
 
-		protected override void OnResizeEnd(EventArgs e) { if (pausedForResizing) emulatedGameBoy.Run(); }
+		protected override void OnResizeEnd(EventArgs e) { if (pausedTemporarily) emulatedGameBoy.Run(); }
 
 		#endregion
 
@@ -371,6 +371,18 @@ namespace CrystalBoy.Emulator
 			InitializeRenderMethod();
 			emulatedGameBoy.Bus.RenderMethod = renderMethod;
 			base.OnShown(e);
+		}
+
+		protected override void OnActivated(EventArgs e)
+		{
+			if (pausedTemporarily) emulatedGameBoy.Run();
+			base.OnActivated(e);
+		}
+
+		protected override void OnDeactivate(EventArgs e)
+		{
+			if (pausedTemporarily = emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause();
+			base.OnDeactivate(e);
 		}
 
 		protected override void OnClosed(EventArgs e)
