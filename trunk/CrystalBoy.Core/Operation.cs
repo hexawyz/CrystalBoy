@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CrystalBoy.Disassembly
+namespace CrystalBoy.Core
 {
 	public enum Operation : byte
 	{

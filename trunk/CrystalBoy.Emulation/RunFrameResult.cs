@@ -18,14 +18,11 @@
 
 using System;
 
-namespace CrystalBoy.Disassembly
+namespace CrystalBoy.Emulation
 {
-	[Flags]
-	public enum DisassembleFlags
+	public sealed class RunFrameResult
 	{
-		Instruction = 0,
-		Offset = 1,
-		RawData = 2,
-		Default = 3
+		public bool Finished { get; internal set; }
+		public bool Value { get; internal set; }
 	}
 }

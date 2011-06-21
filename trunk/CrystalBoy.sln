@@ -3,14 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Decompiler", "CrystalBoy.Decompiler\CrystalBoy.Decompiler.csproj", "{B5E59861-198D-4494-9301-B0B4135667DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Disassembly.OpcodeTableGenerator", "CrystalBoy.Disassembly.OpcodeTableGenerator\CrystalBoy.Disassembly.OpcodeTableGenerator.csproj", "{64472336-07E7-4879-9A07-A8DD98B763A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core.OpcodeTableGenerator", "CrystalBoy.Core.OpcodeTableGenerator\CrystalBoy.Core.OpcodeTableGenerator.csproj", "{64472336-07E7-4879-9A07-A8DD98B763A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Disassembly", "CrystalBoy.Disassembly\CrystalBoy.Disassembly.csproj", "{E40F73A5-B0AF-4D25-99D6-772E44EFC563}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core", "CrystalBoy.Core\CrystalBoy.Core.csproj", "{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{64472336-07E7-4879-9A07-A8DD98B763A1} = {64472336-07E7-4879-9A07-A8DD98B763A1}
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core", "CrystalBoy.Core\CrystalBoy.Core.csproj", "{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator", "CrystalBoy.Emulator\CrystalBoy.Emulator.csproj", "{576E8DDB-67FD-4948-9B83-1C732AAC3175}"
 EndProject
@@ -24,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core.BuildMakerD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulation.Rendering.SlimDX", "CrystalBoy.Emulation.Rendering.SlimDX\CrystalBoy.Emulation.Rendering.SlimDX.csproj", "{2ADA5555-6AC7-4FE2-BCB3-0C994B7CA279}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Disassembly.Windows.Forms", "CrystalBoy.Disassembly.Windows.Forms\CrystalBoy.Disassembly.Windows.Forms.csproj", "{313CC75C-4F18-40BC-82A2-05A818D460DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core.Windows.Forms", "CrystalBoy.Core.Windows.Forms\CrystalBoy.Core.Windows.Forms.csproj", "{313CC75C-4F18-40BC-82A2-05A818D460DB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{145C91F8-4DEC-42D3-B51D-7E7543E8FBCE}"
 	ProjectSection(SolutionItems) = preProject
@@ -52,10 +50,6 @@ Global
 		{64472336-07E7-4879-9A07-A8DD98B763A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64472336-07E7-4879-9A07-A8DD98B763A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64472336-07E7-4879-9A07-A8DD98B763A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E40F73A5-B0AF-4D25-99D6-772E44EFC563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E40F73A5-B0AF-4D25-99D6-772E44EFC563}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E40F73A5-B0AF-4D25-99D6-772E44EFC563}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E40F73A5-B0AF-4D25-99D6-772E44EFC563}.Release|Any CPU.Build.0 = Release|Any CPU
 		{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}.Release|Any CPU.ActiveCfg = Release|Any CPU

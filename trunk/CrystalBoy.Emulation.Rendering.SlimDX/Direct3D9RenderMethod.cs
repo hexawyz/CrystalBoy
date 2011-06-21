@@ -267,7 +267,7 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 				device.BeginScene();
 				device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
 				device.EndScene();
-				device.Present();
+				device.Present(Present.DoNotWait);
 			}
 			else if (result == ResultCode.DeviceLost) DisposeResources();
 			else if (result == ResultCode.DeviceNotReset) { if (ResetDevice()) Render(); }

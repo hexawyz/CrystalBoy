@@ -28,10 +28,13 @@ namespace CrystalBoy.Emulation
 
 		// Snapshot of the video ports, used for frame rendering
 		VideoStatusSnapshot videoStatusSnapshot;
+		VideoStatusSnapshot savedVideoStatusSnapshot;
 		// Recorded video port accesses, used for video frame rendering
 		List<PortAccess> videoPortAccessList;
+		List<PortAccess> savedVideoPortAccessList;
 		// Recorded color palette accesses for CGB mode only. (No need to simulate BGPI/BGPD and OPBI/OBPD during rendering)
 		List<PaletteAccess> paletteAccessList;
+		List<PaletteAccess> savedPaletteAccessList;
 		// Recorded audio port accesses, used for audio frame rendering
 		List<PortAccess> audioPortAccessList;
 
@@ -56,6 +59,15 @@ namespace CrystalBoy.Emulation
 			this.videoPortAccessList = new List<PortAccess>();
 			this.paletteAccessList = new List<PaletteAccess>();
 			this.audioPortAccessList = new List<PortAccess>();
+#if WITH_THREADING
+			this.savedVideoStatusSnapshot = new VideoStatusSnapshot(this);
+			this.savedVideoPortAccessList = new List<PortAccess>();
+			this.savedPaletteAccessList = new List<PaletteAccess>();
+#else
+			this.savedVideoStatusSnapshot = videoStatusSnapshot;
+			this.savedVideoPortAccessList = videoPortAccessList;
+			this.savedPaletteAccessList = paletteAccessList;
+#endif
 		}
 
 		#endregion

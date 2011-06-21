@@ -8,8 +8,8 @@
     <ProjectGuid>{313CC75C-4F18-40BC-82A2-05A818D460DB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CrystalBoy.Disassembly.Windows.Forms</RootNamespace>
-    <AssemblyName>CrystalBoy.Disassembly.Windows.Forms</AssemblyName>
+    <RootNamespace>CrystalBoy.Core.Windows.Forms</RootNamespace>
+    <AssemblyName>CrystalBoy.Core.Windows.Forms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -68,10 +68,6 @@
     <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
       <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
       <Name>CrystalBoy.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CrystalBoy.Disassembly\CrystalBoy.Disassembly.csproj">
-      <Project>{E40F73A5-B0AF-4D25-99D6-772E44EFC563}</Project>
-      <Name>CrystalBoy.Disassembly</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

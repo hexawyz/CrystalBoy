@@ -375,13 +375,13 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnActivated(EventArgs e)
 		{
-			if (pausedTemporarily) emulatedGameBoy.Run();
+			if (emulatedGameBoy != null && pausedTemporarily) emulatedGameBoy.Run();
 			base.OnActivated(e);
 		}
 
 		protected override void OnDeactivate(EventArgs e)
 		{
-			if (pausedTemporarily = emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause();
+			if (emulatedGameBoy != null && (pausedTemporarily = emulatedGameBoy.EmulationStatus == EmulationStatus.Running)) emulatedGameBoy.Pause();
 			base.OnDeactivate(e);
 		}
 

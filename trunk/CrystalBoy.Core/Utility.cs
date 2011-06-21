@@ -21,10 +21,18 @@ using System.Collections.Generic;
 using System.Text;
 using CrystalBoy.Core;
 
-namespace CrystalBoy.Disassembly
+namespace CrystalBoy.Core
 {
 	public static partial class Utility
 	{
+		public static void Swap<T>(ref T a, ref T b)
+		{
+			T c = b;
+
+			b = a;
+			a = c;
+		}
+
 		[CLSCompliant(false)]
 		public static ushort GetPreviousInstructionOffset(IMemory memory, ushort offset)
 		{

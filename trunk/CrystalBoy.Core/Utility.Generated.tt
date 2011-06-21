@@ -1,8 +1,8 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
-<#@ assembly name="$(SolutionDir)CrystalBoy.Disassembly.OpcodeTableGenerator\$(OutDir)OpcodeTableGenerator.dll" #>
+<#@ assembly name="$(SolutionDir)CrystalBoy.Core.OpcodeTableGenerator\$(OutDir)OpcodeTableGenerator.dll" #>
 <#@ import namespace="System.Globalization" #>
-<#@ import namespace="CrystalBoy.Disassembly" #>
-<#@ import namespace="CrystalBoy.Disassembly.OpcodeTableGenerator" #>
+<#@ import namespace="CrystalBoy.Core" #>
+<#@ import namespace="CrystalBoy.Core.OpcodeTableGenerator" #>
 <#@ output extension=".cs" #>
 #region Copyright Notice
 // This file is part of CrystalBoy.
@@ -34,7 +34,7 @@
 
 using System;
 
-namespace CrystalBoy.Disassembly
+namespace CrystalBoy.Core
 {
 	partial class Utility
 	{

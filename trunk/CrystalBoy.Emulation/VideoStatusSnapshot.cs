@@ -26,13 +26,19 @@ namespace CrystalBoy.Emulation
 	internal class VideoStatusSnapshot
 	{
 		private GameBoyMemoryBus bus;
+		private MemoryBlock videoMemoryBlock;
+		private MemoryBlock objectAttributeMemoryBlock;
 		private MemoryBlock paletteMemoryBlock;
 
 		public unsafe VideoStatusSnapshot(GameBoyMemoryBus bus)
 		{
 			this.bus = bus;
+			this.videoMemoryBlock = new MemoryBlock(bus.VideoRam.Length);
+			this.VideoMemory = (byte*)this.videoMemoryBlock.Pointer;
+			this.objectAttributeMemoryBlock = new MemoryBlock(bus.ObjectAttributeMemory.Length);
+			this.ObjectAttributeMemory = (byte*)this.objectAttributeMemoryBlock.Pointer;
 			this.paletteMemoryBlock = new MemoryBlock(bus.PaletteMemory.Length);
-			this.paletteMemory = (byte*)this.paletteMemoryBlock.Pointer;
+			this.PaletteMemory = (byte*)this.paletteMemoryBlock.Pointer;
 		}
 
 		public void Capture()
@@ -42,15 +48,21 @@ namespace CrystalBoy.Emulation
 			SCY = bus.ReadPort(Port.SCY);
 			WX = bus.ReadPort(Port.WX);
 			WY = bus.ReadPort(Port.WY);
-			if (!bus.ColorMode)
+			unsafe
 			{
-				BGP = bus.ReadPort(Port.BGP);
-				OBP0 = bus.ReadPort(Port.OBP0);
-				OBP1 = bus.ReadPort(Port.OBP1);
-			}
-			else unsafe
-			{
-				MemoryBlock.Copy((void*)paletteMemory, bus.PaletteMemory.Pointer, bus.PaletteMemory.Length);
+				if (!bus.ColorMode)
+				{
+					BGP = bus.ReadPort(Port.BGP);
+					OBP0 = bus.ReadPort(Port.OBP0);
+					OBP1 = bus.ReadPort(Port.OBP1);
+					MemoryBlock.Copy((void*)VideoMemory, bus.VideoRam.Pointer, bus.VideoRam.Length >> 1);
+				}
+				else
+				{
+					MemoryBlock.Copy((void*)VideoMemory, bus.VideoRam.Pointer, bus.VideoRam.Length);
+					MemoryBlock.Copy((void*)PaletteMemory, bus.PaletteMemory.Pointer, bus.PaletteMemory.Length);
+				}
+				MemoryBlock.Copy((void*)ObjectAttributeMemory, bus.ObjectAttributeMemory.Pointer, bus.ObjectAttributeMemory.Length);
 			}
 		}
 
@@ -63,6 +75,8 @@ namespace CrystalBoy.Emulation
 		public byte OBP0;
 		public byte OBP1;
 
-		public unsafe readonly byte* paletteMemory;
+		public unsafe readonly byte* PaletteMemory;
+		public unsafe readonly byte* VideoMemory;
+		public unsafe readonly byte* ObjectAttributeMemory;
 	}
 }

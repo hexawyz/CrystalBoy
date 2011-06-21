@@ -65,7 +65,7 @@ namespace CrystalBoy.Emulation.Rendering.Direct3D
 
 		private void InitializeDevice()
 		{
-			device = new Device(0, DeviceType.Hardware, RenderObject, CreateFlags.HardwareVertexProcessing, presentParameters);
+			device = new Device(0, DeviceType.Hardware, RenderObject, CreateFlags.HardwareVertexProcessing | CreateFlags.FpuPreserve, presentParameters);
 			device.DeviceReset += new EventHandler(OnDeviceReset);
 		}
 

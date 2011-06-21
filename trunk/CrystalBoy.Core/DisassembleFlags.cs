@@ -17,47 +17,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CrystalBoy.Disassembly
+namespace CrystalBoy.Core
 {
-	public enum Operand : byte
+	[Flags]
+	public enum DisassembleFlags
 	{
-		// No operand
-		None,
-		// 8 bit Immediate
-		Byte,
-		BytePort, // ($FFNN)
-		SByte, // Sign extended
-		StackRelative, // Sign extended (SP+NN)
-		// 16 bit Immediate
-		Word,
-		Memory,
-		// 8 bit Destination
-		A,
-		B,
-		C,
-		D,
-		E,
-		H,
-		L,
-		MemoryBc, // (BC)
-		MemoryDe, // (DE)
-		MemoryHl, // (HL)
-		RegisterPort, // (C)
-		// 16 bit Register
-		Af,
-		Bc,
-		De,
-		Hl,
-		Sp,
-		// Condition
-		NotZero,
-		Zero,
-		NotCarry,
-		Carry,
-		// Embedded immediate value (Used by RST, BIT, SET and RES)
-		Embedded
+		Instruction = 0,
+		Offset = 1,
+		RawData = 2,
+		Default = 3
 	}
 }
