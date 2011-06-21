@@ -94,6 +94,8 @@ namespace CrystalBoy.Emulation
 #if WITH_THREADING
 		private void ThreadedRender()
 		{
+			// This method will (should) never be called when a rendering operation is already active.
+			// The code below should thus never lock the thread for a long time.
 			lock (videoFrameThread)
 				Monitor.Pulse(videoFrameThread);
 		}
@@ -128,11 +130,8 @@ namespace CrystalBoy.Emulation
 
 					if (!threadingEnabled) return;
 
-					isRendering = true;
-
+					// The method will clear the isRendering field by itself
 					Render();
-
-					isRendering = false;
 
 					OnAfterRendering(EventArgs.Empty);
 				}
