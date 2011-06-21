@@ -41,7 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,7 +51,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -130,17 +130,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CrystalBoy.Core.Windows.Forms\CrystalBoy.Core.Windows.Forms.csproj">
+      <Project>{313CC75C-4F18-40BC-82A2-05A818D460DB}</Project>
+      <Name>CrystalBoy.Core.Windows.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
       <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
       <Name>CrystalBoy.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CrystalBoy.Disassembly.Windows.Forms\CrystalBoy.Disassembly.Windows.Forms.csproj">
-      <Project>{313CC75C-4F18-40BC-82A2-05A818D460DB}</Project>
-      <Name>CrystalBoy.Disassembly.Windows.Forms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CrystalBoy.Disassembly\CrystalBoy.Disassembly.csproj">
-      <Project>{E40F73A5-B0AF-4D25-99D6-772E44EFC563}</Project>
-      <Name>CrystalBoy.Disassembly</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

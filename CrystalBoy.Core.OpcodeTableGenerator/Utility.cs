@@ -19,9 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CrystalBoy.Disassembly;
+using CrystalBoy.Core;
 
-namespace CrystalBoy.Disassembly.OpcodeTableGenerator
+namespace CrystalBoy.Core.OpcodeTableGenerator
 {
 	public static class Utility
 	{

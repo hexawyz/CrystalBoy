@@ -31,9 +31,12 @@ namespace CrystalBoy.Emulator
 		/// <param name="disposing">true si les ressources managées doivent être supprimées ; sinon, false.</param>
 		protected override void Dispose(bool disposing)
 		{
-			if (disposing && (components != null))
+			if (disposing)
 			{
-				components.Dispose();
+				if (components != null) components.Dispose();
+				components = null;
+				if (emulatedGameBoy != null) emulatedGameBoy.Dispose();
+				emulatedGameBoy = null;
 			}
 			base.Dispose(disposing);
 		}

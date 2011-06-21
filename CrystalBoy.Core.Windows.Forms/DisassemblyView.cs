@@ -24,7 +24,7 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using CrystalBoy.Core;
 
-namespace CrystalBoy.Disassembly.Windows.Forms
+namespace CrystalBoy.Core.Windows.Forms
 {
 	[ToolboxBitmap(typeof(DisassemblyView))]
 	public partial class DisassemblyView : UserControl

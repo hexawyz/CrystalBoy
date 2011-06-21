@@ -68,6 +68,7 @@ namespace CrystalBoy.Emulation
 		#region Dispose
 
 		// Define a Dispose function for each module
+		partial void DisposeThreading();
 		partial void DisposeBootRom();
 		partial void DisposeProcessor();
 		partial void DisposeTiming();
@@ -92,6 +93,7 @@ namespace CrystalBoy.Emulation
 			if (disposing && !disposed)
 			{
 				disposed = true;
+				DisposeThreading();
 				DisposeBootRom();
 				DisposeProcessor();
 				DisposeTiming();
@@ -116,6 +118,7 @@ namespace CrystalBoy.Emulation
 		#region Initialize
 
 		// Define an Initialize function for each module
+		partial void InitializeThreading();
 		partial void InitializeProcessor();
 		partial void InitializeTiming();
 		partial void InitializeTimer();
@@ -137,6 +140,7 @@ namespace CrystalBoy.Emulation
 			HardwareType = HardwareType.GameBoyColor;
 			tryUsingBootRom = true;
 
+			InitializeThreading();
 			InitializeProcessor();
 			InitializeTiming();
 			InitializeTimer();
@@ -159,6 +163,7 @@ namespace CrystalBoy.Emulation
 		#region Reset
 
 		// Define a Reset function for each module
+		partial void ResetThreading();
 		partial void ResetBootRom();
 		partial void ResetProcessor();
 		partial void ResetTiming();
@@ -186,6 +191,7 @@ namespace CrystalBoy.Emulation
 			// From now on, the hardware type can only be changed after a "hard" reset of the emulated machine
 			HardwareType = hardwareType;
 
+			ResetThreading();
 			ResetBootRom();
 			ResetProcessor();
 			ResetTiming();

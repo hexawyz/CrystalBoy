@@ -39,22 +39,22 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WITH_DEBUGGING</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WITH_DEBUGGING;WITH_THREADING</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\CrystalBoy.Emulation.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;WITH_DEBUGGING</DefineConstants>
+    <DefineConstants>TRACE;WITH_DEBUGGING;WITH_THREADING</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\CrystalBoy.Emulation.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
@@ -66,14 +66,16 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
+    <Compile Include="Mappers\RomController.cs" />
+    <Compile Include="Mappers\MemoryBankController.cs" />
+    <Compile Include="Mappers\MemoryBankController1.cs" />
     <Compile Include="Mappers\MemoryBankController2.cs" />
     <Compile Include="Mappers\MemoryBankController3.cs" />
-    <Compile Include="Mappers\MemoryBankController1.cs" />
-    <Compile Include="Mappers\RomController.cs" />
-    <Compile Include="GameBoyMemoryBus.cs" />
+    <Compile Include="Mappers\MemoryBankController5.cs" />
     <Compile Include="Interrupt.cs" />
     <Compile Include="GameBoyKeys.cs" />
     <Compile Include="Mapper.cs" />
+    <Compile Include="FrameEventArgs.cs" />
     <Compile Include="PaletteAccess.cs" />
     <Compile Include="Port.cs" />
     <Compile Include="Processor.cs" />
@@ -88,19 +90,12 @@
     <Compile Include="RealTimeClockState.cs" />
     <Compile Include="RenderMethod.cs" />
     <Compile Include="RumbleEventArgs.cs" />
+    <Compile Include="RunFrameResult.cs" />
     <Compile Include="VideoStatusSnapshot.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
-      <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
-      <Name>CrystalBoy.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="OriginalDrawFrame.txt" />
-    <Content Include="Timings.txt" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="GameBoyMemoryBus.cs" />
+    <Compile Include="GameBoyMemoryBus.Threading.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
     <Compile Include="GameBoyMemoryBus.Snapshot.cs">
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
@@ -112,8 +107,6 @@
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
     <Compile Include="HardwareType.cs" />
-    <Compile Include="Mappers\MemoryBankController.cs" />
-    <Compile Include="Mappers\MemoryBankController5.cs" />
     <Compile Include="GameBoyMemoryBus.Rom.cs">
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
@@ -145,6 +138,16 @@
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
     <Compile Include="RtcRegister.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
+      <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
+      <Name>CrystalBoy.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="OriginalDrawFrame.txt" />
+    <Content Include="Timings.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

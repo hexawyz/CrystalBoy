@@ -22,8 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using CrystalBoy.Core;
-using CrystalBoy.Disassembly;
-using DisassemblyOperand = CrystalBoy.Disassembly.Operand;
+using DisassemblyOperand = CrystalBoy.Core.Operand;
 
 namespace CrystalBoy.Decompiler.Analyzer
 {

@@ -28,7 +28,7 @@
 
 using System;
 
-namespace CrystalBoy.Disassembly
+namespace CrystalBoy.Core
 {
 	partial class Utility
 	{

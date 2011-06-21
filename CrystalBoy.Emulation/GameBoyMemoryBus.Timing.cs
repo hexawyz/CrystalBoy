@@ -107,10 +107,8 @@ namespace CrystalBoy.Emulation
 			// Remove a frame from the cycle count
 			cycleCount -= FrameDuration;
 			// Raise the FrameReady event
-			if (NewFrame != null)
-			    NewFrame(this, EventArgs.Empty);
-			Render();
-			// Prepare for the new frame...
+			OnFrameReady();
+			// Prepare for the new frame…
 			// Clear the video access lists
 			videoPortAccessList.Clear();
 			paletteAccessList.Clear();

@@ -52,12 +52,6 @@ namespace CrystalBoy.Emulation
 
 		#endregion
 
-		#region Events
-
-		public event EventHandler NewFrame;
-
-		#endregion
-
 		#region LCD Controller Status
 
 		public bool VideoEnabled { get { return lcdEnabled; } }
