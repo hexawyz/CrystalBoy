@@ -149,9 +149,13 @@ namespace CrystalBoy.Emulation
 				{
 					if (!isRendering)
 					{
+						// Set the flag, effectively locking the saved state
+						isRendering = true;
+						// Swap the buffers
 						Utility.Swap(ref videoStatusSnapshot, ref savedVideoStatusSnapshot);
 						Utility.Swap(ref videoPortAccessList, ref savedVideoPortAccessList);
 						Utility.Swap(ref paletteAccessList, ref savedPaletteAccessList);
+						// Wake up (!) the rendering thread
 						ThreadedRender();
 					}
 				}
@@ -172,11 +176,18 @@ namespace CrystalBoy.Emulation
 			int stride;
 
 			if (renderMethod == null)
+			{
+#if WITH_THREADING
+				// Clear the flag because we didn't draw anything at all…
+				isRendering = false;
+#endif
 				return;
+			}
 
 			buffer = (byte*)renderMethod.LockBuffer(out stride);
 
 			if ((savedVideoStatusSnapshot.LCDC & 0x80) != 0)
+			{
 				if (colorMode)
 				{
 					FillPalettes32((ushort*)savedVideoStatusSnapshot.PaletteMemory);
@@ -197,10 +208,21 @@ namespace CrystalBoy.Emulation
 					}
 					DrawFrame32(buffer, stride);
 				}
-			else ClearBuffer32(buffer, stride, 0xFFFFFFFF);
+#if WITH_THREADING
+				// Clear the flag once the real drawing job is done, as we don't need the buffer anymore
+				isRendering = false;
+#endif
+			}
+			else
+			{
+#if WITH_THREADING
+				// Clear the flag before drawing anything, as we don't need the saved state
+				isRendering = false;
+#endif
+				ClearBuffer32(buffer, stride, 0xFFFFFFFF);
+			}
 
 			renderMethod.UnlockBuffer();
-
 			renderMethod.Render();
 		}
 

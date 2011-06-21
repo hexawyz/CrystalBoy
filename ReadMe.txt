@@ -12,16 +12,30 @@ Préréquisites:
 	* For 32 bit systems, if you want to use the Managed DirectX (MDX) render method:
 		* Up-to date DirectX version
 		* If the program crashes or throws an error during start-up, you need to make sure you have the latest version of DirectX, by downloading the installer on MS website.
-	* For 64 bit systems, if you want hardware accelerated render methods using SlimDX:
+	* For 64 bit systems, if you want hardware accelerated render methods using SlimDX: (.NET 2.0)
 		* Up-to date DirectX version
-		* SlimDX end user version from March 2011
+		* SlimDX end user version from March 2011 (.NET 2.0)
+
+Useful links:
+.NET Framework 4.0 Web Installer: http://www.microsoft.com/downloads/en/details.aspx?FamilyID=9cfb2d51-5ff4-4491-b0e5-b386f32c0992&displaylang=en
+SlimDX March 2011 End-User Runtime (.NET 2.0): http://slimdx.googlecode.com/files/SlimDX%20Runtime%20for%20.NET%202.0%20%28March%202011%29.msi
+DirectX Web Installer: http://www.microsoft.com/download/en/details.aspx?id=35
+
+Depending on your configuration you may need to install some of the packages linked above.
+On old Windows XP systems, DirectX Web Setup needs to be run in order to install the Managed Direct X assemblies.
 
 Since the Direct2D render method has been quite enhanced compared to others, I suggest you use it *if you have Windows 7*.
+However, the performance with Direct2D might be slightly lower than with Direct3D 9, although I haven't been able to really measure anything.
 
 Changes for version 1.4
 	* Now supports loading the DMG, SGB and GBC bootstrap ROMs
 	* Better GBC hardware emulation (now supports switching to fake B&W mode)
 		- Using GBC bootstrap ROM allows to play B&W games with automatic color palette
+		- The GBC automatic palettes are also emulated without the bootstrap ROM
+		- The bootstrap ROMs can be easily embedded in the emulator at compile time. You'll have to build the emualtor yourself for that.
+	* MBC2 support (not totally accurate, but probably good enough)
+	* Instant FPS calculation… Should be instantaneously more accurate, but much more variable than the previously used method.
+	* Multithreaded emulation. (Should only improve uncapped FPS for now)
 
 Changes for version 1.3
 	* More accurate CPU emulation (according to the tests, all instructions now compute 100% exact… Only HALT and STOP may need reworking)
