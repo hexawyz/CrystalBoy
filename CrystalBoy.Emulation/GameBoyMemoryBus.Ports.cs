@@ -123,7 +123,7 @@ namespace CrystalBoy.Emulation
 
 			if (colorHardware && !useBootRom) ApplyAutomaticPalette();
 
-			if (colorHardware) WritePort(Port.PMAP, 0xFE);
+			if (colorHardware) WritePort(Port.PMAP, colorMode ? (byte)0xFE : (byte)0xFF);
 			WritePort(Port.U72, 0x00);
 			WritePort(Port.U73, 0x00);
 			WritePort(Port.U74, 0x00);
@@ -244,11 +244,14 @@ namespace CrystalBoy.Emulation
 				case 0x44: // LY
 					// We use a negative offset here...
 					// -4 allows the interrupt to happen 4 cycles beforce the new line
-					lyOffset = cycleCount / -HorizontalLineDuration - 4;
+					//lyOffset = lcdCycles / -HorizontalLineDuration - 4;
+					// For now leave it as read only… Need to find a game tring to reset LY.
 					break;
 				case 0x45: // LYC
 					if (value < 154) // Valid values are between 0 and 153
-						lycMinCycle = lyOffset + value * HorizontalLineDuration;
+						lycMinCycle = value > 0 ?
+							lyOffset + value * HorizontalLineDuration :
+							FrameDuration - (HorizontalLineDuration - 8);
 					else lycMinCycle = -4;
 					if (notifyCoincidence)
 						UpdateVideoStatusInterrupt();
@@ -304,8 +307,8 @@ namespace CrystalBoy.Emulation
 							hdmaCurrentDestinationLow = hdmaDestinationLow;
 							hdmaCurrentLength = (byte)(value & 0x7F);
 
-							if (cycleCount < FrameDuration - VerticalBlankDuration - HorizontalBlankDuration)
-								hdmaNextCycle = cycleCount - cycleCount % HorizontalLineDuration + Mode2Duration + Mode3Duration;
+							if (lcdCycles < FrameDuration - VerticalBlankDuration - HorizontalBlankDuration)
+								hdmaNextCycle = lcdCycles - lcdCycles % HorizontalLineDuration + Mode2Duration + Mode3Duration;
 							else
 								hdmaNextCycle = FrameDuration + Mode2Duration + Mode3Duration;
 						}
@@ -330,7 +333,7 @@ namespace CrystalBoy.Emulation
 				case 0x49: // OBP1
 					portMemory[port] = value; // Store the value in memory
 					if (!colorMode)
-						videoPortAccessList.Add(new PortAccess(cycleCount, port, value)); // Keep track of the write
+						videoPortAccessList.Add(new PortAccess(lcdCycles, port, value)); // Keep track of the write
 					break;
 				// Only in cgb mode
 				case 0x68: // BCPS / BGPI
@@ -345,7 +348,7 @@ namespace CrystalBoy.Emulation
 					{
 						paletteMemory[bgpIndex] = value;
 						if (usePaletteMapping) greyPaletteUpdated = true;
-						paletteAccessList.Add(new PaletteAccess(cycleCount, (byte)bgpIndex, value));
+						paletteAccessList.Add(new PaletteAccess(lcdCycles, (byte)bgpIndex, value));
 						if (bgpInc)
 							bgpIndex = (bgpIndex + 1) & 0x3F;
 					}
@@ -362,7 +365,7 @@ namespace CrystalBoy.Emulation
 					{
 						paletteMemory[0x40 | obpIndex] = value;
 						if (usePaletteMapping) greyPaletteUpdated = true;
-						paletteAccessList.Add(new PaletteAccess(cycleCount, (byte)(0x40 | obpIndex), value));
+						paletteAccessList.Add(new PaletteAccess(lcdCycles, (byte)(0x40 | obpIndex), value));
 						if (obpInc)
 							obpIndex = (obpIndex + 1) & 0x3F;
 					}
@@ -378,7 +381,7 @@ namespace CrystalBoy.Emulation
 				case 0x43: // SCX
 				case 0x4A: // WY
 				case 0x4B: // WX
-					videoPortAccessList.Add(new PortAccess(cycleCount, port, value)); // Keep track of the write
+					videoPortAccessList.Add(new PortAccess(lcdCycles, port, value)); // Keep track of the write
 					portMemory[port] = value; // Store the value in memory
 					break;
 				default:
@@ -400,30 +403,25 @@ namespace CrystalBoy.Emulation
 				case 0x0F: // IF
 					return RequestedInterrupts;
 				case 0x41: // STAT
-					if (!lcdEnabled)
-						return (byte)(portMemory[0x41] & 0x78);
-					else if (cycleCount < VerticalBlankDuration)
+					if (!lcdEnabled) return (byte)(portMemory[0x41] & 0x78);
+					else if (lcdCycles >= FrameDuration - VerticalBlankDuration)
 						temp = 1;
 					else
 					{
-						temp = cycleCount % HorizontalLineDuration;
+						temp = lcdCycles % HorizontalLineDuration;
 
-						if (temp < Mode2Duration)
-							temp = 2;
-						else if (temp < Mode2Duration + Mode3Duration)
-							temp = 3;
-						else
-							temp = 0;
+						if (temp < Mode2Duration) temp = 2;
+						else if (temp < Mode2Duration + Mode3Duration) temp = 3;
+						else temp = 0;
 					}
 
-					if (cycleCount >= lycMinCycle && cycleCount < lycMinCycle + 456)
+					if (lcdCycles >= lycMinCycle && lcdCycles < lycMinCycle + 456 - 4) // The -4 is here because the coincidence bit is determined 4 cycles earlier
 						temp |= 0x4; // Set the coincidence bit based on coincidence
 					return (byte)(portMemory[0x41] & 0x78 | temp);
 				case 0x44: // LY
-					if (lcdEnabled)
-						return (byte)(lyOffset + (cycleCount + 4) / HorizontalLineDuration);
-					else
-						return 0;
+					return lcdEnabled && lyOffset + lcdCycles + 4 < FrameDuration - HorizontalLineDuration + 8 ?
+						(byte)((lyOffset + lcdCycles + 4) / HorizontalLineDuration) :
+						(byte)0;
 				case 0x4D:
 					return (byte)((doubleSpeed ? 0x80 : 0x00) | (prepareSpeedSwitch ? 0x01 : 0x00));
 				case 0x4F: // VBK

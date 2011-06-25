@@ -427,12 +427,12 @@ namespace CrystalBoy.Emulation
 				}
 			}
 
-			cycleCount += (length + 1) << 3;
+			AddFixedCycles((length + 1) << 3);
 		}
 
 		private unsafe void HandleHdma(bool addCycles)
 		{
-			int copyCount = (cycleCount - hdmaNextCycle) / HorizontalLineDuration;
+			int copyCount = (lcdCycles - hdmaNextCycle) / HorizontalLineDuration;
 
 			if (copyCount > hdmaCurrentLength)
 				copyCount = hdmaCurrentLength;
@@ -471,8 +471,7 @@ namespace CrystalBoy.Emulation
 					if ((hdmaCurrentDestinationLow += 16 )== 0) hdmaCurrentDestinationHigh++;
 					if ((hdmaCurrentSourceLow += 16) == 0) hdmaCurrentSourceHigh++;
 				}
-				if (addCycles)
-					cycleCount += 8;
+				if (addCycles) AddFixedCycles(8);
 				hdmaNextCycle += HorizontalLineDuration;
 				hdmaCurrentLength--;
 			}

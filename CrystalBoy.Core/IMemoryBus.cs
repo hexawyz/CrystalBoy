@@ -25,8 +25,8 @@ namespace CrystalBoy.Core
 	[CLSCompliant(false)]
 	public interface IMemoryBus : IMemory, IPortMap
 	{
-		int CycleCount { get; }
-		bool AddCycles(int count);
+		int LcdCycleCount { get; }
+		bool AddVariableCycles(int count);
 
 		MemoryType GetMapping(ushort offset);
 		MemoryType GetMapping(ushort offset, out int bank);

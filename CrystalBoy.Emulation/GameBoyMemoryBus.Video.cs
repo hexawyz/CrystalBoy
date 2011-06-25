@@ -39,6 +39,7 @@ namespace CrystalBoy.Emulation
 
 		#region Variables
 
+		int lcdCycles; // Current clock cycle count
 		// LCD Status Interrupt
 		int lycMinCycle,
 			statInterruptCycle;
@@ -72,27 +73,15 @@ namespace CrystalBoy.Emulation
 			lcdDrawing = true;
 			// Reset LY
 			lyOffset = 0;
-			// Update the reference timer shift
-			referenceTimerShift += cycleCount % ReferenceTimerTickCycles;
-			if (referenceTimerShift > ReferenceTimerTickCycles)
-				referenceTimerShift -= ReferenceTimerTickCycles;
-			// Update the divider base cycle
-			dividerBaseCycle = (dividerBaseCycle - cycleCount) % 65536;
-			// Update the timer timings if needed
-			if (timerEnabled)
-			{
-				timerBaseCycle -= cycleCount + VerticalBlankDuration;
-				timerInterruptCycle -= cycleCount + VerticalBlankDuration;
-			}
 			// Update HDMA if needed
 			if (hdmaActive)
 				hdmaNextCycle = Mode2Duration + Mode3Duration; // Reset to line 0 HBlank
 			// Set the counter just before the first horizontal line
-			cycleCount = -4; // First line is cycle 0, therefore, cycle -4 is the cycle before ;)
+			lcdCycles = -4; // First line is cycle 0, therefore, cycle -4 is the cycle before ;)
 			// Update the video status interrupt for reflecting changes
 			UpdateVideoStatusInterrupt();
 			// Now set the timer to the first horizontal line (this is a bit of a hack but it should work perfectly :p)
-			cycleCount = 0;
+			lcdCycles = 0;
 			// Clear the video access lists
 			videoPortAccessList.Clear();
 			paletteAccessList.Clear();
@@ -110,15 +99,15 @@ namespace CrystalBoy.Emulation
 				return;
 			}
 
-			coincidence = notifyCoincidence ? cycleCount < lycMinCycle ? lycMinCycle : FrameDuration + lycMinCycle : int.MaxValue;
+			coincidence = notifyCoincidence ? lcdCycles < lycMinCycle + HorizontalLineDuration ? lycMinCycle : FrameDuration + lycMinCycle : int.MaxValue;
 
 			if (notifyMode0 || notifyMode2)
 			{
-				if (cycleCount >= FrameDuration - VerticalBlankDuration) // Case where we are in VBlank period
+				if (lcdCycles >= FrameDuration - VerticalBlankDuration) // Case where we are in VBlank period
 				{
 					if (notifyMode2) // Mode 2 is OAM fetch
 					{
-						mode2 = FrameDuration; // A frame begins at 0, but we calculate for next frame here ;)
+						mode2 = FrameDuration - 4; // A frame begins at 0, but we calculate for next frame here ;)
 						mode0 = int.MaxValue;
 					}
 					else // Mode 0 is Horizontal Blank
@@ -129,21 +118,21 @@ namespace CrystalBoy.Emulation
 				}
 				else // Case when we are not in VBlank period
 				{
-					int timing = cycleCount % HorizontalLineDuration; // Calculate the timing inside our raster line
+					int timing = lcdCycles % HorizontalLineDuration; // Calculate the timing inside our raster line
 
 					if (notifyMode0 && timing < Mode2Duration + Mode3Duration) // If we requested HBlank notification and we are before HBlank...
 					{
-						mode0 = cycleCount - timing + Mode2Duration + Mode3Duration;
+						mode0 = lcdCycles - timing + Mode2Duration + Mode3Duration;
 						mode2 = int.MaxValue;
 					}
 					else if (notifyMode2)
 					{
-						mode2 = cycleCount - timing + HorizontalLineDuration; // If we requested OAM fetch notification... (since mode 2 begins a raster line, we are always after mode 2 beginning ;))
+						mode2 = lcdCycles - timing + HorizontalLineDuration; // If we requested OAM fetch notification... (since mode 2 begins a raster line, we are always after mode 2 beginning ;))
 						mode0 = int.MaxValue;
 					}
 					else // And finally if we requested HBlank notification but we are inside HBlank
 					{
-						mode0 = cycleCount - timing + HorizontalLineDuration + Mode2Duration + Mode3Duration;
+						mode0 = lcdCycles - timing + HorizontalLineDuration + Mode2Duration + Mode3Duration;
 						mode2 = int.MaxValue;
 					}
 				}
@@ -155,7 +144,7 @@ namespace CrystalBoy.Emulation
 			}
 
 			// Mode 1 is Vertical Blank (same as VBI)
-			mode1 = notifyMode1 ? (cycleCount < FrameDuration - VerticalBlankDuration ? 0 : FrameDuration) + FrameDuration - VerticalBlankDuration : int.MaxValue;
+			mode1 = notifyMode1 ? (lcdCycles < FrameDuration - VerticalBlankDuration ? 0 : FrameDuration) + FrameDuration - VerticalBlankDuration : int.MaxValue;
 
 			// The stat interrupt cycle is the minimum of all potential interrupt cycles
 			statInterruptCycle = Math.Min(Math.Min(coincidence, mode0), Math.Min(mode1, mode2));
