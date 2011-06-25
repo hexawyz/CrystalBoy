@@ -230,6 +230,9 @@ namespace CrystalBoy.Emulator
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
+			ToolStripManager.VisualStylesEnabled = true;
+			ToolStripManager.RenderMode = ToolStripManagerRenderMode.Professional;
+
 			RuntimeHelpers.RunClassConstructor(typeof(LookupTables).TypeHandle);
 
 			// Check for embedded plugins

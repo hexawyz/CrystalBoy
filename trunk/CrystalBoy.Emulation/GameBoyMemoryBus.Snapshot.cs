@@ -93,11 +93,13 @@ namespace CrystalBoy.Emulation
 			}
 
 			// Load timing information
-			cycleCount = reader.ReadInt32();
-			referenceTimerShift = reader.ReadInt32();
+			lcdCycles = reader.ReadInt32();
+			referenceTimerCycles = reader.ReadInt32();
 			statInterruptCycle = reader.ReadInt32();
-			timerInterruptCycle = reader.ReadInt32();
-			dividerBaseCycle = reader.ReadInt32();
+			timerEnabled = reader.ReadBoolean();
+			dividerCycleOffset = reader.ReadInt32();
+			timerCycles = reader.ReadInt32();
+			timerResolution = reader.ReadInt32();
 		}
 
 		public void SaveState(Stream stream)
@@ -145,16 +147,14 @@ namespace CrystalBoy.Emulation
 			writer.Write(workRamBank); // Ignore this when !colorMode
 
 			// Save timing information
-			writer.Write(cycleCount);
-			writer.Write(referenceTimerShift);
+			writer.Write(lcdCycles);
+			writer.Write(referenceTimerCycles);
 			writer.Write(statInterruptCycle);
-			writer.Write(timerInterruptCycle);
-			writer.Write(dividerBaseCycle);
 
 			// Save timer information
 			writer.Write(timerEnabled);
-			writer.Write(timerBaseValue);
-			writer.Write(timerBaseCycle);
+			writer.Write(dividerCycleOffset);
+			writer.Write(timerCycles);
 			writer.Write(timerResolution);
 
 			// Save video register information

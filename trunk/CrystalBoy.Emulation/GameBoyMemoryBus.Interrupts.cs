@@ -39,7 +39,7 @@ namespace CrystalBoy.Emulation
 			if (lcdEnabled && (EnabledInterrupts & 0x3) != 0)
 			{
 				vbi = FrameDuration - VerticalBlankDuration;
-				if (cycleCount > vbi)
+				if (lcdCycles > vbi)
 					vbi += FrameDuration;
 				if (statInterruptEnabled)
 					stat = statInterruptCycle;
@@ -52,11 +52,11 @@ namespace CrystalBoy.Emulation
 				stat = int.MaxValue;
 			}
 
-			timer = timerEnabled && (EnabledInterrupts & 0x4) != 0 ? timerInterruptCycle : int.MaxValue;
+			timer = timerEnabled && (EnabledInterrupts & 0x4) != 0 ? timerOverflowCycles : int.MaxValue;
 
 			vbi = Math.Min(vbi, Math.Min(stat, timer));
 
-			return vbi == int.MaxValue ? -1 : vbi - cycleCount;
+			return vbi == int.MaxValue ? -1 : vbi - lcdCycles;
 		}
 
 		public void InterruptRequest(Interrupt interrupt) { requestedInterrupts |= (byte)interrupt; }
@@ -72,23 +72,19 @@ namespace CrystalBoy.Emulation
 			get
 			{
 				// Check for VBLANK Interrupt
-				if (lcdDrawing && cycleCount >= FrameDuration - VerticalBlankDuration)
+				if (lcdDrawing && lcdCycles >= FrameDuration - VerticalBlankDuration)
 				{
 					requestedInterrupts |= 0x01;
 					lcdDrawing = false;
 				}
 				// Check for STAT Interrupt
-				if (statInterruptEnabled && cycleCount >= statInterruptCycle)
+				if (statInterruptEnabled && lcdCycles >= statInterruptCycle)
 				{
 					requestedInterrupts |= 0x02; // Request LCD status interrupt
 					UpdateVideoStatusInterrupt(); // Update timings
 				}
 				// Check for TIMER Interrupt
-				if (timerEnabled && cycleCount >= timerInterruptCycle)
-				{
-					requestedInterrupts |= 0x04; // Request timer interrupt
-					TimerOverflow(); // Update timings
-				}
+				AdjustTimer(); // This method will adjust all the timings as required
 
 				return requestedInterrupts;
 			}

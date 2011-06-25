@@ -31,7 +31,7 @@ namespace CrystalBoy.Emulation
 		// A frame always lasts 70224 cycles, excepted when the frame starts with lcd disabled, and lcd is enabled before frame end
 		// In that case only, we reset the cycle counter before the frame ends, which makes a longer frame, but is needed for correct emulation...
 		// When LCD is enabled, a frame begins at raster line 0, and ends at the last raster line (153, in VBlank)
-		int cycleCount; // Current clock cycle count
+		//int cycleCount; // Current clock cycle count
 
 		// Double Speed Mode (Color Game Boy Only)
 		bool doubleSpeed, prepareSpeedSwitch;
@@ -50,7 +50,8 @@ namespace CrystalBoy.Emulation
 
 		partial void ResetTiming()
 		{
-			cycleCount = 60;
+			lyOffset = -4;
+			lcdCycles = 60;
 			doubleSpeed = false;
 			prepareSpeedSwitch = false;
 		}
@@ -59,19 +60,23 @@ namespace CrystalBoy.Emulation
 
 		#region Timing
 
-		public int CycleCount { get { return cycleCount; } }
+		public int LcdCycleCount { get { return lcdCycles; } }
 
-		public bool AddCycles(int count)
+		public bool AddVariableCycles(int count)
 		{
 #if WITH_DEBUGGING && DEBUG_CYCLE_COUNTER
 			debugCycleCount += count;
 #endif
-			cycleCount += doubleSpeed ? count >> 1 : count;
+			int realCount = doubleSpeed ? count >> 1 : count;
 
-			if (hdmaActive && lcdEnabled && cycleCount >= hdmaNextCycle)
+			lcdCycles += realCount;
+			referenceTimerCycles += realCount;
+			timerCycles += realCount; // Increment even if the timer is disabled, avoiding a conditional jump.
+
+			if (hdmaActive && lcdEnabled && lcdCycles >= hdmaNextCycle)
 				HandleHdma(count < 20);
 
-			if (cycleCount > FrameDuration)
+			if (lcdCycles > FrameDuration)
 			{
 				AdjustTimings();
 				return false;
@@ -79,24 +84,22 @@ namespace CrystalBoy.Emulation
 			return true;
 		}
 
+		public void AddFixedCycles(int count)
+		{
+			lcdCycles += count;
+			referenceTimerCycles += count; // Just ignore overflow for this…
+			timerCycles += count;
+
+			if (hdmaActive && lcdEnabled && lcdCycles >= hdmaNextCycle)
+				HandleHdma(count < 20);
+		}
+
 		private void AdjustTimings()
 		{
 			// Reset LY
-			lyOffset = 0;
+			lyOffset = -4;
 			// Resume LCD drawing (after VBlank)
 			lcdDrawing = lcdEnabled;
-			// Update the reference timer shift
-			referenceTimerShift += ReferenceTimerFrameShift;
-			if (referenceTimerShift > ReferenceTimerTickCycles)
-				referenceTimerShift -= ReferenceTimerTickCycles;
-			// Update the divider base cycle
-			dividerBaseCycle = (dividerBaseCycle - FrameDuration) % 65536;
-			// Update the timer timings if needed
-			if (timerEnabled)
-			{
-				timerBaseCycle -= FrameDuration;
-				timerInterruptCycle -= FrameDuration;
-			}
 			// Update LCD status timings if needed
 			if (statInterruptEnabled)
 				statInterruptCycle -= FrameDuration;
@@ -105,7 +108,7 @@ namespace CrystalBoy.Emulation
 			if (hdmaActive)
 				hdmaNextCycle = Mode2Duration + Mode3Duration; // Reset to line 0 HBlank
 			// Remove a frame from the cycle count
-			cycleCount -= FrameDuration;
+			lcdCycles -= FrameDuration;
 			// Raise the FrameReady event
 			OnFrameReady();
 			// Prepare for the new frame…

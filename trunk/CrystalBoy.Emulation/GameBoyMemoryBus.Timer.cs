@@ -24,25 +24,15 @@ namespace CrystalBoy.Emulation
 {
 	partial class GameBoyMemoryBus
 	{
-		#region Constants
-
-		public const int ReferenceTimerTickCycles = 1024;
-		public const int ReferenceTimerFrameShift = FrameDuration % ReferenceTimerTickCycles; // Shift amount for each frame
-
-		#endregion
-
 		#region Variables
 
-		// Variables used for the reference 4096 Hz Timer
-		// Since this timer is not synchronized with Refresh, it is necessary to keep track of the shift for each frame
-		int referenceTimerShift; // Current frame timer shift
 		// Variables used for the GB Programmable Timer
-		// This timer is kept synchronized with the 4096 Hz reference timer
-		int dividerBaseCycle, // Clock cycle used as reference for the divider (DIV) 0 value
-			timerInterruptCycle, // Clock cycle representing timer overflow, will generate a TIMER interrupt
-			timerBaseCycle, // Clock cycle corresponding to the last known timer value
-			timerResolution; // Clock cycle amount between each timer tick
-		byte timerBaseValue; // Last known timer value
+		// Global cycle counter, used to synchronize the various timer sources
+		int referenceTimerCycles; // Ellapsed clock cycles for the reference timer
+		int dividerCycleOffset; // Offset between the reference cycle counter and the divider's first cycle.
+		int timerCycles; // Ellapsed clock cycles for the timer
+		int timerOverflowCycles; // Number of clock cycles required for an overflow to happen
+		int timerResolution; // Clock cycle count between each timer tick
 		bool timerEnabled; // Determines if the timer is enabled
 
 		#endregion
@@ -51,95 +41,75 @@ namespace CrystalBoy.Emulation
 
 		partial void ResetTimer()
 		{
-			referenceTimerShift = 0;
+			referenceTimerCycles = 0;
+			dividerCycleOffset = 0;
+			timerCycles = 0;
+			timerResolution = 1024;
+			timerOverflowCycles = 256 * timerResolution;
+			timerEnabled = false;
 		}
 
 		#endregion
 
 		#region GameBoy Timer
 
-		private void ResetDivider()
+		private void ResetDivider() { dividerCycleOffset = (referenceTimerCycles & 0xFF) - referenceTimerCycles;}
+
+		private byte GetDividerValue() { return (byte)((referenceTimerCycles + dividerCycleOffset) >> (colorMode ? 7 : 8)); }
+
+		private unsafe void DisableTimer()
 		{
-			int reference;
-
-			// Calculate the reference timer cycle
-			reference = cycleCount + referenceTimerShift;
-			// Calculate the divider base cycle, and make it negative
-			dividerBaseCycle = reference - reference % 256; // The divider has a resolution of 256 clock cycles
-		}
-
-		private byte GetDividerValue()
-		{
-			if (doubleSpeed)
-				return (byte)((cycleCount - dividerBaseCycle) / 128);
-			else
-				return (byte)((cycleCount - dividerBaseCycle) / 256);
-		}
-
-		private void TimerOverflow()
-		{
-			int reference;
-
-			// Read timer modulo and reset the timer
-			unsafe { timerBaseValue = portMemory[0x06]; } // TMA
-			// Calculate the reference timer cycle
-			reference = cycleCount + referenceTimerShift;
-			// Use this to calculate the programmable timer cycle according to the requested resolution
-			timerBaseCycle = reference - reference % timerResolution;
-			// Calculate the timer interrupt cycle
-			timerInterruptCycle = timerBaseCycle + (256 - timerBaseValue) * timerResolution;
-		}
-
-		private void DisableTimer()
-		{
-			// Define the timer base value
-			timerBaseValue = GetTimerValue();
-			// Disable the timer
+			// This operation is useless if the timer has already been disabled, but it will not harm. (Just waste a few real CPU clock cycles)
+			portMemory[0x05] = GetTimerValue();
 			timerEnabled = false;
 		}
 
-		private void EnableTimer(int timerResolution)
+		private unsafe void EnableTimer(int timerResolution)
 		{
-			int reference;
+			// Store the current timer value somewhere safe
+			byte value = portMemory[0x05] = GetTimerValue();
 
-			// Set the current timer value as the base value
-			timerBaseValue = GetTimerValue();
-			// Calculate the reference timer cycle
-			reference = cycleCount + referenceTimerShift;
-			// Use this to calculate the programmable timer cycle according to the requested resolution
-			timerBaseCycle = reference - reference % timerResolution;
-			// Calculate the timer interrupt cycle
-			timerInterruptCycle = timerBaseCycle + (256 - timerBaseValue) * timerResolution;
+			// Initialize the timer cycle counter together with the timer overflow cycle count.
+			timerCycles = (referenceTimerCycles % timerResolution) + (256 - value) * timerResolution - (timerOverflowCycles = (256 - value) * timerResolution);
 			// Define the new timer resolution
 			this.timerResolution = timerResolution;
 			// Enable the timer
 			timerEnabled = true;
 		}
 
-		private void SetTimerValue(byte value)
+		private unsafe void SetTimerValue(byte value)
 		{
-			int reference;
-
 			// Set the timer base value
-			timerBaseValue = value;
-			// Adjust the timings if the timer is enabled
-			if (timerEnabled)
-			{
-				// Calculate the reference timer cycle
-				reference = cycleCount + referenceTimerShift;
-				// Use this to calculate the programmable timer cycle according to the requested resolution
-				timerBaseCycle = reference - reference % timerResolution;
-				// Calculate the timer interrupt cycle
-				timerInterruptCycle = timerBaseCycle + (256 - timerBaseValue) * timerResolution;
-			}
+			portMemory[0x05] = value;
+			// Adjust the timer before doing anything else
+			AdjustTimer();
+			// Adjust the timer cycle counter if the timer is enabled
+			if (timerEnabled) timerCycles = (timerCycles % timerResolution) + (256 - value) * timerResolution - timerOverflowCycles;
 		}
 
-		private byte GetTimerValue()
+		private void SetTimerOverflowValue(byte value)
 		{
-			// Calculate the timer value if the timer is enabled, or return the base value otherwise
+			// Adjust the timer before doing anything else
+			AdjustTimer();
+			// Adjust the timer cycle counter with the new timer overflow cycle count.
+			timerCycles = timerCycles - timerOverflowCycles + (timerOverflowCycles = (256 - value) * timerResolution);
+		}
+
+		private unsafe byte GetTimerValue()
+		{
+			// Calculate the timer value if the timer is enabled, or return the stored value otherwise
 			return timerEnabled ?
-				(byte)(timerBaseValue + (cycleCount - timerBaseCycle) / timerResolution) :
-				timerBaseValue;
+				(byte)(256 - (timerOverflowCycles + timerCycles) / timerResolution) :
+				portMemory[0x05]; // The timer value is stored in TMA
+		}
+
+		private void AdjustTimer()
+		{
+			if (timerEnabled && timerCycles >= timerOverflowCycles)
+			{
+				InterruptRequest(0x04); // Request the TIMER interrupt
+				timerCycles = timerCycles % timerOverflowCycles; // Adjust the cycle counter
+			}
 		}
 
 		#endregion
