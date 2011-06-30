@@ -34,29 +34,47 @@ namespace CrystalBoy.Emulation
 
 		public int WaitForInterrupts()
 		{
-			int vbi, stat, timer;
+			int vbi = int.MaxValue;
+			int stat = int.MaxValue;
+			int timer;
+			int temp;
 
 			if (lcdEnabled && (EnabledInterrupts & 0x3) != 0)
 			{
-				vbi = FrameDuration - VerticalBlankDuration;
-				if (lcdCycles > vbi)
-					vbi += FrameDuration;
-				if (statInterruptEnabled)
-					stat = statInterruptCycle;
-				else
-					stat = int.MaxValue;
+				temp = (144 - lcdRealLine) * HorizontalLineDuration - rasterCycles;
+				if (lcdRealLine > 144) temp += FrameDuration;
+
+				if ((EnabledInterrupts & 0x1) != 0) vbi = temp;
+
+				if ((EnabledInterrupts & 0x2) != 0)
+				{
+					if (notifyMode1) stat = temp;
+					if (notifyCoincidence)
+					{
+						unsafe { temp = portMemory[0x45]; }
+
+						if (temp < 154)
+						{
+							if (lyRegister < temp) // Case where LYC is 1-152 and greater than LY
+								stat = Math.Min(stat, (temp - lcdRealLine) * HorizontalLineDuration - 4 - rasterCycles); // We use the real raster line (not advanced by 4 cycles ;)) for computations here
+							else if (temp == 0) // Case where LYC is 0… (Line 153 ends early, so this is a special case)
+								stat = Math.Min(stat, (153 - lcdRealLine) * HorizontalLineDuration + 8 - rasterCycles + (lcdRealLine == 153 && rasterCycles > 8 ? FrameDuration : 0)); // The coincidence for LY = 0 should happen at the beginning of line 153
+							else if (lyRegister > temp) // Case where LYC is 1-152 and lesser or equal to LY
+								stat = Math.Min(stat, FrameDuration - (lcdRealLine - temp) * HorizontalLineDuration - 4 - rasterCycles);
+							else // Case where LY == LYC
+								stat = Math.Min(stat, FrameDuration - rasterCycles - 4);
+						}
+					}
+					if (notifyMode0) stat = Math.Min(stat, (rasterCycles > Mode2Duration + Mode3Duration ? HorizontalLineDuration : lcdRealLine < 143 ? 0 : (154 - lcdRealLine) * HorizontalLineDuration) + Mode2Duration + Mode3Duration - rasterCycles);
+					if (notifyMode2) stat = Math.Min(stat, lcdRealLine < 143 ? HorizontalLineDuration - rasterCycles : (154 - lcdRealLine) * HorizontalLineDuration - rasterCycles);
+				}
 			}
-			else
-			{
-				vbi = int.MaxValue;
-				stat = int.MaxValue;
-			}
 
-			timer = timerEnabled && (EnabledInterrupts & 0x4) != 0 ? timerOverflowCycles : int.MaxValue;
+			timer = timerEnabled && (EnabledInterrupts & 0x4) != 0 ? timerOverflowCycles - timerCycles : int.MaxValue;
 
-			vbi = Math.Min(vbi, Math.Min(stat, timer));
+			temp = Math.Min(vbi, Math.Min(stat, timer));
 
-			return vbi == int.MaxValue ? -1 : vbi - lcdCycles;
+			return temp == int.MaxValue ? -1 : temp;
 		}
 
 		public void InterruptRequest(Interrupt interrupt) { requestedInterrupts |= (byte)interrupt; }
@@ -69,25 +87,7 @@ namespace CrystalBoy.Emulation
 
 		public byte RequestedInterrupts
 		{
-			get
-			{
-				// Check for VBLANK Interrupt
-				if (lcdDrawing && lcdCycles >= FrameDuration - VerticalBlankDuration)
-				{
-					requestedInterrupts |= 0x01;
-					lcdDrawing = false;
-				}
-				// Check for STAT Interrupt
-				if (statInterruptEnabled && lcdCycles >= statInterruptCycle)
-				{
-					requestedInterrupts |= 0x02; // Request LCD status interrupt
-					UpdateVideoStatusInterrupt(); // Update timings
-				}
-				// Check for TIMER Interrupt
-				AdjustTimer(); // This method will adjust all the timings as required
-
-				return requestedInterrupts;
-			}
+			get { return requestedInterrupts; }
 			set { requestedInterrupts = (byte)(value & 0x1F); }
 		}
 

@@ -430,57 +430,44 @@ namespace CrystalBoy.Emulation
 			AddFixedCycles((length + 1) << 3);
 		}
 
-		private unsafe void HandleHdma(bool addCycles)
+		private unsafe void HandleHdma()
 		{
-			int copyCount = (lcdCycles - hdmaNextCycle) / HorizontalLineDuration;
-
-			if (copyCount > hdmaCurrentLength)
-				copyCount = hdmaCurrentLength;
-
-			while (copyCount-- >= 0)
+			if (hdmaCurrentDestinationLow > 0xF0 || hdmaCurrentSourceLow > 0xF0)
 			{
-				if (hdmaCurrentDestinationLow > 0xF0 || hdmaCurrentSourceLow > 0xF0)
+				uint length, remaining;
+
+				length = 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow);
+
+				MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
+
+				if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
+				if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
+				remaining = 16 - length;
+
+				length = Math.Min(16 - length, 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow));
+
+				MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
+
+				if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
+				if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
+				if ((remaining -= length) != 0)
 				{
-					uint length, remaining;
-
-					length = 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow);
-
-					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
-
-					if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
-					if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
-					remaining = 16 - length;
-
-					length = Math.Min(16 - length, 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow));
-
-					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
-
-					if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
-					if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
-					if ((remaining -= length) != 0)
-					{
-						MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, remaining);
-						hdmaCurrentDestinationLow += (byte)remaining;
-						hdmaCurrentSourceLow += (byte)remaining;
-					}
+					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, remaining);
+					hdmaCurrentDestinationLow += (byte)remaining;
+					hdmaCurrentSourceLow += (byte)remaining;
 				}
-				else
-				{
-					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, 16);
-
-					if ((hdmaCurrentDestinationLow += 16 )== 0) hdmaCurrentDestinationHigh++;
-					if ((hdmaCurrentSourceLow += 16) == 0) hdmaCurrentSourceHigh++;
-				}
-				if (addCycles) AddFixedCycles(8);
-				hdmaNextCycle += HorizontalLineDuration;
-				hdmaCurrentLength--;
 			}
+			else
+			{
+				MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, 16);
+
+				if ((hdmaCurrentDestinationLow += 16 )== 0) hdmaCurrentDestinationHigh++;
+				if ((hdmaCurrentSourceLow += 16) == 0) hdmaCurrentSourceHigh++;
+			}
+			AddFixedCyclesInternal(8);
+			hdmaCurrentLength--;
 
 			hdmaActive = hdmaCurrentLength != 0xFF;
-
-			// Adjusts the next cycle (skips VBlank)
-			if (hdmaNextCycle >= FrameDuration - VerticalBlankDuration)
-				hdmaNextCycle = FrameDuration + Mode2Duration + Mode3Duration;
 		}
 
 		#endregion
@@ -547,7 +534,14 @@ namespace CrystalBoy.Emulation
 		{
 			int offset = bankIndex * 0x4000;
 
-			if (ExternalRom.Length < offset + 0x4000) throw new InvalidOperationException("Unhandled ROM mapping case");
+			if (ExternalRom.Length < offset + 0x4000)
+			{
+				// If the ROM size is a power of two, the fix is easy
+				if ((ExternalRom.Length & (ExternalRom.Length - 1)) == 0)
+					offset = offset & (ExternalRom.Length - 1);
+				// Other cases would involve mapping trash memory in place of ROM. Let's not handle them for now…
+				else throw new InvalidOperationException("Unhandled ROM mapping case");
+			}
 
 			byte* source = (byte*)externalRomBlock.Pointer + offset;
 			byte** segment;

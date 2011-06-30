@@ -773,6 +773,7 @@ namespace CrystalBoy.Emulation
 							// Still need a better emulation of the HALT opcode, but this one will work for now
 							else if (ime || bus.EnabledInterrupts != 0)
 							{
+								bus.AddVariableCycles(4); // Add the 4 cycles now… In order to adjust interrupts
 								if ((bus.EnabledInterrupts & bus.RequestedInterrupts) == 0)
 								{
 									status = ProcessorStatus.Halted;
@@ -781,7 +782,7 @@ namespace CrystalBoy.Emulation
 									if ((cycleCount & 0x3) != 0) cycleCount += 4 - (cycleCount & 0x3); // Keep the cycle count as a multiple of 4
 									status = ProcessorStatus.Running;
 								}
-								else cycleCount = 4;
+								else cycleCount = 0;
 							}
 							break;
 						case 0x77: /* LD (HL),A */
@@ -2841,7 +2842,7 @@ namespace CrystalBoy.Emulation
 #else
 					;
 #endif
-				} while (bus.AddVariableCycles(cycleCount) && finishFrame);
+				} while (bus.AddCycles(cycleCount) && finishFrame);
 
 				return finishFrame; // Emulated with success
 			}
