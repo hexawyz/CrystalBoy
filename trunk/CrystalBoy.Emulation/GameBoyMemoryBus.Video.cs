@@ -39,17 +39,18 @@ namespace CrystalBoy.Emulation
 
 		#region Variables
 
-		int lcdCycles; // Current clock cycle count
+		// LCD “live” status
+		private int frameCycles;
+		private int rasterCycles; // Current clock cycle count, relative to the current LCD line
+		private int lcdRealLine; // LY should be equal to this *most of the time*.
+		private int lyRegister; // Maintain LY status in parallel 
+		private bool lcdEnabled; // Self-explanatory…
 		// LCD Status Interrupt
-		int lycMinCycle,
-			statInterruptCycle;
-		bool statInterruptEnabled, // LCD Status interrupt can happen
-			notifyCoincidence,
-			notifyMode2,
-			notifyMode1,
-			notifyMode0;
-		int lyOffset; // LY counter offset
-		bool lcdEnabled, lcdDrawing;
+		private byte videoNotifications; // Bitmask indicating the requested video interrupts (1 = LY=LYC, 2 = OAM Fetch, 4 = HBLANK, 8 = VBLANK)
+		private bool notifyCoincidence;
+		private bool notifyMode2;
+		private bool notifyMode1;
+		private bool notifyMode0;
 
 		#endregion
 
@@ -62,112 +63,27 @@ namespace CrystalBoy.Emulation
 			// Disabling the LCD is fairly easy.
 			// Enabling it should be a bit more tricky...
 			lcdEnabled = false;
-			lcdDrawing = false;
-			statInterruptEnabled = false;
+			videoNotifications = 0;
+			lcdRealLine = 0;
+			lyRegister = 0;
+			rasterCycles = 0;
 		}
 
 		private void EnableVideo()
 		{
-			// Do almost the same thing as AdjustTimings, excepted that the timings are adjusted basing on the current ellapsed cycles
+			// Restart the LCD at the first line
 			lcdEnabled = true;
-			lcdDrawing = true;
-			// Reset LY
-			lyOffset = 0;
-			// Update HDMA if needed
-			if (hdmaActive)
-				hdmaNextCycle = Mode2Duration + Mode3Duration; // Reset to line 0 HBlank
-			// Set the counter just before the first horizontal line
-			lcdCycles = -4; // First line is cycle 0, therefore, cycle -4 is the cycle before ;)
-			// Update the video status interrupt for reflecting changes
-			UpdateVideoStatusInterrupt();
-			// Now set the timer to the first horizontal line (this is a bit of a hack but it should work perfectly :p)
-			lcdCycles = 0;
+			frameCycles = 0;
+			rasterCycles = 0;
+			lcdRealLine = 0;
+			lyRegister = 0;
+			videoNotifications = 0;
 			// Clear the video access lists
 			videoPortAccessList.Clear();
 			paletteAccessList.Clear();
 			// Create a new snapshot of the video ports
 			videoStatusSnapshot.Capture();
 		}
-
-		public void UpdateVideoStatusInterrupt()
-		{
-			int coincidence, mode0, mode1, mode2;
-
-			if (!(lcdEnabled && (notifyCoincidence || notifyMode0 || notifyMode1 || notifyMode2)))
-			{
-				statInterruptEnabled = false;
-				return;
-			}
-
-			coincidence = notifyCoincidence ? lcdCycles < lycMinCycle + HorizontalLineDuration ? lycMinCycle : FrameDuration + lycMinCycle : int.MaxValue;
-
-			if (notifyMode0 || notifyMode2)
-			{
-				if (lcdCycles >= FrameDuration - VerticalBlankDuration) // Case where we are in VBlank period
-				{
-					if (notifyMode2) // Mode 2 is OAM fetch
-					{
-						mode2 = FrameDuration - 4; // A frame begins at 0, but we calculate for next frame here ;)
-						mode0 = int.MaxValue;
-					}
-					else // Mode 0 is Horizontal Blank
-					{
-						mode0 = FrameDuration + Mode2Duration + Mode3Duration; // Same here ;)
-						mode2 = int.MaxValue;
-					}
-				}
-				else // Case when we are not in VBlank period
-				{
-					int timing = lcdCycles % HorizontalLineDuration; // Calculate the timing inside our raster line
-
-					if (notifyMode0 && timing < Mode2Duration + Mode3Duration) // If we requested HBlank notification and we are before HBlank...
-					{
-						mode0 = lcdCycles - timing + Mode2Duration + Mode3Duration;
-						mode2 = int.MaxValue;
-					}
-					else if (notifyMode2)
-					{
-						mode2 = lcdCycles - timing + HorizontalLineDuration; // If we requested OAM fetch notification... (since mode 2 begins a raster line, we are always after mode 2 beginning ;))
-						mode0 = int.MaxValue;
-					}
-					else // And finally if we requested HBlank notification but we are inside HBlank
-					{
-						mode0 = lcdCycles - timing + HorizontalLineDuration + Mode2Duration + Mode3Duration;
-						mode2 = int.MaxValue;
-					}
-				}
-			}
-			else
-			{
-				mode0 = int.MaxValue;
-				mode2 = int.MaxValue;
-			}
-
-			// Mode 1 is Vertical Blank (same as VBI)
-			mode1 = notifyMode1 ? (lcdCycles < FrameDuration - VerticalBlankDuration ? 0 : FrameDuration) + FrameDuration - VerticalBlankDuration : int.MaxValue;
-
-			// The stat interrupt cycle is the minimum of all potential interrupt cycles
-			statInterruptCycle = Math.Min(Math.Min(coincidence, mode0), Math.Min(mode1, mode2));
-
-			// If the cycle is not valid (which may happen), we disable the interrupt
-			statInterruptEnabled = statInterruptCycle != int.MaxValue;
-		}
-
-		//private void UpdatedCoincidence()
-		//{
-		//    // Assuming notifyCoincidence = true
-
-		//    if (!statInterruptEnabled)
-		//    {
-		//        statInterruptEnabled = true;
-		//        if (cycleCount < lycMinCycle)
-		//            statInterruptCycle = lycMinCycle;
-		//        else
-		//            statInterruptCycle = FrameDuration + lycMinCycle;
-		//    }
-		//    else if (cycleCount < lycMinCycle && lycMinCycle < statInterruptCycle)
-		//        statInterruptCycle = lycMinCycle;
-		//}
 
 		#endregion
 	}

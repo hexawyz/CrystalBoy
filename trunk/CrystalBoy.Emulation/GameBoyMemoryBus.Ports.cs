@@ -45,7 +45,6 @@ namespace CrystalBoy.Emulation
 
 		byte hdmaSourceHigh, hdmaSourceLow, hdmaDestinationHigh, hdmaDestinationLow;
 		// For Horizontal Blank DMA
-		int hdmaNextCycle;
 		bool hdmaActive;
 		byte hdmaCurrentSourceHigh, hdmaCurrentSourceLow, hdmaCurrentDestinationHigh, hdmaCurrentDestinationLow, hdmaCurrentLength;
 
@@ -110,6 +109,7 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.NR52, 0xF1);
 
 			WritePort(Port.LCDC, useBootRom ? (byte)0x00 : (byte)0x91);
+			WritePort(Port.STAT, 0x00);
 			//WritePort(Port.LY, 0x00);
 			WritePort(Port.SCY, 0x00);
 			WritePort(Port.SCX, 0x00);
@@ -239,7 +239,6 @@ namespace CrystalBoy.Emulation
 					notifyMode2 = (value & 0x20) != 0;
 					notifyMode1 = (value & 0x10) != 0;
 					notifyMode0 = (value & 0x08) != 0;
-					UpdateVideoStatusInterrupt();
 					break;
 				case 0x44: // LY
 					// We use a negative offset here...
@@ -248,14 +247,13 @@ namespace CrystalBoy.Emulation
 					// For now leave it as read only… Need to find a game tring to reset LY.
 					break;
 				case 0x45: // LYC
-					if (value < 154) // Valid values are between 0 and 153
-						lycMinCycle = value > 0 ?
-							lyOffset + value * HorizontalLineDuration :
-							FrameDuration - (HorizontalLineDuration - 8);
-					else lycMinCycle = -4;
-					if (notifyCoincidence)
-						UpdateVideoStatusInterrupt();
 					portMemory[0x45] = value;
+					if (notifyCoincidence && value == lyRegister)
+					{
+						videoNotifications |= 0x01;
+						InterruptRequest(0x02);
+					}
+					else videoNotifications &= 0x0E;
 					break;
 				case 0x46: // DMA
 					if (value <= 0xF1) MemoryBlock.Copy(objectAttributeMemory, segmentArray[value], 0xA0);
@@ -272,7 +270,7 @@ namespace CrystalBoy.Emulation
 					break;
 				case 0x4F: // VBK
 					value &= 0x1;
-					if (colorMode && videoRamBank != value)
+					if (colorMode && !hdmaActive && videoRamBank != value)
 					{
 						videoRamBank = value;
 						MapVideoRamBank();
@@ -306,11 +304,6 @@ namespace CrystalBoy.Emulation
 							hdmaCurrentDestinationHigh = hdmaDestinationHigh;
 							hdmaCurrentDestinationLow = hdmaDestinationLow;
 							hdmaCurrentLength = (byte)(value & 0x7F);
-
-							if (lcdCycles < FrameDuration - VerticalBlankDuration - HorizontalBlankDuration)
-								hdmaNextCycle = lcdCycles - lcdCycles % HorizontalLineDuration + Mode2Duration + Mode3Duration;
-							else
-								hdmaNextCycle = FrameDuration + Mode2Duration + Mode3Duration;
 						}
 						else
 							HandleDma(hdmaDestinationHigh, hdmaDestinationLow, hdmaSourceHigh, hdmaSourceLow, (byte)(value & 0x7F));
@@ -333,7 +326,7 @@ namespace CrystalBoy.Emulation
 				case 0x49: // OBP1
 					portMemory[port] = value; // Store the value in memory
 					if (!colorMode)
-						videoPortAccessList.Add(new PortAccess(lcdCycles, port, value)); // Keep track of the write
+						videoPortAccessList.Add(new PortAccess(frameCycles, port, value)); // Keep track of the write
 					break;
 				// Only in cgb mode
 				case 0x68: // BCPS / BGPI
@@ -348,7 +341,7 @@ namespace CrystalBoy.Emulation
 					{
 						paletteMemory[bgpIndex] = value;
 						if (usePaletteMapping) greyPaletteUpdated = true;
-						paletteAccessList.Add(new PaletteAccess(lcdCycles, (byte)bgpIndex, value));
+						paletteAccessList.Add(new PaletteAccess(frameCycles, (byte)bgpIndex, value));
 						if (bgpInc)
 							bgpIndex = (bgpIndex + 1) & 0x3F;
 					}
@@ -365,7 +358,7 @@ namespace CrystalBoy.Emulation
 					{
 						paletteMemory[0x40 | obpIndex] = value;
 						if (usePaletteMapping) greyPaletteUpdated = true;
-						paletteAccessList.Add(new PaletteAccess(lcdCycles, (byte)(0x40 | obpIndex), value));
+						paletteAccessList.Add(new PaletteAccess(frameCycles, (byte)(0x40 | obpIndex), value));
 						if (obpInc)
 							obpIndex = (obpIndex + 1) & 0x3F;
 					}
@@ -381,7 +374,7 @@ namespace CrystalBoy.Emulation
 				case 0x43: // SCX
 				case 0x4A: // WY
 				case 0x4B: // WX
-					videoPortAccessList.Add(new PortAccess(lcdCycles, port, value)); // Keep track of the write
+					videoPortAccessList.Add(new PortAccess(frameCycles, port, value)); // Keep track of the write
 					portMemory[port] = value; // Store the value in memory
 					break;
 				default:
@@ -404,24 +397,25 @@ namespace CrystalBoy.Emulation
 					return RequestedInterrupts;
 				case 0x41: // STAT
 					if (!lcdEnabled) return (byte)(portMemory[0x41] & 0x78);
-					else if (lcdCycles >= FrameDuration - VerticalBlankDuration)
+					// The check for line 143 fixes X - Xekkusu (which, oddly enough, was working with the previous emulation method…)
+					// The game checks for VBLANK in an *active* loop (?!) but the VBLANK interrupt gets triggered before the virtual CPU even got a chance of readign the mode 0…
+					// There may be something else i'm emulating wrong, which could cause this bug, but in the mean time, this fixes it well enough…
+					// (The better fix being, if there are no other bugs, to emulate the read/write cycles correctly…)
+					else if (lcdRealLine >= 144 || lcdRealLine == 143 && rasterCycles >= HorizontalLineDuration - 8)
 						temp = 1;
 					else
 					{
-						temp = lcdCycles % HorizontalLineDuration;
-
-						if (temp < Mode2Duration) temp = 2;
-						else if (temp < Mode2Duration + Mode3Duration) temp = 3;
+						if (rasterCycles < Mode2Duration) temp = 2;
+						else if (rasterCycles < Mode2Duration + Mode3Duration) temp = 3;
 						else temp = 0;
 					}
 
-					if (lcdCycles >= lycMinCycle && lcdCycles < lycMinCycle + 456 - 4) // The -4 is here because the coincidence bit is determined 4 cycles earlier
+					if (lyRegister == portMemory[0x45])
 						temp |= 0x4; // Set the coincidence bit based on coincidence
+
 					return (byte)(portMemory[0x41] & 0x78 | temp);
 				case 0x44: // LY
-					return lcdEnabled && lyOffset + lcdCycles + 4 < FrameDuration - HorizontalLineDuration + 8 ?
-						(byte)((lyOffset + lcdCycles + 4) / HorizontalLineDuration) :
-						(byte)0;
+					return (byte)lyRegister;
 				case 0x4D:
 					return (byte)((doubleSpeed ? 0x80 : 0x00) | (prepareSpeedSwitch ? 0x01 : 0x00));
 				case 0x4F: // VBK

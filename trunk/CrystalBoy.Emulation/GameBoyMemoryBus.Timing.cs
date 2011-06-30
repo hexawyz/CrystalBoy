@@ -35,6 +35,7 @@ namespace CrystalBoy.Emulation
 
 		// Double Speed Mode (Color Game Boy Only)
 		bool doubleSpeed, prepareSpeedSwitch;
+		bool frameDone;
 
 		#endregion
 
@@ -50,8 +51,7 @@ namespace CrystalBoy.Emulation
 
 		partial void ResetTiming()
 		{
-			lyOffset = -4;
-			lcdCycles = 60;
+			rasterCycles = 60;
 			doubleSpeed = false;
 			prepareSpeedSwitch = false;
 		}
@@ -60,63 +60,162 @@ namespace CrystalBoy.Emulation
 
 		#region Timing
 
-		public int LcdCycleCount { get { return lcdCycles; } }
+		public int LcdCycleCount { get { return rasterCycles; } }
 
-		public bool AddVariableCycles(int count)
+		public bool AddCycles(int count) { return AddVariableCycles(count); }
+
+		internal bool AddVariableCycles(int count)
 		{
 #if WITH_DEBUGGING && DEBUG_CYCLE_COUNTER
 			debugCycleCount += count;
 #endif
-			int realCount = doubleSpeed ? count >> 1 : count;
+			AddFixedCycles(doubleSpeed ? count >> 1 : count);
 
-			lcdCycles += realCount;
-			referenceTimerCycles += realCount;
-			timerCycles += realCount; // Increment even if the timer is disabled, avoiding a conditional jump.
+			if (!frameDone) return true;
+			else return frameDone = false;
+		}
 
-			if (hdmaActive && lcdEnabled && lcdCycles >= hdmaNextCycle)
-				HandleHdma(count < 20);
+		internal void AddFixedCycles(int count)
+		{
+			AddFixedCyclesInternal(count);
 
-			if (lcdCycles > FrameDuration)
+			if (hdmaActive && lcdEnabled && lcdRealLine < 144 && rasterCycles >= Mode2Duration + Mode3Duration)
+				HandleHdma(); // Will add 8 cycles
+		}
+
+		private unsafe void AddFixedCyclesInternal(int count)
+		{
+			if ((frameCycles += count) >= FrameDuration)
 			{
-				AdjustTimings();
-				return false;
+				frameCycles -= FrameDuration;
+				frameDone = true;
 			}
-			return true;
-		}
-
-		public void AddFixedCycles(int count)
-		{
-			lcdCycles += count;
 			referenceTimerCycles += count; // Just ignore overflow for this…
-			timerCycles += count;
+			timerCycles += count; // Increment even if the timer is disabled, avoiding a conditional jump.
+			AdjustTimer();
 
-			if (hdmaActive && lcdEnabled && lcdCycles >= hdmaNextCycle)
-				HandleHdma(count < 20);
-		}
+			if (!lcdEnabled) return;
 
-		private void AdjustTimings()
-		{
-			// Reset LY
-			lyOffset = -4;
-			// Resume LCD drawing (after VBlank)
-			lcdDrawing = lcdEnabled;
-			// Update LCD status timings if needed
-			if (statInterruptEnabled)
-				statInterruptCycle -= FrameDuration;
-			// Update HDMA if needed
-			// TODO: Add HDMA support in HALT handler !
-			if (hdmaActive)
-				hdmaNextCycle = Mode2Duration + Mode3Duration; // Reset to line 0 HBlank
-			// Remove a frame from the cycle count
-			lcdCycles -= FrameDuration;
-			// Raise the FrameReady event
-			OnFrameReady();
-			// Prepare for the new frame…
-			// Clear the video access lists
-			videoPortAccessList.Clear();
-			paletteAccessList.Clear();
-			// Create a new snapshot of the video ports
-			videoStatusSnapshot.Capture();
+			rasterCycles += count; // Increment the LCD cycle counter only if LCD is enabled (which should be most of the time)
+
+			// From now on, we have either one (or more) new raster line(s) to handle, or the raster notifications to handle.
+			// Notifications for new raster lines will be handler as a part of the loop, and slightly differently.
+			if (rasterCycles < HorizontalLineDuration)
+			{
+				// Update LY *and* check for LY=LYC coincidence
+				// Line 153 “ends” early
+				if (lcdRealLine == 153)
+				{
+					// Only update if not done before…
+					if (lyRegister != 0 && rasterCycles >= 8)
+					{
+						if ((lyRegister = 0) == portMemory[0x45] && notifyCoincidence && (videoNotifications & 0x01) == 0)
+						{
+							videoNotifications |= 0x01;
+							InterruptRequest(0x02);
+						}
+						else videoNotifications &= 0x0E;
+					}
+				}
+				// Update LY 4 cycles before next line
+				else if (rasterCycles >= HorizontalLineDuration - 4)
+				{
+					if ((lyRegister = lcdRealLine + 1) == portMemory[0x45] && notifyCoincidence && (videoNotifications & 0x01) == 0)
+					{
+						videoNotifications |= 0x01;
+						InterruptRequest(0x02);
+					}
+					else videoNotifications &= 0x0E;
+				}
+
+				// Mode 2, 3 and 0 can only happen outside of VBLANK
+				if (lcdRealLine < 144)
+				{
+					// Check for OAM Fetch
+					if (notifyMode2 && rasterCycles < Mode2Duration && (videoNotifications & 0x02) == 0)
+					{
+						videoNotifications |= 0x02;
+						InterruptRequest(0x02);
+					}
+					// Check for HBLANK
+					if (notifyMode0 && rasterCycles >= Mode2Duration + Mode3Duration && (videoNotifications & 0x04) == 0)
+					{
+						videoNotifications |= 0x04;
+						InterruptRequest(0x02);
+					}
+				}
+			}
+			else do // This may probably be sped up a little bit for big updates (> 20 cycles) but those should not happen very often
+			{
+				rasterCycles -= HorizontalLineDuration;
+
+				if (lcdRealLine == 153)
+				{
+					lcdRealLine = 0;
+					// Resume LCD drawing (after VBlank)
+					videoNotifications &= 0x01; // Keep the coincidence bit
+					// Raise the FrameReady event
+					OnFrameReady();
+					// Prepare for the new frame…
+					// Clear the video access lists
+					videoPortAccessList.Clear();
+					paletteAccessList.Clear();
+					// Create a new snapshot of the video ports
+					videoStatusSnapshot.Capture();
+				}
+				else
+				{
+					lcdRealLine++;
+					videoNotifications &= 0x09; // Keep the coincidence and vblank bits
+				}
+
+				// Compute the new LY value
+				int lyNewValue = lcdRealLine < 153 ?
+					rasterCycles >= HorizontalLineDuration - 4 ?
+						lcdRealLine + 1 :
+						lcdRealLine :
+					rasterCycles < 8 ?
+						153 :
+						0;
+
+				// TODO handle LY "jumping" from 152 to 0
+
+				// Check for LY=LYC coincidence
+				if (notifyCoincidence && lyNewValue == portMemory[0x45])
+				{
+					if ((videoNotifications & 0x01) == 0 || lyNewValue != lyRegister)
+					{
+						videoNotifications |= 0x01;
+						InterruptRequest(0x02);
+					}
+				}
+				else videoNotifications &= 0x0E;
+				lyRegister = lyNewValue;
+
+				// Check for VBLANK Interrupt
+				if (lcdRealLine >= 144)
+				{
+					if ((videoNotifications & 0x08) == 0)
+					{
+						videoNotifications |= 0x08;
+						InterruptRequest(notifyMode1 ? (byte)0x03 : (byte)0x01);
+					}
+				}
+				// Check for Mode 2 or Mode 0
+				else
+				{
+					if (notifyMode2)
+					{
+						videoNotifications |= 0x02;
+						InterruptRequest(0x02);
+					}
+					if (notifyMode0 && rasterCycles >= Mode2Duration + Mode3Duration)
+					{
+						videoNotifications |= 0x04;
+						InterruptRequest(0x02);
+					}
+				}
+			} while (rasterCycles >= HorizontalLineDuration);
 		}
 
 		internal int HandleProcessorStop()

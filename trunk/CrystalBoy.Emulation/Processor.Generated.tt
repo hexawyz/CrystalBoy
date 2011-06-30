@@ -1,9 +1,10 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
-<#@ assembly name="$(SolutionDir)CrystalBoy.Disassembly\$(OutDir)CrystalBoy.Disassembly.dll" #>
+<#@ assembly name="$(SolutionDir)CrystalBoy.Core.OpcodeTableGenerator\$(OutDir)OpcodeTableGenerator.dll" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Globalization" #>
 <#@ import namespace="System.Reflection" #>
-<#@ import namespace="CrystalBoy.Disassembly" #>
+<#@ import namespace="CrystalBoy.Core" #>
+<#@ import namespace="CrystalBoy.Core.OpcodeTableGenerator" #>
 <#@ output extension=".cs" #>
 <# InitializeTemplateDictionary(); #>
 #region Copyright Notice
@@ -686,6 +687,7 @@ if (enableInterruptDelay > 0) pc--; // Case where HALT directly follows EI
 // Still need a better emulation of the HALT opcode, but this one will work for now
 else if (ime || bus.EnabledInterrupts != 0)
 {
+	bus.AddVariableCycles(4); // Add the 4 cycles now… In order to adjust interrupts
 	if ((bus.EnabledInterrupts & bus.RequestedInterrupts) == 0)
 	{
 		status = ProcessorStatus.Halted;
@@ -694,7 +696,7 @@ else if (ime || bus.EnabledInterrupts != 0)
 		if ((cycleCount & 0x3) != 0) cycleCount += 4 - (cycleCount & 0x3); // Keep the cycle count as a multiple of 4
 		status = ProcessorStatus.Running;
 	}
-	else cycleCount = 4;
+	else cycleCount = 0;
 }
 <#+
 }
