@@ -8,8 +8,8 @@
     <ProjectGuid>{090230BA-E06A-40D5-B341-D13AD4E99F84}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CrystalBoy.Emulation.Rendering.Direct3D</RootNamespace>
-    <AssemblyName>CrystalBoy.Emulation.Rendering.Direct3D</AssemblyName>
+    <RootNamespace>CrystalBoy.Emulator.Rendering.Direct3D</RootNamespace>
+    <AssemblyName>Rendering.Direct3D</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
@@ -69,7 +69,7 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
-    <Compile Include="Direct3DRenderMethod.cs" />
+    <Compile Include="Direct3DRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

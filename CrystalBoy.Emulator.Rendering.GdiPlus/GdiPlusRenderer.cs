@@ -21,20 +21,21 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using CrystalBoy.Emulation;
 
-namespace CrystalBoy.Emulation.Rendering.GdiPlus
+namespace CrystalBoy.Emulator.Rendering.GdiPlus
 {
 	[DisplayName("GDI+")]
-	public sealed class GdiPlusRenderMethod : RenderMethod<Control>
+	public sealed class GdiPlusRenderer : RenderMethod<Control>
 	{
 		Bitmap bitmap;
 		BitmapData bitmapData;
 		InterpolationMode interpolationMode;
 
-		public GdiPlusRenderMethod(Control renderObject)
+		public GdiPlusRenderer(Control renderObject)
 			: base(renderObject)
 		{
-			bitmap = new Bitmap(160, 144);
+			bitmap = new Bitmap(160, 144, PixelFormat.Format32bppArgb);
 			bitmapData = new BitmapData();
 			ResetInterpolationMode();
 		}
@@ -59,7 +60,7 @@ namespace CrystalBoy.Emulation.Rendering.GdiPlus
 		private void ResetInterpolationMode()
 		{
 			if (Interpolation)
-				interpolationMode = InterpolationMode.Bilinear;
+				interpolationMode = InterpolationMode.Default;
 			else
 				interpolationMode = InterpolationMode.NearestNeighbor;
 		}
@@ -74,6 +75,10 @@ namespace CrystalBoy.Emulation.Rendering.GdiPlus
 		{
 			Graphics g = RenderObject.CreateGraphics();
 
+			g.CompositingMode = CompositingMode.SourceCopy;
+			g.CompositingQuality = CompositingQuality.HighSpeed;
+			g.PixelOffsetMode = PixelOffsetMode.Half;
+			g.SmoothingMode = SmoothingMode.None;
 			g.InterpolationMode = interpolationMode;
 			g.DrawImage(bitmap, RenderObject.ClientRectangle);
 

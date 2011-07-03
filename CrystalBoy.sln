@@ -14,13 +14,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator", "Crys
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulation", "CrystalBoy.Emulation\CrystalBoy.Emulation.csproj", "{48489DFD-05FC-4AF5-B238-15912EC77719}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulation.Rendering.Direct3D", "CrystalBoy.Emulation.Rendering.Direct3D\CrystalBoy.Emulation.Rendering.Direct3D.csproj", "{090230BA-E06A-40D5-B341-D13AD4E99F84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator.Rendering.Direct3D", "CrystalBoy.Emulator.Rendering.Direct3D\CrystalBoy.Emulator.Rendering.Direct3D.csproj", "{090230BA-E06A-40D5-B341-D13AD4E99F84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulation.Rendering.GdiPlus", "CrystalBoy.Emulation.Rendering.GdiPlus\CrystalBoy.Emulation.Rendering.GdiPlus.csproj", "{E4887957-456F-40CB-9835-3CBE38B0B1A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator.Rendering.GdiPlus", "CrystalBoy.Emulator.Rendering.GdiPlus\CrystalBoy.Emulator.Rendering.GdiPlus.csproj", "{E4887957-456F-40CB-9835-3CBE38B0B1A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core.BuildMakerDictionary", "CrystalBoy.Core.BuildMakerDictionary\CrystalBoy.Core.BuildMakerDictionary.csproj", "{71B95B4F-60ED-4E17-8F7B-281C8F07DC17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulation.Rendering.SlimDX", "CrystalBoy.Emulation.Rendering.SlimDX\CrystalBoy.Emulation.Rendering.SlimDX.csproj", "{2ADA5555-6AC7-4FE2-BCB3-0C994B7CA279}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator.Rendering.SlimDX", "CrystalBoy.Emulator.Rendering.SlimDX\CrystalBoy.Emulator.Rendering.SlimDX.csproj", "{2ADA5555-6AC7-4FE2-BCB3-0C994B7CA279}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core.Windows.Forms", "CrystalBoy.Core.Windows.Forms\CrystalBoy.Core.Windows.Forms.csproj", "{313CC75C-4F18-40BC-82A2-05A818D460DB}"
 EndProject

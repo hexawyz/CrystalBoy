@@ -41,7 +41,6 @@ namespace CrystalBoy.Emulation
 		int bgpIndex, obpIndex;
 		bool bgpInc, obpInc;
 		bool usePaletteMapping;
-		bool workRamBanked;
 
 		byte hdmaSourceHigh, hdmaSourceLow, hdmaDestinationHigh, hdmaDestinationLow;
 		// For Horizontal Blank DMA
@@ -76,8 +75,6 @@ namespace CrystalBoy.Emulation
 		partial void ResetPorts()
 		{
 			hdmaActive = false;
-			// This value will have been set correctly according to wether we are using the GBC bootstrap ROM or not
-			workRamBanked = colorMode;
 			usePaletteMapping = colorHardware && !useBootRom;
 
 			WritePort(Port.JOYP, useBootRom ? (byte)0x00 : (byte)0x30); // Reset the joypad
@@ -208,20 +205,18 @@ namespace CrystalBoy.Emulation
 					if (colorMode) prepareSpeedSwitch = (value & 0x1) != 0;
 					break;
 				case 0x50: // BLCK
-					// Disables the boot ROM when 0x01 is written, and never re-enable it again.
+					// Disables the boot ROM when 0x01 or 0x11 is written, and never re-enable it again.
 					if (internalRomMapped)
 					{
 						if ((value & 0x1) != 0)
 							UnmapInternalRom();
-						// The most logical guess is that bit 4 controls ability to change the work RAM bank
-						workRamBanked = (value & 0x10) != 0;
 					}
 					break;
 				case 0x70: // SVBK
 					value &= 0x7;
 					if (value == 0)
 						value = 1;
-					if (workRamBanked && workRamBank != value)
+					if (colorMode && workRamBank != value)
 					{
 						workRamBank = value;
 						MapWorkRamBank();
@@ -258,7 +253,7 @@ namespace CrystalBoy.Emulation
 				case 0x46: // DMA
 					if (value <= 0xF1) MemoryBlock.Copy(objectAttributeMemory, segmentArray[value], 0xA0);
 					break;
-				// Undocumented port used for controllingLCD operating mode
+				// Undocumented port used for controlling LCD operating mode
 				case 0x4C: // LCDM
 					if (colorHardware)
 					{

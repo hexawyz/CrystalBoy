@@ -36,7 +36,7 @@ namespace CrystalBoy.Emulator
 		private MapViewerForm mapViewerForm;
 		private RomInformationForm romInformationForm;
 		private EmulatedGameBoy emulatedGameBoy;
-		private RenderMethod renderMethod;
+		private VideoRenderer videoRenderer;
 		private Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
 		private bool pausedTemporarily;
 		private BinaryWriter ramSaveWriter;
@@ -108,14 +108,14 @@ namespace CrystalBoy.Emulator
 
 		private void SwitchRenderMethod(Type renderMethodType)
 		{
-			if (renderMethod != null)
+			if (videoRenderer != null)
 			{
-				emulatedGameBoy.Bus.RenderMethod = null;
-				renderMethod.Dispose();
-				renderMethod = null;
+				emulatedGameBoy.Bus.VideoRenderer = null;
+				videoRenderer.Dispose();
+				videoRenderer = null;
 			}
 
-			renderMethod = CreateRenderMethod(renderMethodType);
+			videoRenderer = CreateRenderMethod(renderMethodType);
 
 			ToolStripMenuItem selectedMethodMenuItem = renderMethodMenuItemDictionary[renderMethodType];
 
@@ -123,14 +123,14 @@ namespace CrystalBoy.Emulator
 				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedMethodMenuItem;
 
 			// Store the FullName once we know the type of render method to use
-			Settings.Default.RenderMethod = renderMethodType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
+			Settings.Default.VideoRenderer = renderMethodType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 
-			emulatedGameBoy.Bus.RenderMethod = renderMethod;
+			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
 		}
 
 		private void InitializeRenderMethod()
 		{
-			string renderMethodName = Settings.Default.RenderMethod;
+			string renderMethodName = Settings.Default.VideoRenderer;
 			Type renderMethodType = Type.GetType(renderMethodName); // Try to find the type by simple reflexion (will work for embedded types and AssemblyQualifiedNames)
 
 			if (renderMethodType != null)
@@ -344,14 +344,6 @@ namespace CrystalBoy.Emulator
 
 		#region Status Updates
 
-		private void UpdateZoomMenuItems()
-		{
-			ToolStripMenuItem zoomItem = null;
-
-			foreach (ToolStripMenuItem menuItem in zoomToolStripMenuItem.DropDownItems)
-				menuItem.Checked = (menuItem == zoomItem);
-		}
-
 		private void UpdateEmulationStatus() { emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus == EmulationStatus.Running ? Resources.RunningText : Resources.PausedText; }
 
 		private void UpdateFrameRate()
@@ -369,7 +361,7 @@ namespace CrystalBoy.Emulator
 		protected override void OnShown(EventArgs e)
 		{
 			InitializeRenderMethod();
-			emulatedGameBoy.Bus.RenderMethod = renderMethod;
+			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
 			base.OnShown(e);
 		}
 
@@ -388,6 +380,7 @@ namespace CrystalBoy.Emulator
 		protected override void OnClosed(EventArgs e)
 		{
 			UnloadRom();
+			Settings.Default.RenderSize = toolStripContainer.ContentPanel.ClientSize;
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
@@ -398,7 +391,7 @@ namespace CrystalBoy.Emulator
 
 		private unsafe void OnNewFrame(object sender, EventArgs e) { UpdateFrameRate(); }
 
-		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e) { renderMethod.Render(); }
+		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e) { videoRenderer.Render(); }
 
 		#region Menus
 
@@ -468,8 +461,8 @@ namespace CrystalBoy.Emulator
 
 		private void videoToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
-			interpolationToolStripMenuItem.Enabled = renderMethod.SupportsInterpolation;
-			interpolationToolStripMenuItem.Checked = renderMethod.Interpolation;
+			interpolationToolStripMenuItem.Enabled = videoRenderer.SupportsInterpolation;
+			interpolationToolStripMenuItem.Checked = videoRenderer.Interpolation;
 		}
 
 		private void renderMethodMenuItem_Click(object sender, EventArgs e)
@@ -492,7 +485,7 @@ namespace CrystalBoy.Emulator
 				checkItem = zoom200toolStripMenuItem;
 			else if (renderSize == new Size(480, 432))
 				checkItem = zoom300toolStripMenuItem;
-			else if (renderSize == new Size(649, 567))
+			else if (renderSize == new Size(640, 576))
 				checkItem = zoom400toolStripMenuItem;
 
 			foreach (ToolStripMenuItem zoomMenuItem in zoomToolStripMenuItem.DropDownItems)
@@ -509,7 +502,7 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
-		private void interpolationToolStripMenuItem_Click(object sender, EventArgs e) { renderMethod.Interpolation = !renderMethod.Interpolation; }
+		private void interpolationToolStripMenuItem_Click(object sender, EventArgs e) { videoRenderer.Interpolation = !videoRenderer.Interpolation; }
 
 		#endregion
 

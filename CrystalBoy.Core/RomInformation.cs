@@ -102,7 +102,7 @@ namespace CrystalBoy.Core
 			}
 			else automaticColorPaletteIndex = 192;
 
-			// Read the cartidge type
+			// Read the cartridge type
 			switch (romType = (RomType)memory[0x147])
 			{
 				case RomType.RomMbc3TimerRamBattery:

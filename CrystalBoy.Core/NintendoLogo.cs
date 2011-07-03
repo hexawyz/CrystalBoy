@@ -40,5 +40,8 @@ namespace CrystalBoy.Core
 
 		// A static indexer would do a better job, but there is no such thing in C#… :(
 		public static byte Get(int index) { return Data[index]; }
+
+		// Exposing the length should allow for range-check elimination in for loops…
+		public static int Length { get { return Data.Length; } }
 	}
 }

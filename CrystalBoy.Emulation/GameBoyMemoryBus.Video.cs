@@ -51,6 +51,35 @@ namespace CrystalBoy.Emulation
 		private bool notifyMode2;
 		private bool notifyMode1;
 		private bool notifyMode0;
+		private bool hdmaDone;
+
+		#endregion
+
+		#region Reset
+
+		partial void ResetVideo()
+		{
+			lcdRealLine = 0;
+			lyRegister = 0;
+			frameCycles = rasterCycles = 60;
+			videoNotifications = 0;
+			lcdEnabled = true;
+			hdmaActive = false;
+			hdmaDone = false;
+
+			// The boostrap ROM uses the video RAM before executing the game, so we need to emulate this behavior when not using the bootstrap ROM
+			if (!useBootRom)
+				unsafe
+				{
+					// The video RAM will first be cleared by the bootstrap ROM
+					MemoryBlock.Set((void*)videoMemory, 0, colorHardware ? (uint)videoMemoryBlock.Length : (uint)videoMemoryBlock.Length / 2);
+					// Then before leaving control to the actual game, the bootstrap ROM will leave the video RAM with the Nintendo logo ad the ® symbol.
+					// (Actual time depends on the specific boostrap ROM, but we don't care here)
+					WriteLogoTiles();
+					// Only write the logo map if not running a color game
+					if (!colorMode) WriteLogoMap();
+				}
+		}
 
 		#endregion
 
@@ -83,6 +112,76 @@ namespace CrystalBoy.Emulation
 			paletteAccessList.Clear();
 			// Create a new snapshot of the video ports
 			videoStatusSnapshot.Capture();
+		}
+
+		#endregion
+
+		#region Various Methods
+
+		private unsafe void WriteLogoTiles()
+		{
+			byte* destination = videoMemory + 16;
+			byte sourceData;
+			byte finalData = 0; // Initialize the variable once to stop the compiler from complaining. In fact we _really_ do not care about the initial value.
+			int bitCount = NintendoLogo.Length << 3;
+
+			// The three loops iterate on the same variable…
+			// I'll name this the dododo pattern %)
+			do
+			{
+				sourceData = this[(ushort)(0x104 + NintendoLogo.Length - (bitCount >> 3))];
+				do
+				{
+					do
+					{
+						finalData <<= 2;
+						if ((sourceData & 0x80) != 0) finalData |= 3;
+						sourceData <<= 1;
+					}
+					while ((--bitCount & 0x3) != 0);
+					*destination++ = finalData;
+					*destination++ = 0; // Set this to 0 even though this shouldn't be needed
+					*destination++ = finalData;
+					*destination++ = 0; // Set this to 0 even though this shouldn't be needed
+				}
+				while ((bitCount & 0x4) != 0);
+			}
+			while (bitCount != 0);
+
+			// Write data for the ® symbol
+			*destination++ = 0x3C;
+			*destination++ = 0x00;
+			*destination++ = 0x42;
+			*destination++ = 0x00;
+			*destination++ = 0xB9;
+			*destination++ = 0x00;
+			*destination++ = 0xA5;
+			*destination++ = 0x00;
+			*destination++ = 0xB9;
+			*destination++ = 0x00;
+			*destination++ = 0xA5;
+			*destination++ = 0x00;
+			*destination++ = 0x42;
+			*destination++ = 0x00;
+			*destination++ = 0x3C;
+			*destination++ = 0x00;
+		}
+
+		private unsafe void WriteLogoMap()
+		{
+			byte tileIndex = 0x19; // Tile 0 is (should be) blank, logo starts at 1
+
+			videoMemory[0x1910] = tileIndex--;
+
+			// Put the nintendo logo tiles in place
+			byte* destination = videoMemory + 0x192f;
+
+			do
+			{
+				for (int i = 0; i < 12; i++) *destination-- = tileIndex--;
+				destination -= 0x14;
+			}
+			while (tileIndex != 0);
 		}
 
 		#endregion
