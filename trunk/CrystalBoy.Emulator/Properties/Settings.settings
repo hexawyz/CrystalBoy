@@ -2,8 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CrystalBoy.Emulator.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="RenderMethod" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Direct3DRenderMethod</Value>
+    <Setting Name="VideoRenderer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Direct3D9Renderer</Value>
     </Setting>
     <Setting Name="RenderSize" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">320, 288</Value>
@@ -14,9 +14,9 @@
     <Setting Name="PluginAssemblies" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;string&gt;CrystalBoy.Emulation.Rendering.GdiPlus.dll&lt;/string&gt;
-  &lt;string&gt;CrystalBoy.Emulation.Rendering.Direct3D.dll&lt;/string&gt;
-  &lt;string&gt;CrystalBoy.Emulation.Rendering.SlimDX.dll&lt;/string&gt;
+  &lt;string&gt;Rendering.GdiPlus.dll&lt;/string&gt;
+  &lt;string&gt;Rendering.Direct3D.dll&lt;/string&gt;
+  &lt;string&gt;Rendering.SlimDX.dll&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="LimitSpeed" Type="System.Boolean" Scope="User">

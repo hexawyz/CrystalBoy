@@ -23,7 +23,7 @@ using System.Text;
 namespace CrystalBoy.Emulation
 {
 	[CLSCompliant(false)]
-	public unsafe abstract class RenderMethod : IDisposable
+	public unsafe abstract class VideoRenderer : IDisposable
 	{
 		bool interpolation;
 
@@ -57,7 +57,7 @@ namespace CrystalBoy.Emulation
 	}
 
 	[CLSCompliant(false)]
-	public abstract class RenderMethod<T> : RenderMethod
+	public abstract class RenderMethod<T> : VideoRenderer
 		where T: class
 	{
 		T renderObject;

@@ -21,11 +21,12 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
+using CrystalBoy.Emulation;
 
-namespace CrystalBoy.Emulation.Rendering.Direct3D
+namespace CrystalBoy.Emulator.Rendering.Direct3D
 {
 	[DisplayName("Direct3D")]
-	public sealed class Direct3DRenderMethod : RenderMethod<Control>
+	public sealed class Direct3DRenderer : RenderMethod<Control>
 	{
 		PresentParameters presentParameters;
 		Device device;
@@ -34,7 +35,7 @@ namespace CrystalBoy.Emulation.Rendering.Direct3D
 		GraphicsStream graphicsStream;
 		TextureFilter textureFilter;
 
-		public Direct3DRenderMethod(Control renderObject)
+		public Direct3DRenderer(Control renderObject)
 			: base(renderObject)
 		{
 			ResetTextureFilter();

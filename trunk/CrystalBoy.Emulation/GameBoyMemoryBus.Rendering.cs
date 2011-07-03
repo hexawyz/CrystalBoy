@@ -27,7 +27,7 @@ namespace CrystalBoy.Emulation
 		#region Variables
 
 		private FrameEventArgs frameEventArgs;
-		private RenderMethod renderMethod;
+		private VideoRenderer videoRenderer;
 		private MemoryBlock renderPaletteMemoryBlock;
 
 		private unsafe uint** backgroundPalettes32, spritePalettes32;
@@ -122,15 +122,12 @@ namespace CrystalBoy.Emulation
 		#region Properties
 
 		[CLSCompliant(false)]
-		public RenderMethod RenderMethod
+		public VideoRenderer VideoRenderer
 		{
-			get
-			{
-				return renderMethod;
-			}
+			get { return videoRenderer; }
 			set
 			{
-				renderMethod = value;
+				videoRenderer = value;
 				ClearBuffer();
 			}
 		}
@@ -175,7 +172,7 @@ namespace CrystalBoy.Emulation
 			byte* buffer;
 			int stride;
 
-			if (renderMethod == null)
+			if (videoRenderer == null)
 			{
 #if WITH_THREADING
 				// Clear the flag because we didn't draw anything at all…
@@ -184,7 +181,7 @@ namespace CrystalBoy.Emulation
 				return;
 			}
 
-			buffer = (byte*)renderMethod.LockBuffer(out stride);
+			buffer = (byte*)videoRenderer.LockBuffer(out stride);
 
 			if ((savedVideoStatusSnapshot.LCDC & 0x80) != 0)
 			{
@@ -222,8 +219,8 @@ namespace CrystalBoy.Emulation
 				ClearBuffer32(buffer, stride, 0xFFFFFFFF);
 			}
 
-			renderMethod.UnlockBuffer();
-			renderMethod.Render();
+			videoRenderer.UnlockBuffer();
+			videoRenderer.Render();
 		}
 
 		#region Palette Initialization
@@ -269,16 +266,16 @@ namespace CrystalBoy.Emulation
 			byte* buffer;
 			int stride;
 
-			if (renderMethod == null)
+			if (videoRenderer == null)
 				return;
 
-			buffer = (byte*)renderMethod.LockBuffer(out stride);
+			buffer = (byte*)videoRenderer.LockBuffer(out stride);
 
 			ClearBuffer32(buffer, stride, 0xFF000000);
 
-			renderMethod.UnlockBuffer();
+			videoRenderer.UnlockBuffer();
 
-			renderMethod.Render();
+			videoRenderer.Render();
 		}
 
 		#region 16 BPP
@@ -414,7 +411,7 @@ namespace CrystalBoy.Emulation
 					data2 = i * 456; // Line clock
 
 					// Update ports before drawing the line
-					while (pi < savedVideoPortAccessList.Count && savedVideoPortAccessList[pi].Clock < data2)
+					while (pi < savedVideoPortAccessList.Count && savedVideoPortAccessList[pi].Clock <= data2)
 					{
 						switch (savedVideoPortAccessList[pi].Port)
 						{
@@ -680,7 +677,7 @@ namespace CrystalBoy.Emulation
 					data2 = i * 456; // Line clock
 
 					// Update ports before drawing the line
-					while (pi < savedVideoPortAccessList.Count && savedVideoPortAccessList[pi].Clock < data2)
+					while (pi < savedVideoPortAccessList.Count && savedVideoPortAccessList[pi].Clock <= data2)
 					{
 						switch (savedVideoPortAccessList[pi].Port)
 						{

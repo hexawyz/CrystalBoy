@@ -23,11 +23,12 @@ using System.IO;
 using SlimDX;
 using SlimDX.Direct3D9;
 using System.Runtime.InteropServices;
+using CrystalBoy.Emulation;
 
-namespace CrystalBoy.Emulation.Rendering.SlimDX
+namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
 	[DisplayName("Direct3D 9")]
-	public sealed class Direct3D9RenderMethod : RenderMethod<Control>
+	public sealed class Direct3D9Renderer : RenderMethod<Control>
 	{
 		Direct3D direct3D;
 		PresentParameters presentParameters;
@@ -40,7 +41,7 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 		GCHandle temporaryBufferHandle;
 		bool temporaryBufferLocked;
 
-		public Direct3D9RenderMethod(Control renderObject)
+		public Direct3D9Renderer(Control renderObject)
 			: base(renderObject)
 		{
 			direct3D = new Direct3D();

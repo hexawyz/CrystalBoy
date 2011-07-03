@@ -20,7 +20,7 @@ using System;
 
 namespace CrystalBoy.Emulation
 {
-	/// <summary>Represents a rom/ram/whatever mapper for Game Boy games cartidges.</summary>
+	/// <summary>Represents a rom/ram/whatever mapper for Game Boy games cartridges.</summary>
 	public abstract class Mapper
 	{
 		GameBoyMemoryBus bus;

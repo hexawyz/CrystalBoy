@@ -26,11 +26,12 @@ using Format = SlimDX.DXGI.Format;
 using Size = System.Drawing.Size;
 using RectangleF = System.Drawing.RectangleF;
 using System.Runtime.InteropServices;
+using CrystalBoy.Emulation;
 
-namespace CrystalBoy.Emulation.Rendering.SlimDX
+namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
 	[DisplayName("Direct2D")]
-	public sealed class Direct2DRenderMethod : RenderMethod<Control>
+	public sealed class Direct2DRenderer : RenderMethod<Control>
 	{
 		Factory factory;
 		WindowRenderTarget renderTarget;
@@ -40,7 +41,7 @@ namespace CrystalBoy.Emulation.Rendering.SlimDX
 		GCHandle bufferHandle;
 		bool bufferLocked;
 
-		public Direct2DRenderMethod(Control renderObject)
+		public Direct2DRenderer(Control renderObject)
 			: base(renderObject)
 		{
 			buffer = new byte[160 * 144 * 4];

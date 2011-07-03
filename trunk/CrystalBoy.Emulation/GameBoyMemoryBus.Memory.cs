@@ -121,15 +121,16 @@ namespace CrystalBoy.Emulation
 				externalRamBlock.Dispose();
 				externalRamBlock = new MemoryBlock(mapper.RamSize);
 			}
-
+			
+			// Fill various RAM areas with random data at “boot” time
+			// This allows for erasing the previous game residual information.
 			unsafe
 			{
-				// Fill the video RAM with random data if the bootstrap ROM is used
-				if (useBootRom) RandomFill(videoMemory, videoMemoryBlock.Length);
-				// The boostrap ROM clears the video RAM, so we need to emulate this behavior when not using the bootstrap ROM
-				else MemoryBlock.Set((void*)videoMemory, 0, (uint)videoMemoryBlock.Length);
+				// Fill the video RAM.
+				RandomFill(videoMemory, videoMemoryBlock.Length);
+				// Fill the OAM.
 				RandomFill(objectAttributeMemory, objectAttributeMemoryBlock.Length);
-
+				// Fill the “trash” memory. (Invalid memory)
 				RandomFill(trashMemory, 256);
 			}
 
@@ -430,7 +431,7 @@ namespace CrystalBoy.Emulation
 			AddFixedCycles((length + 1) << 3);
 		}
 
-		private unsafe void HandleHdma()
+		private unsafe void HandleHdma(bool addCycles)
 		{
 			if (hdmaCurrentDestinationLow > 0xF0 || hdmaCurrentSourceLow > 0xF0)
 			{
@@ -464,10 +465,9 @@ namespace CrystalBoy.Emulation
 				if ((hdmaCurrentDestinationLow += 16 )== 0) hdmaCurrentDestinationHigh++;
 				if ((hdmaCurrentSourceLow += 16) == 0) hdmaCurrentSourceHigh++;
 			}
-			AddFixedCyclesInternal(8);
-			hdmaCurrentLength--;
-
-			hdmaActive = hdmaCurrentLength != 0xFF;
+			hdmaActive = hdmaCurrentLength-- != 0;
+			hdmaDone = true;
+			if (addCycles) AddFixedCycles(8);
 		}
 
 		#endregion
@@ -532,6 +532,10 @@ namespace CrystalBoy.Emulation
 
 		internal unsafe void MapExternalRomBank(bool upper, int bankIndex)
 		{
+			if (bankIndex > romInformation.RomBankCount)
+			{
+			}
+
 			int offset = bankIndex * 0x4000;
 
 			if (ExternalRom.Length < offset + 0x4000)
@@ -540,7 +544,7 @@ namespace CrystalBoy.Emulation
 				if ((ExternalRom.Length & (ExternalRom.Length - 1)) == 0)
 					offset = offset & (ExternalRom.Length - 1);
 				// Other cases would involve mapping trash memory in place of ROM. Let's not handle them for now…
-				else throw new InvalidOperationException("Unhandled ROM mapping case");
+				else throw new NotSupportedException("Unhandled ROM mapping case");
 			}
 
 			byte* source = (byte*)externalRomBlock.Pointer + offset;

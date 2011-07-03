@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Text;
 using SlimDX;
 
-namespace CrystalBoy.Emulation.Rendering.SlimDX
+namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
 	internal struct TransformedTexturedVertex
 	{

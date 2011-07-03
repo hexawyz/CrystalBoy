@@ -51,7 +51,6 @@ namespace CrystalBoy.Emulation
 
 		partial void ResetTiming()
 		{
-			rasterCycles = 60;
 			doubleSpeed = false;
 			prepareSpeedSwitch = false;
 		}
@@ -75,15 +74,7 @@ namespace CrystalBoy.Emulation
 			else return frameDone = false;
 		}
 
-		internal void AddFixedCycles(int count)
-		{
-			AddFixedCyclesInternal(count);
-
-			if (hdmaActive && lcdEnabled && lcdRealLine < 144 && rasterCycles >= Mode2Duration + Mode3Duration)
-				HandleHdma(); // Will add 8 cycles
-		}
-
-		private unsafe void AddFixedCyclesInternal(int count)
+		internal unsafe void AddFixedCycles(int count)
 		{
 			if ((frameCycles += count) >= FrameDuration)
 			{
@@ -138,16 +129,22 @@ namespace CrystalBoy.Emulation
 						InterruptRequest(0x02);
 					}
 					// Check for HBLANK
-					if (notifyMode0 && rasterCycles >= Mode2Duration + Mode3Duration && (videoNotifications & 0x04) == 0)
+					if (rasterCycles >= Mode2Duration + Mode3Duration)
 					{
-						videoNotifications |= 0x04;
-						InterruptRequest(0x02);
+						if (notifyMode0 && (videoNotifications & 0x04) == 0)
+						{
+							videoNotifications |= 0x04;
+							InterruptRequest(0x02);
+						}
+						// In this case, always add the cycles taken for HDMA (they are not included in the count parameter)
+						if (hdmaActive && !hdmaDone) HandleHdma(true);
 					}
 				}
 			}
 			else do // This may probably be sped up a little bit for big updates (> 20 cycles) but those should not happen very often
 			{
 				rasterCycles -= HorizontalLineDuration;
+				hdmaDone = false;
 
 				if (lcdRealLine == 153)
 				{
@@ -209,10 +206,16 @@ namespace CrystalBoy.Emulation
 						videoNotifications |= 0x02;
 						InterruptRequest(0x02);
 					}
-					if (notifyMode0 && rasterCycles >= Mode2Duration + Mode3Duration)
+					if (rasterCycles >= Mode2Duration + Mode3Duration)
 					{
-						videoNotifications |= 0x04;
-						InterruptRequest(0x02);
+						if (notifyMode0)
+						{
+							videoNotifications |= 0x04;
+							InterruptRequest(0x02);
+						}
+						// Handle HDMA, but add cycles only if the processing here is done…
+						// (If we still have another line waiting, the cycles are already included in the computation…)
+						if (hdmaActive && !hdmaDone) HandleHdma(rasterCycles < HorizontalLineDuration);
 					}
 				}
 			} while (rasterCycles >= HorizontalLineDuration);
