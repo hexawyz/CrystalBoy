@@ -2842,7 +2842,7 @@ namespace CrystalBoy.Emulation
 #else
 					;
 #endif
-				} while (bus.AddCycles(cycleCount) && finishFrame);
+				} while (bus.AddVariableCycles(cycleCount) && finishFrame);
 
 				return finishFrame; // Emulated with success
 			}

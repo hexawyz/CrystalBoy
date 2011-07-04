@@ -35,7 +35,7 @@ namespace CrystalBoy.Emulation
 			this.bus = bus;
 			this.videoMemoryBlock = new MemoryBlock(bus.VideoRam.Length);
 			this.VideoMemory = (byte*)this.videoMemoryBlock.Pointer;
-			this.objectAttributeMemoryBlock = new MemoryBlock(bus.ObjectAttributeMemory.Length);
+			this.objectAttributeMemoryBlock = new MemoryBlock(0xA0); // Do not allocate more bytes than needed… GameBoyMemoryBus allocates 0x100 because of the segmented memory.
 			this.ObjectAttributeMemory = (byte*)this.objectAttributeMemoryBlock.Pointer;
 			this.paletteMemoryBlock = new MemoryBlock(bus.PaletteMemory.Length);
 			this.PaletteMemory = (byte*)this.paletteMemoryBlock.Pointer;
@@ -62,7 +62,7 @@ namespace CrystalBoy.Emulation
 					MemoryBlock.Copy((void*)VideoMemory, bus.VideoRam.Pointer, bus.VideoRam.Length);
 					MemoryBlock.Copy((void*)PaletteMemory, bus.PaletteMemory.Pointer, bus.PaletteMemory.Length);
 				}
-				MemoryBlock.Copy((void*)ObjectAttributeMemory, bus.ObjectAttributeMemory.Pointer, bus.ObjectAttributeMemory.Length);
+				MemoryBlock.Copy((void*)ObjectAttributeMemory, bus.ObjectAttributeMemory.Pointer, objectAttributeMemoryBlock.Length);
 			}
 		}
 

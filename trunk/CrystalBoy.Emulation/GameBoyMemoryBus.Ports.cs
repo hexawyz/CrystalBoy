@@ -206,11 +206,8 @@ namespace CrystalBoy.Emulation
 					break;
 				case 0x50: // BLCK
 					// Disables the boot ROM when 0x01 or 0x11 is written, and never re-enable it again.
-					if (internalRomMapped)
-					{
-						if ((value & 0x1) != 0)
-							UnmapInternalRom();
-					}
+					if (internalRomMapped && (value & 0x1) != 0)
+						UnmapInternalRom();
 					break;
 				case 0x70: // SVBK
 					value &= 0x7;
@@ -300,8 +297,7 @@ namespace CrystalBoy.Emulation
 							hdmaCurrentDestinationLow = hdmaDestinationLow;
 							hdmaCurrentLength = (byte)(value & 0x7F);
 						}
-						else
-							HandleDma(hdmaDestinationHigh, hdmaDestinationLow, hdmaSourceHigh, hdmaSourceLow, (byte)(value & 0x7F));
+						else HandleDma(hdmaDestinationHigh, hdmaDestinationLow, hdmaSourceHigh, hdmaSourceLow, (byte)(value & 0x7F));
 					}
 					break;
 				// Undocumented port used for palette synchronization
@@ -360,18 +356,20 @@ namespace CrystalBoy.Emulation
 					break;
 				// Always
 				case 0x40: // LCDC
-					if ((value & 0x80) == 0)
-						DisableVideo();
+					if ((value & 0x80) == 0) DisableVideo();
 					else if (!lcdEnabled)
+					{
+						portMemory[port] = value;
 						EnableVideo();
+						break;
+					}
 					goto case 0x42;
 				case 0x42: // SCY
 				case 0x43: // SCX
 				case 0x4A: // WY
 				case 0x4B: // WX
 					videoPortAccessList.Add(new PortAccess(frameCycles, port, value)); // Keep track of the write
-					portMemory[port] = value; // Store the value in memory
-					break;
+					goto default;
 				default:
 					portMemory[port] = value; // Store the value in memory
 					break;
