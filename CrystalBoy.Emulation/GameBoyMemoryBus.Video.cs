@@ -61,7 +61,7 @@ namespace CrystalBoy.Emulation
 		{
 			lcdRealLine = 0;
 			lyRegister = 0;
-			frameCycles = rasterCycles = 60;
+			frameCycles = rasterCycles = 0;
 			videoNotifications = 0;
 			lcdEnabled = true;
 			hdmaActive = false;
@@ -73,6 +73,7 @@ namespace CrystalBoy.Emulation
 				{
 					// The video RAM will first be cleared by the bootstrap ROM
 					MemoryBlock.Set((void*)videoMemory, 0, colorHardware ? (uint)videoMemoryBlock.Length : (uint)videoMemoryBlock.Length / 2);
+					MemoryBlock.Set((void*)objectAttributeMemory, 0, 0xA0);
 					// Then before leaving control to the actual game, the bootstrap ROM will leave the video RAM with the Nintendo logo ad the ® symbol.
 					// (Actual time depends on the specific boostrap ROM, but we don't care here)
 					WriteLogoTiles();

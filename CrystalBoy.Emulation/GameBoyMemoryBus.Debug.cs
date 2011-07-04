@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using CrystalBoy.Core;
+using System.Diagnostics;
 
 namespace CrystalBoy.Emulation
 {
@@ -27,9 +28,9 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		List<int> breakPointList;
+		private List<int> breakPointList;
 #if DEBUG_CYCLE_COUNTER
-		int debugCycleCount;
+		private int debugCycleCount;
 #endif
 
 		#endregion
@@ -45,10 +46,15 @@ namespace CrystalBoy.Emulation
 
 		#region Reset
 
-#if DEBUG_CYCLE_COUNTER
+#if DEBUG_CYCLE_COUNTER || DEBUG
 		partial void ResetDebug()
 		{
+#if DEBUG_CYCLE_COUNTER
 			debugCycleCount = 0;
+#endif
+#if DEBUG && DEBUG_OAM
+			segmentWriteHandlerArray[0xFE] += DebugHandleOamWrite;
+#endif
 		}
 #endif
 
@@ -58,13 +64,7 @@ namespace CrystalBoy.Emulation
 
 		public event EventHandler BreakpointUpdate;
 
-		public int BreakpointCount
-		{
-			get
-			{
-				return breakPointList.Count;
-			}
-		}
+		public int BreakpointCount { get { return breakPointList.Count; } }
 
 		[CLSCompliant(false)]
 		public bool IsBreakPoint(ushort offset)
@@ -184,6 +184,19 @@ namespace CrystalBoy.Emulation
 		public int DebugCycleCount { get { return debugCycleCount; } }
 
 		public void ResetDebugCycleCounter() { debugCycleCount = 0; }
+#endif
+
+		#endregion
+
+		#region Memory Write Debugger
+
+#if DEBUG && DEBUG_OAM
+		private unsafe void DebugHandleOamWrite(byte offsetLow, byte offsetHigh, byte value)
+		{
+			//Debug.WriteLine("Memory Write [0x" + ((offsetHigh << 8) | offsetLow).ToString("X4") + "] = 0x" + value.ToString("X2"));
+			objectAttributeMemory[offsetLow] = value;
+
+		}
 #endif
 
 		#endregion

@@ -156,6 +156,7 @@ namespace CrystalBoy.Emulation
 
 		private void ResetWriteHandlers()
 		{
+			for (int i = 0; i < segmentWriteHandlerArray.Length; i++) segmentWriteHandlerArray[i] = null;
 			ResetRomWriteHandler();
 			ResetRamWriteHandler();
 			segmentWriteHandlerArray[0xFF] = WritePort;
@@ -403,7 +404,7 @@ namespace CrystalBoy.Emulation
 				sh = sourceHigh,
 				sl = sourceLow;
 
-			while (fullLength > 0)
+			do
 			{
 				int max = 256 - (dl > sl ? dl : sl);
 
@@ -427,44 +428,18 @@ namespace CrystalBoy.Emulation
 					dh++;
 				}
 			}
+			while (fullLength > 0);
 
 			AddFixedCycles((length + 1) << 3);
 		}
 
 		private unsafe void HandleHdma(bool addCycles)
 		{
-			if (hdmaCurrentDestinationLow > 0xF0 || hdmaCurrentSourceLow > 0xF0)
-			{
-				uint length, remaining;
+			MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, 16);
 
-				length = 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow);
+			if ((hdmaCurrentDestinationLow += 16 )== 0) hdmaCurrentDestinationHigh++;
+			if ((hdmaCurrentSourceLow += 16) == 0) hdmaCurrentSourceHigh++;
 
-				MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
-
-				if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
-				if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
-				remaining = 16 - length;
-
-				length = Math.Min(16 - length, 0x100 - Math.Max((uint)hdmaCurrentDestinationLow, (uint)hdmaCurrentSourceLow));
-
-				MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, length);
-
-				if ((hdmaCurrentDestinationLow += (byte)length) == 0) hdmaCurrentDestinationHigh++;
-				if ((hdmaCurrentSourceLow += (byte)length) == 0) hdmaCurrentSourceHigh++;
-				if ((remaining -= length) != 0)
-				{
-					MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, remaining);
-					hdmaCurrentDestinationLow += (byte)remaining;
-					hdmaCurrentSourceLow += (byte)remaining;
-				}
-			}
-			else
-			{
-				MemoryBlock.Copy(segmentArray[hdmaCurrentDestinationHigh] + hdmaCurrentDestinationLow, segmentArray[hdmaCurrentSourceHigh] + hdmaCurrentSourceLow, 16);
-
-				if ((hdmaCurrentDestinationLow += 16 )== 0) hdmaCurrentDestinationHigh++;
-				if ((hdmaCurrentSourceLow += 16) == 0) hdmaCurrentSourceHigh++;
-			}
 			hdmaActive = hdmaCurrentLength-- != 0;
 			hdmaDone = true;
 			if (addCycles) AddFixedCycles(8);
@@ -647,7 +622,7 @@ namespace CrystalBoy.Emulation
 			for (int i = 0xD0; i < 0xE0; i++, source += 256)
 			{
 				segmentArray[i] = source;
-				if (i <= 0xDE) // Echo memory
+				if (i < 0xDE) // Echo memory
 					segmentArray[i + 0x20] = source;
 			}
 		}
