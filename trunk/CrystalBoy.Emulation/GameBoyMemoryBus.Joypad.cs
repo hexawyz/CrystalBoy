@@ -17,8 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
@@ -26,18 +24,40 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		GameBoyKeys keys;
-		bool joypadRow0,
-			joypadRow1;
+		private GameBoyKeys baseKeys;
+		private bool joypadRow0;
+		private bool joypadRow1;
+
+		#endregion
+
+		#region Reset
+
+		partial void ResetJoypad()
+		{
+			baseKeys = GameBoyKeys.None;
+			joypadRow0 = false;
+			joypadRow1 = false;
+		}
 
 		#endregion
 
 		#region Joypad
 
-		private unsafe void UpdateJoypad()
+		private void KeyRegisterWrite(byte value)
+		{
+			// In order for both operations to be executed, use a bitwise or, not a logical or…
+			if ((joypadRow0 != (joypadRow0 = (value & 0x10) == 0))
+				| (joypadRow1 != (joypadRow1 = (value & 0x20) == 0)))
+			{
+				if (superFunctions) SuperGameBoyKeyRegisterWrite();
+				UpdateKeyRegister();
+			}
+		}
+
+		private unsafe void UpdateKeyRegister()
 		{
 			byte oldValue, newValue;
-			byte keys = (byte)this.keys;
+			byte keys = joypadIndex != 0 ? (byte)additionalKeys[joypadIndex - 1] : (byte)this.baseKeys;
 
 			if (joypadRow0 && joypadRow1)
 				newValue = (byte)(~(keys | (keys >> 4)) & 0xF);
@@ -45,39 +65,34 @@ namespace CrystalBoy.Emulation
 				newValue = (byte)(0x20 | ~keys & 0xF);
 			else if (joypadRow1)
 				newValue = (byte)(0x10 | ~(keys >> 4) & 0xF);
-			else
-				newValue = 0x3F;
+			else newValue = (byte)(0x3F - joypadIndex);
 
-			oldValue = portMemory[0x00];
-			portMemory[0x00] = newValue;
-
-			if ((oldValue & ~newValue & 0xF) != 0) // Check High-to-Low Joypad transitions
+			if ((portMemory[0x00] & ~newValue & 0xF) != 0) // Check High-to-Low Joypad transitions
 				InterruptRequest(0x10); // Request Joypad interrupt
+
+			portMemory[0x00] = newValue;
 		}
 
 		public GameBoyKeys PressedKeys
 		{
-			get
-			{
-				return keys;
-			}
+			get { return baseKeys; }
 			set
 			{
-				keys = value;
-				UpdateJoypad();
+				baseKeys = value;
+				UpdateKeyRegister();
 			}
 		}
 
 		public void NotifyPressedKeys(GameBoyKeys pressedKeys)
 		{
-			keys |= pressedKeys;
-			UpdateJoypad();
+			baseKeys |= pressedKeys;
+			UpdateKeyRegister();
 		}
 
 		public void NotifyReleasedKeys(GameBoyKeys releasedKeys)
 		{
-			keys &= ~releasedKeys;
-			UpdateJoypad();
+			baseKeys &= ~releasedKeys;
+			UpdateKeyRegister();
 		}
 
 		#endregion

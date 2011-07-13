@@ -31,6 +31,7 @@ namespace CrystalBoy.Emulation
 		private HardwareType hardwareType;
 		private bool colorHardware;
 		private bool colorMode;
+		private bool superFunctions;
 		private bool disposed;
 
 		#endregion
@@ -77,6 +78,7 @@ namespace CrystalBoy.Emulation
 		partial void DisposeMemory();
 		partial void DisposeRom();
 		partial void DisposeVideo();
+		partial void DisposeSuperGameBoy();
 		partial void DisposeJoypad();
 		partial void DisposePorts();
 		partial void DisposeRendering();
@@ -102,6 +104,7 @@ namespace CrystalBoy.Emulation
 				DisposeMemory();
 				DisposeRom();
 				DisposeVideo();
+				DisposeSuperGameBoy();
 				DisposeJoypad();
 				DisposePorts();
 				DisposeRendering();
@@ -127,6 +130,7 @@ namespace CrystalBoy.Emulation
 		partial void InitializeBootRom();
 		partial void InitializeRom();
 		partial void InitializeVideo();
+		partial void InitializeSuperGameBoy();
 		partial void InitializeJoypad();
 		partial void InitializePorts();
 		partial void InitializeRendering();
@@ -149,6 +153,7 @@ namespace CrystalBoy.Emulation
 			InitializeBootRom();
 			InitializeRom();
 			InitializeVideo();
+			InitializeSuperGameBoy();
 			InitializeJoypad();
 			InitializePorts();
 			InitializeRendering();
@@ -172,6 +177,7 @@ namespace CrystalBoy.Emulation
 		partial void ResetMemory();
 		partial void ResetRom();
 		partial void ResetVideo();
+		partial void ResetSuperGameBoy();
 		partial void ResetJoypad();
 		partial void ResetPorts();
 		partial void ResetRendering();
@@ -200,6 +206,7 @@ namespace CrystalBoy.Emulation
 			ResetMemory();
 			ResetRom();
 			ResetVideo();
+			ResetSuperGameBoy();
 			ResetJoypad();
 			ResetPorts();
 			ResetRendering();
@@ -228,6 +235,13 @@ namespace CrystalBoy.Emulation
 				this.colorHardware = value >= HardwareType.GameBoyColor;
 				// Don't forget to reset the color mode flag too…
 				this.colorMode = ColorHardware && RomInformation != null ? RomInformation.ColorGameBoySupport : false;
+				// Enable SGB functions for some configurations only
+				this.superFunctions = RomInformation != null
+					&& RomInformation.SuperGameBoySupport
+					&& (value == HardwareType.SuperGameBoy
+						|| value == HardwareType.SuperGameBoy2
+						|| value == HardwareType.SuperGameBoyColor
+						|| value == HardwareType.SuperGameBoyAdvance);
 			}
 		}
 
@@ -249,6 +263,10 @@ namespace CrystalBoy.Emulation
 		/// </remarks>
 		/// <value><c>true</c> if the emulated system is running in color mode; otherwise, <c>false</c>.</value>
 		public bool ColorMode { get { return colorMode; } }
+
+		/// <summary>Gets a value indicating whether the emulated system has super game boy functions enabled.</summary>
+		/// <value><c>true</c> if the emulated system has super game boy functions enabled; otherwise, <c>false</c>.</value>
+		public bool SuperGameBoyFunctions { get { return superFunctions; } }
 
 		#endregion
 	}

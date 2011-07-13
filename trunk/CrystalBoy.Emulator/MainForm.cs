@@ -75,7 +75,7 @@ namespace CrystalBoy.Emulator
 
 				renderMethodMenuItemDictionary.Add(renderMethod.Key, renderMethodMenuItem);
 
-				renderMethodToolStripMenuItem.DropDownItems.Add(renderMethodMenuItem);
+				rendererToolStripMenuItem.DropDownItems.Add(renderMethodMenuItem);
 			}
 		}
 
@@ -99,11 +99,11 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		private RenderMethod<Control> CreateRenderMethod(Type renderMethodType)
+		private VideoRenderer<Control> CreateRenderMethod(Type renderMethodType)
 		{
 			ConstructorInfo constructor = renderMethodType.GetConstructor(new Type[] { typeof(Control) });
 
-			return (RenderMethod<Control>)constructor.Invoke(new object[] { toolStripContainer.ContentPanel });
+			return (VideoRenderer<Control>)constructor.Invoke(new object[] { toolStripContainer.ContentPanel });
 		}
 
 		private void SwitchRenderMethod(Type renderMethodType)
@@ -116,6 +116,8 @@ namespace CrystalBoy.Emulator
 			}
 
 			videoRenderer = CreateRenderMethod(renderMethodType);
+			videoRenderer.Interpolation = false;
+			videoRenderer.BorderVisible = true;
 
 			ToolStripMenuItem selectedMethodMenuItem = renderMethodMenuItemDictionary[renderMethodType];
 
@@ -525,17 +527,13 @@ namespace CrystalBoy.Emulator
 				emulatedGameBoy.Reset();
 		}
 
-		private void gameBoyToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoy); }
+		private void randomHardwareToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			var menuItem = sender as ToolStripMenuItem;
 
-		private void gameBoyPocketToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoyPocket); }
-
-		private void gameBoyColorToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoyColor); }
-
-		private void gameBoyAdvanceToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.GameBoyAdvance); }
-
-		private void superGameBoyToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.SuperGameBoy); }
-
-		private void superGameBoy2ToolStripMenuItem_Click(object sender, EventArgs e) { SwitchHardware(HardwareType.SuperGameBoy2); }
+			if (menuItem.Tag is HardwareType) SwitchHardware((HardwareType)menuItem.Tag);
+			else throw new InvalidOperationException();
+		}
 
 		private void SwitchHardware(HardwareType hardwareType)
 		{

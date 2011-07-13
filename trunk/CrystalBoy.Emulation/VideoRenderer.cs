@@ -25,44 +25,66 @@ namespace CrystalBoy.Emulation
 	[CLSCompliant(false)]
 	public unsafe abstract class VideoRenderer : IDisposable
 	{
-		bool interpolation;
+		private short clearColor = 0x7FFF;
+		private bool interpolation;
+		private bool borderVisible;
 
-		public EventHandler InterpolationChanged;
+		public event EventHandler ClearColorChanged;
+		public event EventHandler BorderVisibileChanged;
+		public event EventHandler InterpolationChanged;
 
 		public abstract void Dispose();
-		public abstract void* LockBuffer(out int stride);
-		public abstract void UnlockBuffer();
+		public abstract void* LockBorderBuffer(out int stride);
+		public abstract void UnlockBorderBuffer();
+		public abstract void* LockScreenBuffer(out int stride);
+		public abstract void UnlockScreenBuffer();
 		public abstract void Render();
 
-		public virtual bool SupportsInterpolation { get { return true; } }
+		/// <summary>Gets a value indicating whether the video renderer supports interpolation.</summary>
+		/// <remarks>
+		/// The value returned by this property must be constant.
+		/// The default implementation always returns <c>false</c>.
+		/// Subclasses supporting interpolated rendering should override this property and always return <c>true</c>.
+		/// </remarks>
+		/// <value><c>true</c> if the video renderer supports interpolation; otherwise, <c>false</c>.</value>
+		public virtual bool SupportsInterpolation { get { return false; } }
 
-		protected virtual void OnInterpolationChanged(EventArgs e)
+		public short ClearColor
 		{
-			if (InterpolationChanged != null)
-				InterpolationChanged(this, e);
+			get { return clearColor; }
+			set { if (clearColor != (clearColor = (short)(value & 0x7FFF))) OnClearColorChanged(EventArgs.Empty); }
 		}
+
+		protected virtual void OnClearColorChanged(EventArgs e) { if (BorderVisibileChanged != null) BorderVisibileChanged(this, e); }
+
+		public bool BorderVisible
+		{
+			get { return borderVisible; }
+			set { if (borderVisible != (borderVisible = value)) OnBorderVisibleChanged(EventArgs.Empty); }
+		}
+
+		protected virtual void OnBorderVisibleChanged(EventArgs e) { if (BorderVisibileChanged != null) BorderVisibileChanged(this, e); }
 
 		public bool Interpolation
 		{
 			get { return interpolation; }
 			set
 			{
-				if (SupportsInterpolation && value != interpolation) // Can have a weird behavior if SupportsInterpolation is dynamic, but I assume you know what you do if you make it dynamic...
-				{
-					interpolation = value;
-					OnInterpolationChanged(EventArgs.Empty);
-				}
+				if (!SupportsInterpolation) throw new NotSupportedException();
+				if (interpolation != (interpolation = value)) OnInterpolationChanged(EventArgs.Empty);
 			}
 		}
+
+		protected virtual void OnInterpolationChanged(EventArgs e) { if (InterpolationChanged != null) InterpolationChanged(this, e); }
 	}
 
 	[CLSCompliant(false)]
-	public abstract class RenderMethod<T> : VideoRenderer
+	public abstract class VideoRenderer<T> : VideoRenderer
 		where T: class
 	{
 		T renderObject;
 
-		public RenderMethod(T renderObject)
+		public VideoRenderer(T renderObject)
 		{
 			if (renderObject == null)
 				throw new ArgumentNullException("renderObject");

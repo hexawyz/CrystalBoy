@@ -80,17 +80,19 @@ namespace CrystalBoy.Emulator
 			this.zoom200toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom300toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom400toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.renderMethodToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.rendererToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.interpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.hardwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.useBootstrapRomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
 			this.gameBoyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.gameBoyPocketToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.gameBoyColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.gameBoyAdvanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.superGameBoyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.gameBoyPocketToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.superGameBoy2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.gameBoyColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.superGameBoyColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.gameBoyAdvanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.superGameBoyAdvanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.joypadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -286,7 +288,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.videoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zoomToolStripMenuItem,
-            this.renderMethodToolStripMenuItem,
+            this.rendererToolStripMenuItem,
             toolStripMenuItem5,
             this.interpolationToolStripMenuItem});
 			this.videoToolStripMenuItem.Name = "videoToolStripMenuItem";
@@ -328,10 +330,10 @@ namespace CrystalBoy.Emulator
 			resources.ApplyResources(this.zoom400toolStripMenuItem, "zoom400toolStripMenuItem");
 			this.zoom400toolStripMenuItem.Click += new System.EventHandler(this.zoom400toolStripMenuItem_Click);
 			// 
-			// renderMethodToolStripMenuItem
+			// rendererToolStripMenuItem
 			// 
-			this.renderMethodToolStripMenuItem.Name = "renderMethodToolStripMenuItem";
-			resources.ApplyResources(this.renderMethodToolStripMenuItem, "renderMethodToolStripMenuItem");
+			this.rendererToolStripMenuItem.Name = "rendererToolStripMenuItem";
+			resources.ApplyResources(this.rendererToolStripMenuItem, "rendererToolStripMenuItem");
 			// 
 			// toolStripMenuItem5
 			// 
@@ -350,11 +352,13 @@ namespace CrystalBoy.Emulator
             this.useBootstrapRomToolStripMenuItem,
             this.toolStripMenuItem6,
             this.gameBoyToolStripMenuItem,
-            this.gameBoyPocketToolStripMenuItem,
-            this.gameBoyColorToolStripMenuItem,
-            this.gameBoyAdvanceToolStripMenuItem,
             this.superGameBoyToolStripMenuItem,
-            this.superGameBoy2ToolStripMenuItem});
+            this.gameBoyPocketToolStripMenuItem,
+            this.superGameBoy2ToolStripMenuItem,
+            this.gameBoyColorToolStripMenuItem,
+            this.superGameBoyColorToolStripMenuItem,
+            this.gameBoyAdvanceToolStripMenuItem,
+            this.superGameBoyAdvanceToolStripMenuItem});
 			this.hardwareToolStripMenuItem.Name = "hardwareToolStripMenuItem";
 			resources.ApplyResources(this.hardwareToolStripMenuItem, "hardwareToolStripMenuItem");
 			this.hardwareToolStripMenuItem.DropDownOpening += new System.EventHandler(this.hardwareToolStripMenuItem_DropDownOpening);
@@ -375,42 +379,55 @@ namespace CrystalBoy.Emulator
 			this.gameBoyToolStripMenuItem.Name = "gameBoyToolStripMenuItem";
 			resources.ApplyResources(this.gameBoyToolStripMenuItem, "gameBoyToolStripMenuItem");
 			this.gameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoy;
-			this.gameBoyToolStripMenuItem.Click += new System.EventHandler(this.gameBoyToolStripMenuItem_Click);
-			// 
-			// gameBoyPocketToolStripMenuItem
-			// 
-			this.gameBoyPocketToolStripMenuItem.Name = "gameBoyPocketToolStripMenuItem";
-			resources.ApplyResources(this.gameBoyPocketToolStripMenuItem, "gameBoyPocketToolStripMenuItem");
-			this.gameBoyPocketToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyPocket;
-			this.gameBoyPocketToolStripMenuItem.Click += new System.EventHandler(this.gameBoyPocketToolStripMenuItem_Click);
-			// 
-			// gameBoyColorToolStripMenuItem
-			// 
-			this.gameBoyColorToolStripMenuItem.Name = "gameBoyColorToolStripMenuItem";
-			resources.ApplyResources(this.gameBoyColorToolStripMenuItem, "gameBoyColorToolStripMenuItem");
-			this.gameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyColor;
-			this.gameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.gameBoyColorToolStripMenuItem_Click);
-			// 
-			// gameBoyAdvanceToolStripMenuItem
-			// 
-			this.gameBoyAdvanceToolStripMenuItem.Name = "gameBoyAdvanceToolStripMenuItem";
-			resources.ApplyResources(this.gameBoyAdvanceToolStripMenuItem, "gameBoyAdvanceToolStripMenuItem");
-			this.gameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyAdvance;
-			this.gameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.gameBoyAdvanceToolStripMenuItem_Click);
+			this.gameBoyToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
 			// 
 			// superGameBoyToolStripMenuItem
 			// 
 			this.superGameBoyToolStripMenuItem.Name = "superGameBoyToolStripMenuItem";
 			resources.ApplyResources(this.superGameBoyToolStripMenuItem, "superGameBoyToolStripMenuItem");
 			this.superGameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy;
-			this.superGameBoyToolStripMenuItem.Click += new System.EventHandler(this.superGameBoyToolStripMenuItem_Click);
+			this.superGameBoyToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// gameBoyPocketToolStripMenuItem
+			// 
+			this.gameBoyPocketToolStripMenuItem.Name = "gameBoyPocketToolStripMenuItem";
+			resources.ApplyResources(this.gameBoyPocketToolStripMenuItem, "gameBoyPocketToolStripMenuItem");
+			this.gameBoyPocketToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyPocket;
+			this.gameBoyPocketToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
 			// 
 			// superGameBoy2ToolStripMenuItem
 			// 
 			this.superGameBoy2ToolStripMenuItem.Name = "superGameBoy2ToolStripMenuItem";
 			resources.ApplyResources(this.superGameBoy2ToolStripMenuItem, "superGameBoy2ToolStripMenuItem");
 			this.superGameBoy2ToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy2;
-			this.superGameBoy2ToolStripMenuItem.Click += new System.EventHandler(this.superGameBoy2ToolStripMenuItem_Click);
+			this.superGameBoy2ToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// gameBoyColorToolStripMenuItem
+			// 
+			this.gameBoyColorToolStripMenuItem.Name = "gameBoyColorToolStripMenuItem";
+			resources.ApplyResources(this.gameBoyColorToolStripMenuItem, "gameBoyColorToolStripMenuItem");
+			this.gameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyColor;
+			this.gameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// superGameBoyColorToolStripMenuItem
+			// 
+			this.superGameBoyColorToolStripMenuItem.Name = "superGameBoyColorToolStripMenuItem";
+			resources.ApplyResources(this.superGameBoyColorToolStripMenuItem, "superGameBoyColorToolStripMenuItem");
+			this.superGameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoyAdvance;
+			this.superGameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// gameBoyAdvanceToolStripMenuItem
+			// 
+			this.gameBoyAdvanceToolStripMenuItem.Name = "gameBoyAdvanceToolStripMenuItem";
+			resources.ApplyResources(this.gameBoyAdvanceToolStripMenuItem, "gameBoyAdvanceToolStripMenuItem");
+			this.gameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyAdvance;
+			this.gameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// superGameBoyAdvanceToolStripMenuItem
+			// 
+			this.superGameBoyAdvanceToolStripMenuItem.Name = "superGameBoyAdvanceToolStripMenuItem";
+			resources.ApplyResources(this.superGameBoyAdvanceToolStripMenuItem, "superGameBoyAdvanceToolStripMenuItem");
+			this.superGameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
 			// 
 			// joypadToolStripMenuItem
 			// 
@@ -533,7 +550,7 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripMenuItem superGameBoyToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem superGameBoy2ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem romInformationToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem renderMethodToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem rendererToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoomToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom100toolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom200toolStripMenuItem;
@@ -552,6 +569,8 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripMenuItem runFrameToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem useBootstrapRomToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
+		private System.Windows.Forms.ToolStripMenuItem superGameBoyColorToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem superGameBoyAdvanceToolStripMenuItem;
 	}
 }
 

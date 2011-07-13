@@ -25,9 +25,9 @@ namespace CrystalBoy.Emulation
 	public static class LookupTables
 	{
 		[CLSCompliant(false)]
-		public static readonly uint[] ColorLookupTable32 = InitializeColorLookupTable32();
+		public static readonly uint[] StandardColorLookupTable32 = InitializeStandardColorLookupTable32();
 		[CLSCompliant(false)]
-		public static readonly ushort[] ColorLookupTable16 = InitializeColorLookupTable16();
+		public static readonly ushort[] StandardColorLookupTable16 = InitializeStandardColorLookupTable16();
 
 		[CLSCompliant(false)]
 		public static readonly uint[] GrayPalette = BuildPalette();
@@ -84,45 +84,43 @@ namespace CrystalBoy.Emulation
 
 		// Static constructors should be avoided for performance, we use these method for table initialization instead
 
-		private static ushort[] InitializeColorLookupTable16()
+		private static ushort[] InitializeStandardColorLookupTable16()
 		{
 			ushort[] lookupTable = new ushort[65536];
 
-			GetPoppyColors16(lookupTable);
+			GetStandardColors16(lookupTable);
 
 			return lookupTable;
 		}
 
-		private static uint[] InitializeColorLookupTable32()
+		private static uint[] InitializeStandardColorLookupTable32()
 		{
 			uint[] lookupTable = new uint[65536];
 
-			GetPoppyColors32(lookupTable);
+			GetStandardColors32(lookupTable);
 
 			return lookupTable;
 		}
 
 		#endregion
 
-		#region Poppy Colors
+		#region Standard Colors
 
 		[CLSCompliant(false)]
-		public static void GetPoppyColors16(ushort[] lookupTable)
+		public static void GetStandardColors16(ushort[] lookupTable)
 		{
 			for (uint i = 0; i < lookupTable.Length; i++)
-			{
 				lookupTable[i] = (ushort)((i << 1) & 0xFFC0 | i & 0x1F);
-			}
 		}
 
 		[CLSCompliant(false)]
-		public static void GetPoppyColors32(uint[] lookupTable)
+		public static void GetStandardColors32(uint[] lookupTable)
 		{
 			for (uint i = 0; i < lookupTable.Length; i++)
 			{
-				uint r = 0xFF * (i & 0x1F) / 0x1F,
-					g = 0xFF * ((i >> 5) & 0x1F) / 0x1F,
-					b = 0xFF * ((i >> 10) & 0x1F) / 0x1F;
+				uint r = 0xFF * (i & 0x1F) / 0x1F;
+				uint g = 0xFF * ((i >> 5) & 0x1F) / 0x1F;
+				uint b = 0xFF * ((i >> 10) & 0x1F) / 0x1F;
 
 				lookupTable[i] = b | (g << 8) | (r << 16) | 0xFF000000;
 			}

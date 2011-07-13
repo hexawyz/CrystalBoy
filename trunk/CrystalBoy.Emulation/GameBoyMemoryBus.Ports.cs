@@ -54,13 +54,13 @@ namespace CrystalBoy.Emulation
 		partial void InitializePorts()
 		{
 			this.videoStatusSnapshot = new VideoStatusSnapshot(this);
-			this.videoPortAccessList = new List<PortAccess>();
-			this.paletteAccessList = new List<PaletteAccess>();
-			this.audioPortAccessList = new List<PortAccess>();
+			this.videoPortAccessList = new List<PortAccess>(1000);
+			this.paletteAccessList = new List<PaletteAccess>(1000);
+			this.audioPortAccessList = new List<PortAccess>(1000);
 #if WITH_THREADING
 			this.savedVideoStatusSnapshot = new VideoStatusSnapshot(this);
-			this.savedVideoPortAccessList = new List<PortAccess>();
-			this.savedPaletteAccessList = new List<PaletteAccess>();
+			this.savedVideoPortAccessList = new List<PortAccess>(1000);
+			this.savedPaletteAccessList = new List<PaletteAccess>(1000);
 #else
 			this.savedVideoStatusSnapshot = videoStatusSnapshot;
 			this.savedVideoPortAccessList = videoPortAccessList;
@@ -77,7 +77,7 @@ namespace CrystalBoy.Emulation
 			hdmaActive = false;
 			usePaletteMapping = colorHardware && !useBootRom;
 
-			WritePort(Port.JOYP, useBootRom ? (byte)0x00 : (byte)0x30); // Reset the joypad
+			unsafe { portMemory[0x00] = 0x30; }
 
 			WritePort(Port.TIMA, 0);
 			WritePort(Port.TMA, 0);
@@ -172,9 +172,7 @@ namespace CrystalBoy.Emulation
 			{
 				// Joypad
 				case 0x00: // JOYP
-					joypadRow0 = (value & 0x10) == 0;
-					joypadRow1 = (value & 0x20) == 0;
-					UpdateJoypad();
+					KeyRegisterWrite(value);
 					break;
 				// Timer Ports
 				case 0x04: // DIV

@@ -192,7 +192,7 @@ namespace CrystalBoy.Emulator
 				{
 					try
 					{
-						if (typeof(RenderMethod<Control>).IsAssignableFrom(type) && type.GetConstructor(defaultTypeArray) != null)
+						if (typeof(VideoRenderer<Control>).IsAssignableFrom(type) && type.GetConstructor(defaultTypeArray) != null)
 							AddRenderMethod(type);
 					}
 					catch (TypeLoadException ex)

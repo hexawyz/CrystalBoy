@@ -22,7 +22,7 @@ using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
-	public partial class GameBoyMemoryBus : IDisposable
+	partial class GameBoyMemoryBus
 	{
 		#region Variables
 
@@ -60,13 +60,18 @@ namespace CrystalBoy.Emulation
 			// Simulate Boot ROM behavior
 			if (!useBootRom)
 			{
-				if (hardwareType == HardwareType.GameBoyPocket)
+				if (hardwareType == HardwareType.GameBoyPocket
+					|| hardwareType == HardwareType.SuperGameBoy2)
 					processor.AF = 0xFFB0;
-				else if (hardwareType == HardwareType.GameBoyColor || hardwareType == HardwareType.GameBoyAdvance)
+				else if (hardwareType == HardwareType.GameBoyColor
+					|| hardwareType == HardwareType.SuperGameBoyColor
+					|| hardwareType == HardwareType.GameBoyAdvance
+					|| hardwareType == HardwareType.SuperGameBoyAdvance)
 					processor.AF = 0x11B0;
 				else processor.AF = 0x01B0;
 
-				if (hardwareType == HardwareType.GameBoyAdvance)
+				if (hardwareType == HardwareType.GameBoyAdvance
+					|| hardwareType == HardwareType.SuperGameBoyAdvance)
 					processor.BC = 0x0113;
 				else processor.BC = 0x0013;
 

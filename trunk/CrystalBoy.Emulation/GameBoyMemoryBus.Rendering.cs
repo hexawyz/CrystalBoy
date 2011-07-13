@@ -139,6 +139,13 @@ namespace CrystalBoy.Emulation
 		private void OnFrameReady()
 		{
 			OnBeforeRendering(frameEventArgs);
+
+			if (pendingSgbTransfer)
+			{
+				ProcessSuperGameBoyCommand(true);
+				pendingSgbTransfer = false;
+			}
+
 			if (!frameEventArgs.SkipFrame)
 			{
 #if WITH_THREADING
@@ -181,7 +188,7 @@ namespace CrystalBoy.Emulation
 				return;
 			}
 
-			buffer = (byte*)videoRenderer.LockBuffer(out stride);
+			buffer = (byte*)videoRenderer.LockScreenBuffer(out stride);
 
 			if ((savedVideoStatusSnapshot.LCDC & 0x80) != 0)
 			{
@@ -219,8 +226,23 @@ namespace CrystalBoy.Emulation
 				ClearBuffer32(buffer, stride, 0xFFFFFFFF);
 			}
 
-			videoRenderer.UnlockBuffer();
+			videoRenderer.UnlockScreenBuffer();
 			videoRenderer.Render();
+		}
+
+		private unsafe void RenderBorder()
+		{
+			try
+			{
+				int stride;
+				byte* bufferPointer = (byte*)videoRenderer.LockBorderBuffer(out stride);
+
+				DrawBorder32(bufferPointer, stride);
+
+				videoRenderer.UnlockBorderBuffer();
+			}
+			catch (NotSupportedException) { }
+			catch (NotImplementedException) { }
 		}
 
 		#region Palette Initialization
@@ -230,7 +252,7 @@ namespace CrystalBoy.Emulation
 			ushort* dest = backgroundPalettes16[0];
 
 			for (int i = 0; i < 64; i++)
-				*dest++ = LookupTables.ColorLookupTable16[*paletteData++];
+				*dest++ = LookupTables.StandardColorLookupTable16[*paletteData++];
 		}
 
 		private unsafe void FillPalettes32(ushort* paletteData)
@@ -238,7 +260,7 @@ namespace CrystalBoy.Emulation
 			uint* dest = backgroundPalettes32[0];
 
 			for (int i = 0; i < 64; i++)
-				*dest++ = LookupTables.ColorLookupTable32[*paletteData++];
+				*dest++ = LookupTables.StandardColorLookupTable32[*paletteData++];
 		}
 
 		#endregion
@@ -269,11 +291,11 @@ namespace CrystalBoy.Emulation
 			if (videoRenderer == null)
 				return;
 
-			buffer = (byte*)videoRenderer.LockBuffer(out stride);
+			buffer = (byte*)videoRenderer.LockScreenBuffer(out stride);
 
 			ClearBuffer32(buffer, stride, 0xFF000000);
 
-			videoRenderer.UnlockBuffer();
+			videoRenderer.UnlockScreenBuffer();
 
 			videoRenderer.Render();
 		}
@@ -333,15 +355,69 @@ namespace CrystalBoy.Emulation
 
 		#endregion
 
+		#region Border Rendering
+
+		/// <summary>Draws the SGB border into a 32 BPP buffer.</summary>
+		/// <param name="buffer">Destination pixel buffer.</param>
+		/// <param name="stride">Buffer line stride.</param>
+		private unsafe void DrawBorder32(byte* buffer, int stride)
+		{
+			uint[] paletteData = new uint[8 << 4];
+			int mapRowOffset = -32;
+
+			// Fill only the 4 border palettes… Just ignore the others
+			for (int i = 0x40; i < paletteData.Length; i++) paletteData[i] = LookupTables.StandardColorLookupTable32[sgbBorderMapData[0x400 - 0x40 + i]];
+
+			for (int i = 0; i < 224; i++)
+			{
+				uint* pixelPointer = (uint*)buffer;
+				int tileBaseRowOffset = (i & 0x7) << 1; // Tiles are stored in a weird planar way…
+				int mapTileOffset = tileBaseRowOffset != 0 ? mapRowOffset : mapRowOffset += 32;
+
+				for (int j = 32; j-- != 0; mapTileOffset++)
+				{
+					ushort tileInformation = sgbBorderMapData[mapTileOffset];
+					int tileRowOffset = ((tileInformation & 0xFF) << 5) + ((tileInformation & 0x8000) != 0 ? 0xE - tileBaseRowOffset : tileBaseRowOffset);
+					int paletteOffset = ((tileInformation >> 10) & 0x7) << 4;
+
+					byte tileValue0 = sgbCharacterData[tileRowOffset];
+					byte tileValue1 = sgbCharacterData[tileRowOffset + 1];
+					byte tileValue2 = sgbCharacterData[tileRowOffset + 16];
+					byte tileValue3 = sgbCharacterData[tileRowOffset + 17];
+
+					if ((tileInformation & 0x4000) != 0)
+						for (byte k = 0x01; k != 0; k <<= 1)
+						{
+							byte color = (tileValue0 & k) != 0 ? (byte)1 : (byte)0;
+							if ((tileValue1 & k) != 0) color |= 2;
+							if ((tileValue2 & k) != 0) color |= 4;
+							if ((tileValue3 & k) != 0) color |= 8;
+							*pixelPointer++ = color != 0 ? paletteData[paletteOffset + color] : 0;
+						}
+					else
+						for (byte k = 0x80; k != 0; k >>= 1)
+						{
+							byte color = (tileValue0 & k) != 0 ? (byte)1 : (byte)0;
+							if ((tileValue1 & k) != 0) color |= 2;
+							if ((tileValue2 & k) != 0) color |= 4;
+							if ((tileValue3 & k) != 0) color |= 8;
+							*pixelPointer++ = color != 0 ? paletteData[paletteOffset + color] : 0;
+						}
+				}
+
+				buffer += stride;
+			}
+		}
+
+		#endregion
+
 		#region Color Rendering
 
 		#region 32 BPP
 
-		/// <summary>
-		/// Draws the current frame into a pixel buffer
-		/// </summary>
-		/// <param name="buffer">Destination pixel buffer</param>
-		/// <param name="stride">Buffer line stride</param>
+		/// <summary>Draws the current frame into a 32 BPP buffer.</summary>
+		/// <param name="buffer">Destination pixel buffer.</param>
+		/// <param name="stride">Buffer line stride.</param>
 		private unsafe void DrawColorFrame32(byte* buffer, int stride)
 		{
 			// WARNING: Very looooooooooong code :D
@@ -431,7 +507,7 @@ namespace CrystalBoy.Emulation
 					{
 						// By doing this, we trash the palette memory snapshot… But at least it works. (Might be necessary to allocate another temporary palette buffer in the future)
 						savedVideoStatusSnapshot.PaletteMemory[savedPaletteAccessList[ppi].Offset] = savedPaletteAccessList[ppi].Value;
-						bgPalettes[0][savedPaletteAccessList[ppi].Offset / 2] = LookupTables.ColorLookupTable32[((ushort*)savedVideoStatusSnapshot.PaletteMemory)[savedPaletteAccessList[ppi].Offset / 2]];
+						bgPalettes[0][savedPaletteAccessList[ppi].Offset / 2] = LookupTables.StandardColorLookupTable32[((ushort*)savedVideoStatusSnapshot.PaletteMemory)[savedPaletteAccessList[ppi].Offset / 2]];
 
 						ppi++;
 					}
@@ -588,11 +664,9 @@ namespace CrystalBoy.Emulation
 
 		#region 32 BPP
 
-		/// <summary>
-		/// Draws the current frame into a pixel buffer
-		/// </summary>
-		/// <param name="buffer">Destination pixel buffer</param>
-		/// <param name="stride">Buffer line stride</param>
+		/// <summary>Draws the current frame into a 32 BPP buffer.</summary>
+		/// <param name="buffer">Destination buffer.</param>
+		/// <param name="stride">Buffer line stride.</param>
 		private unsafe void DrawFrame32(byte* buffer, int stride)
 		{
 			// WARNING: Very looooooooooong code :D
