@@ -26,7 +26,7 @@ using CrystalBoy.Emulation;
 namespace CrystalBoy.Emulator.Rendering.Direct3D
 {
 	[DisplayName("Direct3D")]
-	public sealed class Direct3DRenderer : RenderMethod<Control>
+	public sealed class Direct3DRenderer : VideoRenderer<Control>
 	{
 		PresentParameters presentParameters;
 		Device device;
@@ -108,6 +108,7 @@ namespace CrystalBoy.Emulator.Rendering.Direct3D
 			device.SetTexture(0, texture);
 			device.SetSamplerState(0, SamplerStageStates.MagFilter, (int)textureFilter);
 			device.SetSamplerState(0, SamplerStageStates.MinFilter, (int)textureFilter);
+			device.RenderState.AlphaBlendEnable = false;
 		}
 
 		private void DisposeTexture()
@@ -116,14 +117,24 @@ namespace CrystalBoy.Emulator.Rendering.Direct3D
 				texture.Dispose();
 		}
 
-		public override unsafe void* LockBuffer(out int stride)
+		public override unsafe void* LockBorderBuffer(out int stride)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void UnlockBorderBuffer()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override unsafe void* LockScreenBuffer(out int stride)
 		{
 			graphicsStream = texture.LockRectangle(0, LockFlags.Discard, out stride);
 
 			return graphicsStream.InternalDataPointer;
 		}
 
-		public override void UnlockBuffer()
+		public override void UnlockScreenBuffer()
 		{
 			texture.UnlockRectangle(0);
 		}
@@ -149,6 +160,7 @@ namespace CrystalBoy.Emulator.Rendering.Direct3D
 
 		public override void Render()
 		{
+			device.Clear(ClearFlags.Target, 0, 1, 0);
 			device.BeginScene();
 			device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
 			device.EndScene();

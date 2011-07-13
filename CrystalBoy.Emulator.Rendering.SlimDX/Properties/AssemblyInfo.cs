@@ -28,4 +28,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 [assembly: Guid("72985425-e3cb-424c-9569-555ec4bf2896")]
 
-[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.4.0.0")]

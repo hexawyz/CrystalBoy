@@ -89,7 +89,7 @@ namespace CrystalBoy.Emulator
 		private unsafe void UpdateColorPalettes(ushort *paletteMemory)
 		{
 			for (int i = 0; i < colors.Length; i++)
-				colors[i] = LookupTables.ColorLookupTable32[*paletteMemory++];
+				colors[i] = LookupTables.StandardColorLookupTable32[*paletteMemory++];
 		}
 
 		private unsafe void UpdateGreyPalette(byte bgp)

@@ -26,35 +26,49 @@ using CrystalBoy.Emulation;
 namespace CrystalBoy.Emulator.Rendering.GdiPlus
 {
 	[DisplayName("GDI+")]
-	public sealed class GdiPlusRenderer : RenderMethod<Control>
+	public sealed class GdiPlusRenderer : VideoRenderer<Control>
 	{
-		Bitmap bitmap;
+		Bitmap borderBitmap;
+		Bitmap screenBitmap;
 		BitmapData bitmapData;
 		InterpolationMode interpolationMode;
 
 		public GdiPlusRenderer(Control renderObject)
 			: base(renderObject)
 		{
-			bitmap = new Bitmap(160, 144, PixelFormat.Format32bppArgb);
+			borderBitmap = new Bitmap(256, 224, PixelFormat.Format32bppPArgb);
+			screenBitmap = new Bitmap(160, 144, PixelFormat.Format32bppRgb);
 			bitmapData = new BitmapData();
 			ResetInterpolationMode();
 		}
 
 		public override void Dispose()
 		{
-			bitmap.Dispose();
+			screenBitmap.Dispose();
 		}
 
-		public override unsafe void* LockBuffer(out int stride)
+		public override unsafe void* LockBorderBuffer(out int stride)
 		{
-			bitmap.LockBits(new Rectangle(0, 0, 160, 144), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb, bitmapData);
+			borderBitmap.LockBits(new Rectangle(0, 0, 256, 224), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb, bitmapData);
 			stride = bitmapData.Stride;
 			return (void*)bitmapData.Scan0;
 		}
 
-		public override void UnlockBuffer()
+		public override void UnlockBorderBuffer()
 		{
-			bitmap.UnlockBits(bitmapData);
+			borderBitmap.UnlockBits(bitmapData);
+		}
+
+		public override unsafe void* LockScreenBuffer(out int stride)
+		{
+			screenBitmap.LockBits(new Rectangle(0, 0, 160, 144), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb, bitmapData);
+			stride = bitmapData.Stride;
+			return (void*)bitmapData.Scan0;
+		}
+
+		public override void UnlockScreenBuffer()
+		{
+			screenBitmap.UnlockBits(bitmapData);
 		}
 
 		private void ResetInterpolationMode()
@@ -80,7 +94,7 @@ namespace CrystalBoy.Emulator.Rendering.GdiPlus
 			g.PixelOffsetMode = PixelOffsetMode.Half;
 			g.SmoothingMode = SmoothingMode.None;
 			g.InterpolationMode = interpolationMode;
-			g.DrawImage(bitmap, RenderObject.ClientRectangle);
+			g.DrawImage(screenBitmap, RenderObject.ClientRectangle);
 
 			g.Dispose();
 		}

@@ -88,6 +88,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PortAccess.cs" />
     <Compile Include="RealTimeClockState.cs" />
+    <Compile Include="SuperGameBoyCommand.cs" />
     <Compile Include="VideoRenderer.cs" />
     <Compile Include="RumbleEventArgs.cs" />
     <Compile Include="RunFrameResult.cs" />
@@ -137,6 +138,9 @@
     <Compile Include="GameBoyMemoryBus.BootRom.cs">
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
+    <Compile Include="GameBoyMemoryBus.SuperGameBoy.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+    </Compile>
     <Compile Include="RtcRegister.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -172,11 +176,11 @@
     </None>
     <EmbeddedResource Condition="Exists('$(ProjectDir)cgb.rom')" Include="cgb.rom" />
     <EmbeddedResource Condition="Exists('$(ProjectDir)dmg.rom')" Include="dmg.rom" />
+    <EmbeddedResource Condition="Exists('$(ProjectDir)sgb.rom')" Include="sgb.rom" />
     <None Include="Processor.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Processor.Generated.cs</LastGenOutput>
     </None>
-    <EmbeddedResource Condition="Exists('$(ProjectDir)sgb.rom')" Include="sgb.rom" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

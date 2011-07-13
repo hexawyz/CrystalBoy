@@ -63,12 +63,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
-      <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
-      <Name>CrystalBoy.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>

@@ -28,7 +28,7 @@ using CrystalBoy.Emulation;
 namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
 	[DisplayName("Direct3D 9")]
-	public sealed class Direct3D9Renderer : RenderMethod<Control>
+	public sealed class Direct3D9Renderer : VideoRenderer<Control>
 	{
 		Direct3D direct3D;
 		PresentParameters presentParameters;
@@ -190,7 +190,17 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 
 		#region Locking
 
-		public override unsafe void* LockBuffer(out int stride)
+		public override unsafe void* LockBorderBuffer(out int stride)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void UnlockBorderBuffer()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override unsafe void* LockScreenBuffer(out int stride)
 		{
 			if (texture != null && device.TestCooperativeLevel().IsSuccess)
 			{
@@ -216,7 +226,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			}
 		}
 
-		public override void UnlockBuffer()
+		public override void UnlockScreenBuffer()
 		{
 			if (temporaryBufferLocked)
 			{
@@ -253,6 +263,8 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 
 		#endregion
 
+		public override bool SupportsInterpolation { get { return true; } }
+
 		protected override void OnInterpolationChanged(EventArgs e)
 		{
 			ResetTextureFilter();
@@ -265,6 +277,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 
 			if (result.IsSuccess)
 			{
+				device.Clear(ClearFlags.Target, 0, 1, 0);
 				device.BeginScene();
 				device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
 				device.EndScene();

@@ -40,45 +40,38 @@ namespace CrystalBoy.Core.BuildMakerDictionary
 			// This code produce an XML file containing maker entries found in the file
 			// Since the file is mainly for human reading, additional *manual* post-processing must be done for the file to be really usable
 			// Entries named ??? and such must be removed from the file, and many uncertain entries (see the original file for reference) must be manually checked
-			try
-			{
-				text = webClient.DownloadString(sourceUrl);
+			text = webClient.DownloadString(sourceUrl);
 
-				xmlWriter = XmlWriter.Create("makers.xml",
-					new XmlWriterSettings()
-					{
-						Indent = true,
-						CloseOutput = true,
-						ConformanceLevel = ConformanceLevel.Document,
-						IndentChars = "\t",
-						NewLineHandling = NewLineHandling.Entitize,
-						Encoding = Encoding.UTF8,
-						CheckCharacters = true,
-						NewLineOnAttributes = false,
-						OmitXmlDeclaration = false
-					});
-
-				xmlWriter.WriteStartDocument();
-				xmlWriter.WriteStartElement("Makers");
-
-				foreach (Match match in parsingRegex.Matches(text, 0))
+			xmlWriter = XmlWriter.Create("makers.xml",
+				new XmlWriterSettings()
 				{
-					xmlWriter.WriteStartElement("Maker");
-					xmlWriter.WriteStartAttribute("Code");
-					xmlWriter.WriteString(match.Groups["code"].Value);
-					xmlWriter.WriteEndAttribute();
-					xmlWriter.WriteString(match.Groups["name"].Value);
-					xmlWriter.WriteEndElement();
-				}
-				xmlWriter.WriteEndElement();
-				xmlWriter.WriteEndDocument();
+					Indent = true,
+					CloseOutput = true,
+					ConformanceLevel = ConformanceLevel.Document,
+					IndentChars = "\t",
+					NewLineHandling = NewLineHandling.Entitize,
+					Encoding = Encoding.UTF8,
+					CheckCharacters = true,
+					NewLineOnAttributes = false,
+					OmitXmlDeclaration = false
+				});
 
-				xmlWriter.Close();
-			}
-			catch
+			xmlWriter.WriteStartDocument();
+			xmlWriter.WriteStartElement("Makers");
+
+			foreach (Match match in parsingRegex.Matches(text, 0))
 			{
-				throw;
+				xmlWriter.WriteStartElement("Maker");
+				xmlWriter.WriteStartAttribute("Code");
+				xmlWriter.WriteString(match.Groups["code"].Value);
+				xmlWriter.WriteEndAttribute();
+				xmlWriter.WriteString(match.Groups["name"].Value);
+				xmlWriter.WriteEndElement();
 			}
+			xmlWriter.WriteEndElement();
+			xmlWriter.WriteEndDocument();
+
+			xmlWriter.Close();
 		}
 	}
 }

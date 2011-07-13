@@ -8,6 +8,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core", "CrystalBoy.Core\CrystalBoy.Core.csproj", "{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{64472336-07E7-4879-9A07-A8DD98B763A1} = {64472336-07E7-4879-9A07-A8DD98B763A1}
+		{71B95B4F-60ED-4E17-8F7B-281C8F07DC17} = {71B95B4F-60ED-4E17-8F7B-281C8F07DC17}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator", "CrystalBoy.Emulator\CrystalBoy.Emulator.csproj", "{576E8DDB-67FD-4948-9B83-1C732AAC3175}"

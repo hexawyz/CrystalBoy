@@ -22,13 +22,27 @@ using System.Text;
 
 namespace CrystalBoy.Emulation
 {
+	/// <summary>Represent an emulated hardware type.</summary>
 	public enum HardwareType : byte
 	{
+		/// <summary>Original Game Boy</summary>
 		GameBoy = 0,
+		/// <summary>Pocket Game Boy</summary>
 		GameBoyPocket = 1,
+		/// <summary>Super Game Boy</summary>
 		SuperGameBoy = 2,
-		GameBoyColor = 3,
-		SuperGameBoy2 = 4,
-		GameBoyAdvance = 5
+		/// <summary>Super Game Boy 2</summary>
+		SuperGameBoy2 = 3,
+		/// <summary>Game Boy Color</summary>
+		GameBoyColor = 4,
+		/// <summary>Super Game Boy + Game Boy Color</summary>
+		/// <remarks>This is used for combining Game Boy Color emulation with Super Game Boy emulation, and doesn't represent real hardware.</remarks>
+		SuperGameBoyColor = 5,
+		/// <summary>Game Boy Advance</summary>
+		/// <remarks>This is mostly like a Game Boy Color when GB(C) games are concerned.</remarks>
+		GameBoyAdvance = 6,
+		/// <summary>Super Game Boy + Game Boy Advance</summary>
+		/// <remarks>This is used for combining Game Boy Advance emulation with Super Game Boy emulation, and doesn't represent real hardware.</remarks>
+		SuperGameBoyAdvance = 7
 	}
 }
