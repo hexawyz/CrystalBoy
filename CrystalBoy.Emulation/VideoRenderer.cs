@@ -25,13 +25,17 @@ namespace CrystalBoy.Emulation
 	[CLSCompliant(false)]
 	public unsafe abstract class VideoRenderer : IDisposable
 	{
-		private short clearColor = 0x7FFF;
+		private short clearColor = 0x7FFF; // Set this value to its default in order not to trigger the ClearColorChanged event inside the constructor.
 		private bool interpolation;
 		private bool borderVisible;
 
 		public event EventHandler ClearColorChanged;
 		public event EventHandler BorderVisibileChanged;
 		public event EventHandler InterpolationChanged;
+
+		public VideoRenderer() { Reset(); }
+
+		public virtual void Reset() { ClearColor = 0x7FFF; }
 
 		public abstract void Dispose();
 		public abstract void* LockBorderBuffer(out int stride);
@@ -68,11 +72,7 @@ namespace CrystalBoy.Emulation
 		public bool Interpolation
 		{
 			get { return interpolation; }
-			set
-			{
-				if (!SupportsInterpolation) throw new NotSupportedException();
-				if (interpolation != (interpolation = value)) OnInterpolationChanged(EventArgs.Empty);
-			}
+			set { if (interpolation != (interpolation = value)) OnInterpolationChanged(EventArgs.Empty); }
 		}
 
 		protected virtual void OnInterpolationChanged(EventArgs e) { if (InterpolationChanged != null) InterpolationChanged(this, e); }

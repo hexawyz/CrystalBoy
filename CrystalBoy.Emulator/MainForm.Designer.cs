@@ -75,6 +75,12 @@ namespace CrystalBoy.Emulator
 			this.audioEnabledToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.muteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.videoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.borderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.borderAutoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
+			this.borderOnToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.borderOffToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripSeparator();
 			this.zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom100toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom200toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -287,6 +293,8 @@ namespace CrystalBoy.Emulator
 			// videoToolStripMenuItem
 			// 
 			this.videoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.borderToolStripMenuItem,
+            this.toolStripMenuItem9,
             this.zoomToolStripMenuItem,
             this.rendererToolStripMenuItem,
             toolStripMenuItem5,
@@ -294,6 +302,45 @@ namespace CrystalBoy.Emulator
 			this.videoToolStripMenuItem.Name = "videoToolStripMenuItem";
 			resources.ApplyResources(this.videoToolStripMenuItem, "videoToolStripMenuItem");
 			this.videoToolStripMenuItem.DropDownOpening += new System.EventHandler(this.videoToolStripMenuItem_DropDownOpening);
+			// 
+			// borderToolStripMenuItem
+			// 
+			this.borderToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.borderAutoToolStripMenuItem,
+            this.toolStripMenuItem8,
+            this.borderOnToolStripMenuItem,
+            this.borderOffToolStripMenuItem});
+			this.borderToolStripMenuItem.Name = "borderToolStripMenuItem";
+			resources.ApplyResources(this.borderToolStripMenuItem, "borderToolStripMenuItem");
+			this.borderToolStripMenuItem.DropDownOpening += new System.EventHandler(this.borderToolStripMenuItem_DropDownOpening);
+			// 
+			// borderAutoToolStripMenuItem
+			// 
+			this.borderAutoToolStripMenuItem.Name = "borderAutoToolStripMenuItem";
+			resources.ApplyResources(this.borderAutoToolStripMenuItem, "borderAutoToolStripMenuItem");
+			this.borderAutoToolStripMenuItem.Click += new System.EventHandler(this.borderAutoToolStripMenuItem_Click);
+			// 
+			// toolStripMenuItem8
+			// 
+			this.toolStripMenuItem8.Name = "toolStripMenuItem8";
+			resources.ApplyResources(this.toolStripMenuItem8, "toolStripMenuItem8");
+			// 
+			// borderOnToolStripMenuItem
+			// 
+			this.borderOnToolStripMenuItem.Name = "borderOnToolStripMenuItem";
+			resources.ApplyResources(this.borderOnToolStripMenuItem, "borderOnToolStripMenuItem");
+			this.borderOnToolStripMenuItem.Click += new System.EventHandler(this.borderOnToolStripMenuItem_Click);
+			// 
+			// borderOffToolStripMenuItem
+			// 
+			this.borderOffToolStripMenuItem.Name = "borderOffToolStripMenuItem";
+			resources.ApplyResources(this.borderOffToolStripMenuItem, "borderOffToolStripMenuItem");
+			this.borderOffToolStripMenuItem.Click += new System.EventHandler(this.borderOffToolStripMenuItem_Click);
+			// 
+			// toolStripMenuItem9
+			// 
+			this.toolStripMenuItem9.Name = "toolStripMenuItem9";
+			resources.ApplyResources(this.toolStripMenuItem9, "toolStripMenuItem9");
 			// 
 			// zoomToolStripMenuItem
 			// 
@@ -571,6 +618,12 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem6;
 		private System.Windows.Forms.ToolStripMenuItem superGameBoyColorToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem superGameBoyAdvanceToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem borderToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem borderAutoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem borderOffToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
+		private System.Windows.Forms.ToolStripMenuItem borderOnToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
 	}
 }
 

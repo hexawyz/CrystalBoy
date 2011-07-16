@@ -38,12 +38,12 @@ namespace CrystalBoy.Emulator.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("320, 288")]
-        public global::System.Drawing.Size RenderSize {
+        public global::System.Drawing.Size ContentSize {
             get {
-                return ((global::System.Drawing.Size)(this["RenderSize"]));
+                return ((global::System.Drawing.Size)(this["ContentSize"]));
             }
             set {
-                this["RenderSize"] = value;
+                this["ContentSize"] = value;
             }
         }
         
@@ -109,6 +109,30 @@ namespace CrystalBoy.Emulator.Properties {
             }
             set {
                 this["UseBootstrapRom"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Interpolation {
+            get {
+                return ((bool)(this["Interpolation"]));
+            }
+            set {
+                this["Interpolation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Auto")]
+        public global::CrystalBoy.Emulation.BorderVisibility BorderVisibility {
+            get {
+                return ((global::CrystalBoy.Emulation.BorderVisibility)(this["BorderVisibility"]));
+            }
+            set {
+                this["BorderVisibility"] = value;
             }
         }
     }

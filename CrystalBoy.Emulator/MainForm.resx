@@ -271,7 +271,7 @@
     <value>174, 22</value>
   </data>
   <data name="runFrameToolStripMenuItem.Text" xml:space="preserve">
-    <value>Run &amp;Frame</value>
+    <value>R&amp;un Frame</value>
   </data>
   <data name="runFrameToolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Run the game for one frame.</value>
@@ -300,11 +300,41 @@
   <data name="audioToolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Audio options…</value>
   </data>
+  <data name="borderAutoToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="borderAutoToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Auto</value>
+  </data>
+  <data name="toolStripMenuItem8.Size" type="System.Drawing.Size, System.Drawing">
+    <value>149, 6</value>
+  </data>
+  <data name="borderOnToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="borderOnToolStripMenuItem.Text" xml:space="preserve">
+    <value>O&amp;n</value>
+  </data>
+  <data name="borderOffToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="borderOffToolStripMenuItem.Text" xml:space="preserve">
+    <value>O&amp;ff</value>
+  </data>
+  <data name="borderToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>152, 22</value>
+  </data>
+  <data name="borderToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Border</value>
+  </data>
+  <data name="toolStripMenuItem9.Size" type="System.Drawing.Size, System.Drawing">
+    <value>149, 6</value>
+  </data>
   <data name="zoomToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>152, 22</value>
   </data>
   <data name="zoomToolStripMenuItem.Text" xml:space="preserve">
-    <value>Zoom</value>
+    <value>&amp;Zoom</value>
   </data>
   <data name="zoomToolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Select a default zoom level…</value>
@@ -313,7 +343,7 @@
     <value>152, 22</value>
   </data>
   <data name="rendererToolStripMenuItem.Text" xml:space="preserve">
-    <value>Renderer</value>
+    <value>&amp;Renderer</value>
   </data>
   <data name="rendererToolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Choose the video renderer…</value>
@@ -511,7 +541,7 @@
     <value>Exit the emulator.</value>
   </data>
   <data name="audioEnabledToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>147, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="audioEnabledToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Enabled</value>
@@ -520,7 +550,7 @@
     <value>Ctrl+M</value>
   </data>
   <data name="muteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>147, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="muteToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Mute</value>
@@ -836,6 +866,42 @@
   </data>
   <data name="&gt;&gt;videoToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;borderToolStripMenuItem.Name" xml:space="preserve">
+    <value>borderToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;borderToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;borderAutoToolStripMenuItem.Name" xml:space="preserve">
+    <value>borderAutoToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;borderAutoToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem8.Name" xml:space="preserve">
+    <value>toolStripMenuItem8</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem8.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;borderOnToolStripMenuItem.Name" xml:space="preserve">
+    <value>borderOnToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;borderOnToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;borderOffToolStripMenuItem.Name" xml:space="preserve">
+    <value>borderOffToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;borderOffToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem9.Name" xml:space="preserve">
+    <value>toolStripMenuItem9</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem9.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;zoomToolStripMenuItem.Name" xml:space="preserve">
     <value>zoomToolStripMenuItem</value>

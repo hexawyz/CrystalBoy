@@ -106,6 +106,12 @@ namespace CrystalBoy.Emulation
 				Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette1, 0, 4 * sizeof(uint));
 				Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette2, 0, 4 * sizeof(uint));
 			}
+			if (videoRenderer != null)
+			{
+				videoRenderer.Reset();
+				RenderBorder();
+				Render();
+			}
 		}
 
 		#endregion
@@ -140,10 +146,10 @@ namespace CrystalBoy.Emulation
 		{
 			OnBeforeRendering(frameEventArgs);
 
-			if (pendingSgbTransfer)
+			if (sgbPendingTransfer)
 			{
 				ProcessSuperGameBoyCommand(true);
-				pendingSgbTransfer = false;
+				sgbPendingTransfer = false;
 			}
 
 			if (!frameEventArgs.SkipFrame)

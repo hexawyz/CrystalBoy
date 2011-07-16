@@ -71,13 +71,9 @@ namespace CrystalBoy.Emulator.Rendering.GdiPlus
 			screenBitmap.UnlockBits(bitmapData);
 		}
 
-		private void ResetInterpolationMode()
-		{
-			if (Interpolation)
-				interpolationMode = InterpolationMode.Default;
-			else
-				interpolationMode = InterpolationMode.NearestNeighbor;
-		}
+		public override bool SupportsInterpolation { get { return true; } }
+
+		private void ResetInterpolationMode() { interpolationMode = Interpolation ? InterpolationMode.Default : InterpolationMode.NearestNeighbor; }
 
 		protected override void OnInterpolationChanged(System.EventArgs e)
 		{

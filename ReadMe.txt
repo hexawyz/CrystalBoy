@@ -29,6 +29,10 @@ NOTE 2: At first run, the emulator may inform you that one or more plugin assemb
 Since the Direct2D render method has been quite enhanced compared to others, I suggest you use it *if you have Windows 7*.
 However, the performance with Direct2D might be slightly lower than with Direct3D 9, although I haven't been able to really measure anything.
 
+Changes for version 1.5
+	* Super Game Boy emulation
+		- Border support
+
 Changes for version 1.4
 	* Now supports loading the DMG, SGB and GBC bootstrap ROMs
 	* Better GBC hardware emulation (now supports switching to fake B&W mode)

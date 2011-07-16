@@ -5,7 +5,7 @@
     <Setting Name="VideoRenderer" Type="System.String" Scope="User">
       <Value Profile="(Default)">Direct3D9Renderer</Value>
     </Setting>
-    <Setting Name="RenderSize" Type="System.Drawing.Size" Scope="User">
+    <Setting Name="ContentSize" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">320, 288</Value>
     </Setting>
     <Setting Name="ZoomFactor" Type="System.Int32" Scope="User">
@@ -27,6 +27,12 @@
     </Setting>
     <Setting Name="UseBootstrapRom" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Interpolation" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="BorderVisibility" Type="CrystalBoy.Emulation.BorderVisibility" Scope="User">
+      <Value Profile="(Default)">Auto</Value>
     </Setting>
   </Settings>
 </SettingsFile>

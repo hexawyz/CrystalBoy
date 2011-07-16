@@ -42,6 +42,12 @@ namespace CrystalBoy.Emulator
 		public event EventHandler EmulationStatusChanged;
 		public event EventHandler NewFrame;
 
+		public event EventHandler BorderChanged
+		{
+			add { bus.BorderChanged += value; }
+			remove { bus.BorderChanged -= value; }
+		}
+
 		public EmulatedGameBoy()
 		{
 			bus = new GameBoyMemoryBus();
@@ -89,6 +95,8 @@ namespace CrystalBoy.Emulator
 		public RomInformation RomInformation { get { return bus.RomInformation; } }
 
 		public bool RomLoaded { get { return bus.RomLoaded; } }
+
+		public bool HasCustomBorder { get { return bus.HasCustomBorder; } }
 
 		public GameBoyMemoryBus Bus { get { return bus; } }
 
