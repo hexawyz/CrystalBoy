@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
@@ -26,14 +25,21 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		private byte[] sgbCommandBuffer;
 		private byte[] sgbCharacterData;
 		private ushort[] sgbBorderMapData;
+		private byte[] sgbCommandBuffer;
 		private GameBoyKeys[] additionalKeys;
 		private ushort sgbCommandBufferStatus;
 		private byte joypadCount;
 		private byte joypadIndex;
-		private bool pendingSgbTransfer;
+		private bool sgbPendingTransfer;
+		private bool sgbCustomBorder;
+
+		#endregion
+
+		#region Events
+
+		public event EventHandler BorderChanged;
 
 		#endregion
 
@@ -46,7 +52,6 @@ namespace CrystalBoy.Emulation
 			sgbBorderMapData = new ushort[0x800]; // This will also include palettes 4 - 7
 			sgbCommandBuffer = new byte[7 * 16];
 			sgbCommandBufferStatus = 0;
-			pendingSgbTransfer = false;
 		}
 
 		#endregion
@@ -59,13 +64,22 @@ namespace CrystalBoy.Emulation
 			joypadIndex = 0;
 			for (int i = 0; i < additionalKeys.Length; i++)
 				additionalKeys[i] = GameBoyKeys.None;
+			Array.Clear(sgbCharacterData, 0, sgbCharacterData.Length);
+			Array.Clear(sgbBorderMapData, 0, sgbBorderMapData.Length);
+			Array.Clear(sgbCommandBuffer, 0, sgbCommandBuffer.Length);
+			sgbPendingTransfer = false;
+			sgbCustomBorder = false;
 		}
 
 		#endregion
 
+		public bool HasCustomBorder { get { return sgbCustomBorder; } }
+
+		private void OnBorderChanged(EventArgs e) { if (BorderChanged != null) BorderChanged(this, e); }
+
 		private void SuperGameBoyKeyRegisterWrite()
 		{
-			if (pendingSgbTransfer) return;
+			if (sgbPendingTransfer) return;
 
 			// A sgb packet is one reset pulse plus 128 bits plus one stop bit.
 			// Up to seven packets can be transferred.
@@ -164,11 +178,11 @@ namespace CrystalBoy.Emulation
 					break;
 				case SuperGameBoyCommand.CHR_TRN:
 					if (doNotWait) SgbCharacterTransfer((sgbCommandBuffer[1] & 0x1) != 0);
-					else pendingSgbTransfer = true;
+					else sgbPendingTransfer = true;
 					break;
 				case SuperGameBoyCommand.PCT_TRN:
 					if (doNotWait) SgbPictureTransfer();
-					else pendingSgbTransfer = true;
+					else sgbPendingTransfer = true;
 					break;
 				case SuperGameBoyCommand.MASK_EN:
 					// Need to add a flag to prevent swapping the rendering buffers, and re-render the previous frame.
@@ -198,6 +212,8 @@ namespace CrystalBoy.Emulation
 				SgbVideoTransfer((void*)sgbBorderMapDataPointer, videoStatusSnapshot.VideoMemory);
 
 			RenderBorder();
+
+			OnBorderChanged(EventArgs.Empty);
 		}
 
 		private unsafe void SgbVideoTransfer(void* destination, void* videoMemory)
@@ -216,7 +232,7 @@ namespace CrystalBoy.Emulation
 				for (int j = i != 0 ? 20 : 16; j-- != 0; )
 				{
 					// Assume the data is aligned, and copy one tile as two QWORD.
-					// This seems to be a safe guess, and should work in all cases on x86...
+					// This seems to be a safe guess (malloc will always alloc aligned memory blocks, right ?), and should work in all cases on x86… (Since it allows for unaligned accesses)
 					ulong* src = (ulong*)((byte*)videoMemory + (((lcdc & 0x10) != 0 ? *bgMap++ : 0x100 + unchecked((sbyte)*bgMap++)) << 4));
 
 					*dst++ = *src++;

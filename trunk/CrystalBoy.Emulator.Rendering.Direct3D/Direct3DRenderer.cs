@@ -152,6 +152,8 @@ namespace CrystalBoy.Emulator.Rendering.Direct3D
 			}
 		}
 
+		public override bool SupportsInterpolation { get { return true; } }
+
 		protected override void OnInterpolationChanged(EventArgs e)
 		{
 			ResetTextureFilter();

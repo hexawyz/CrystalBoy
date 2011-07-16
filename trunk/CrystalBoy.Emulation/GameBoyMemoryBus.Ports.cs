@@ -308,6 +308,22 @@ namespace CrystalBoy.Emulation
 						portMemory[0x6C] = (byte)(0xFE | value & 0x01);
 					}
 					break;
+				// Tracked audio ports
+				case 0x1A: // NR30
+					if ((value & 0x80) != 0)
+					{
+						portMemory[0x1A] = 0xFF;
+						portMemory[0x26] |= 0x04;
+					}
+					else
+					{
+						portMemory[0x1A] = 0x7F;
+						portMemory[0x26] &= 0xFB;
+					}
+					break;
+				case 0x26: // NR52
+					portMemory[0x26] = (value & 0x80) != 0 ? (byte)(0xF0 | portMemory[0x26]) : (byte)0x00;
+					break;
 				// Tracked video ports
 				// Only in non-cgb mode
 				case 0x47: // BGP

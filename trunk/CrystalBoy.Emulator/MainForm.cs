@@ -38,9 +38,9 @@ namespace CrystalBoy.Emulator
 		private EmulatedGameBoy emulatedGameBoy;
 		private VideoRenderer videoRenderer;
 		private Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
-		private bool pausedTemporarily;
 		private BinaryWriter ramSaveWriter;
 		private BinaryReader ramSaveReader;
+		private bool pausedTemporarily;
 
 		#region Constructor and Initialization
 
@@ -51,11 +51,13 @@ namespace CrystalBoy.Emulator
 			emulatedGameBoy.TryUsingBootRom = Settings.Default.UseBootstrapRom;
 			emulatedGameBoy.EnableFramerateLimiter = Settings.Default.LimitSpeed;
 			emulatedGameBoy.RomChanged += OnRomChanged;
+			emulatedGameBoy.AfterReset += OnAfterReset;
 			emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
 			emulatedGameBoy.NewFrame += OnNewFrame;
+			emulatedGameBoy.BorderChanged += OnBorderChanged;
 			try { emulatedGameBoy.Reset(Settings.Default.HardwareType); }
 			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
-			AdjustSize(Settings.Default.RenderSize);
+			AdjustSize(Settings.Default.ContentSize);
 			UpdateEmulationStatus();
 			UpdateFrameRate();
 			SetStatusTextHandler();
@@ -117,7 +119,7 @@ namespace CrystalBoy.Emulator
 
 			videoRenderer = CreateRenderMethod(renderMethodType);
 			videoRenderer.Interpolation = false;
-			videoRenderer.BorderVisible = true;
+			videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
 
 			ToolStripMenuItem selectedMethodMenuItem = renderMethodMenuItemDictionary[renderMethodType];
 
@@ -203,6 +205,8 @@ namespace CrystalBoy.Emulator
 		}
 
 		#endregion
+
+		#region ROM Loading & RAM Saving
 
 		private void UnloadRom()
 		{
@@ -311,14 +315,49 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
+		#endregion
+
 		#region Size Management
+
+		#region Border Visibility Management
+
+		private void OnAfterReset(object sender, EventArgs e) { SetBorderVisibility(Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder); }
+
+		private void OnBorderChanged(object sender, EventArgs e) { if (Settings.Default.BorderVisibility == BorderVisibility.Auto) ShowBorder(); }
+
+		private void SetBorderVisibility(bool visible) { if (visible) ShowBorder(); else HideBorder(); }
+
+		private void ShowBorder()
+		{
+			if (videoRenderer != null && !videoRenderer.BorderVisible)
+			{
+				var panelSize = toolStripContainer.ContentPanel.ClientSize;
+
+				videoRenderer.BorderVisible = true;
+				AdjustSize(panelSize.Width * 256 / 160, panelSize.Height * 224 / 144);
+			}
+		}
+
+		private void HideBorder()
+		{
+			if (videoRenderer != null && videoRenderer.BorderVisible)
+			{
+				var panelSize = toolStripContainer.ContentPanel.ClientSize;
+
+				videoRenderer.BorderVisible = false;
+				AdjustSize(panelSize.Width * 160 / 256, panelSize.Height * 144 / 224);
+			}
+		}
+
+		#endregion
 
 		private void SetZoomFactor(int factor)
 		{
-			if (factor <= 0)
-				throw new ArgumentOutOfRangeException("factor");
+			var referenceSize = videoRenderer.BorderVisible ? new Size(256, 224) : new Size(160, 144);
+
+			if (factor <= 0) throw new ArgumentOutOfRangeException("factor");
 			Settings.Default.ZoomFactor = factor;
-			AdjustSize(factor * 160, factor * 144);
+			AdjustSize(factor * referenceSize.Width, factor * referenceSize.Height);
 		}
 
 		private void AdjustSize(Size requestedSize)
@@ -382,7 +421,7 @@ namespace CrystalBoy.Emulator
 		protected override void OnClosed(EventArgs e)
 		{
 			UnloadRom();
-			Settings.Default.RenderSize = toolStripContainer.ContentPanel.ClientSize;
+			Settings.Default.ContentSize = toolStripContainer.ContentPanel.ClientSize;
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
@@ -473,6 +512,37 @@ namespace CrystalBoy.Emulator
 
 			SwitchRenderMethod((Type)renderMethodMenuItem.Tag);
 		}
+
+		#region Border
+
+		private void borderToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+		{
+			var borderVisibility = Settings.Default.BorderVisibility;
+
+			borderAutoToolStripMenuItem.Checked = borderVisibility == BorderVisibility.Auto;
+			borderOnToolStripMenuItem.Checked = borderVisibility == BorderVisibility.On;
+			borderOffToolStripMenuItem.Checked = borderVisibility == BorderVisibility.Off;
+		}
+		
+		private void borderAutoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Settings.Default.BorderVisibility = BorderVisibility.Auto;
+			SetBorderVisibility(emulatedGameBoy.HasCustomBorder);
+		}
+
+		private void borderOnToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Settings.Default.BorderVisibility = BorderVisibility.On;
+			ShowBorder();
+		}
+
+		private void borderOffToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Settings.Default.BorderVisibility = BorderVisibility.Off;
+			HideBorder();
+		}
+
+		#endregion
 
 		#region Zoom
 
