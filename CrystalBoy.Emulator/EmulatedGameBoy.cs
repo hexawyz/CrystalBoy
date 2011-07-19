@@ -22,10 +22,11 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using CrystalBoy.Core;
 using CrystalBoy.Emulation;
+using System.ComponentModel;
 
 namespace CrystalBoy.Emulator
 {
-	sealed class EmulatedGameBoy : IDisposable
+	sealed class EmulatedGameBoy : IComponent, IDisposable
 	{
 		private GameBoyMemoryBus bus;
 		private EmulationStatus emulationStatus;
@@ -40,7 +41,12 @@ namespace CrystalBoy.Emulator
 		public event EventHandler Paused;
 		public event EventHandler Break;
 		public event EventHandler EmulationStatusChanged;
-		public event EventHandler NewFrame;
+
+		public event EventHandler NewFrame
+		{
+			add { bus.FrameDone += value; }
+			remove { bus.FrameDone -= value; }
+		}
 
 		public event EventHandler BorderChanged
 		{
@@ -53,11 +59,38 @@ namespace CrystalBoy.Emulator
 			bus = new GameBoyMemoryBus();
 			frameStopwatch = new Stopwatch();
 			frameRateStopwatch = new Stopwatch();
+#if WITH_THREADING
+			bus.EmulationStopped += OnEmulationStopped;
+#else
 			Application.Idle += OnApplicationIdle;
+#endif
+			bus.ReadKeys += new EventHandler<ReadKeysEventArgs>(OnReadKeys);
 			emulationStatus = bus.UseBootRom ? EmulationStatus.Paused : EmulationStatus.Stopped;
 		}
 
-		public void Dispose() { bus.Dispose(); }
+		#region IComponent Members
+
+		public event EventHandler Disposed;
+
+		public ISite Site { get; set; }
+
+		#endregion
+
+		private void OnReadKeys(object sender, ReadKeysEventArgs e) { if (e.JoypadIndex == 0) bus.PressedKeys = ReadKeys(); }
+
+#if WITH_THREADING
+		private void  OnEmulationStopped(object sender, EventArgs e) { Pause(Processor.Status == ProcessorStatus.Running); }
+#endif
+
+		public void Dispose()
+		{
+			if (bus != null)
+			{
+				bus.Dispose();
+				bus = null;
+				if (Disposed != null) Disposed(this, EventArgs.Empty);
+			}
+		}
 
 		public void Reset() { Reset(bus.HardwareType); }
 
@@ -162,6 +195,9 @@ namespace CrystalBoy.Emulator
 			{
 				ResetCounter();
 				EmulationStatus = EmulationStatus.Running;
+#if WITH_THREADING
+				bus.Run();
+#endif
 			}
 		}
 
@@ -184,6 +220,9 @@ namespace CrystalBoy.Emulator
 
 		private void Pause(bool breakpoint)
 		{
+#if WITH_THREADING
+			bus.Stop();
+#endif
 			EmulationStatus = EmulationStatus.Paused;
 
 			frameRateStopwatch.Stop();
@@ -198,32 +237,11 @@ namespace CrystalBoy.Emulator
 			set { bus.PressedKeys = value; }
 		}
 
-		public void NotifyPressedKeys(GameBoyKeys pressedKeys) { bus.NotifyPressedKeys(pressedKeys); }
+		//public void NotifyPressedKeys(GameBoyKeys pressedKeys) { bus.NotifyPressedKeys(pressedKeys); }
 
-		public void NotifyReleasedKeys(GameBoyKeys releasedKeys) { bus.NotifyReleasedKeys(releasedKeys); }
+		//public void NotifyReleasedKeys(GameBoyKeys releasedKeys) { bus.NotifyReleasedKeys(releasedKeys); }
 
-		private void RunFrameInternal()
-		{
-			bus.PressedKeys = ReadKeys();
-#if WITH_THREADING
-			var runFrameResult = bus.RunFrame();
-
-			lock (runFrameResult)
-			{
-				if (!runFrameResult.Finished)
-					Monitor.Wait(runFrameResult);
-			}
-
-			if (runFrameResult.Value)
-#else
-			if (Processor.Emulate(true))
-#endif
-				OnNewFrame(EventArgs.Empty);
-			// If a breakpoint is encountered, the processor is still virtually running.
-			else if (Processor.Status == ProcessorStatus.Running) Pause(true);
-			// If the processor crashed, there is no point in continuing the emulation.
-			else if (Processor.Status == ProcessorStatus.Crashed) EmulationStatus = EmulationStatus.Stopped;
-		}
+		private void RunFrameInternal() { bus.RunFrame(); }
 
 		private bool IsKeyDown(Keys vKey) { return (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0; }
 
@@ -253,6 +271,7 @@ namespace CrystalBoy.Emulator
 #endif
 		}
 
+#if !WITH_THREADING
 		private void OnApplicationIdle(object sender, EventArgs e)
 		{
 #if PINVOKE
@@ -290,6 +309,7 @@ namespace CrystalBoy.Emulator
 #error Render loop cannot work without P/Invoke
 #endif
 		}
+#endif
 
 		private void OnRomChanged(EventArgs e)
 		{
@@ -319,12 +339,6 @@ namespace CrystalBoy.Emulator
 		{
 			if (EmulationStatusChanged != null)
 				EmulationStatusChanged(this, e);
-		}
-
-		private void OnNewFrame(EventArgs e)
-		{
-			if (NewFrame != null)
-				NewFrame(this, e);
 		}
 	}
 }

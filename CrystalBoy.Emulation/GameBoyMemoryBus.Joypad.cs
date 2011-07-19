@@ -22,11 +22,79 @@ namespace CrystalBoy.Emulation
 {
 	partial class GameBoyMemoryBus
 	{
+		public sealed class JoypadState
+		{
+			private GameBoyMemoryBus bus;
+
+			internal JoypadState(GameBoyMemoryBus bus) { this.bus = bus; }
+
+			public GameBoyKeys this[int joypadIndex]
+			{
+				get
+				{
+					if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
+
+					return joypadIndex == 0 ? bus.baseKeys : bus.additionalKeys[joypadIndex - 1];
+				}
+				set
+				{
+					if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
+
+					if (joypadIndex == 0) bus.baseKeys = value;
+					else bus.additionalKeys[joypadIndex - 1] = value;
+					if (joypadIndex == bus.joypadIndex) bus.UpdateJoypadRegister();
+				}
+			}
+
+			public void NotifyPressedKeys(GameBoyKeys pressedKeys)
+			{
+				bus.baseKeys |= pressedKeys;
+				if (bus.joypadIndex == 0) bus.UpdateJoypadRegister();
+			}
+
+			public void NotifyPressedKeys(int joypadIndex, GameBoyKeys pressedKeys)
+			{
+				if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
+
+				if (joypadIndex == 0) bus.baseKeys |= pressedKeys;
+				else bus.additionalKeys[joypadIndex - 1] |= pressedKeys;
+				if (joypadIndex == bus.joypadIndex) bus.UpdateJoypadRegister();
+			}
+
+			public void NotifyReleasedKeys(GameBoyKeys releasedKeys)
+			{
+				bus.baseKeys &= ~releasedKeys;
+				if (bus.joypadIndex == 0) bus.UpdateJoypadRegister();
+			}
+
+			public void NotifyReleasedKeys(int joypadIndex, GameBoyKeys releasedKeys)
+			{
+				if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
+
+				if (joypadIndex == 0) bus.baseKeys &= ~releasedKeys;
+				else bus.additionalKeys[joypadIndex - 1] &= releasedKeys;
+				if (joypadIndex == bus.joypadIndex) bus.UpdateJoypadRegister();
+			}
+		}
+
 		#region Variables
 
+		private ReadKeysEventArgs readKeysEventArgs;
 		private GameBoyKeys baseKeys;
 		private bool joypadRow0;
 		private bool joypadRow1;
+
+		#endregion
+
+		#region Events
+
+		public event EventHandler<ReadKeysEventArgs> ReadKeys;
+
+		#endregion
+
+		#region Initialize
+
+		partial void InitializeJoypad() { readKeysEventArgs = new ReadKeysEventArgs(); }
 
 		#endregion
 
@@ -43,20 +111,20 @@ namespace CrystalBoy.Emulation
 
 		#region Joypad
 
-		private void KeyRegisterWrite(byte value)
+		private void WriteJoypadRegister(byte value)
 		{
 			// In order for both operations to be executed, use a bitwise or, not a logical or…
 			if ((joypadRow0 != (joypadRow0 = (value & 0x10) == 0))
 				| (joypadRow1 != (joypadRow1 = (value & 0x20) == 0)))
 			{
 				if (superFunctions) SuperGameBoyKeyRegisterWrite();
-				UpdateKeyRegister();
+				UpdateJoypadRegister();
 			}
 		}
 
-		private unsafe void UpdateKeyRegister()
+		private unsafe void UpdateJoypadRegister()
 		{
-			byte oldValue, newValue;
+			byte newValue;
 			byte keys = joypadIndex != 0 ? (byte)additionalKeys[joypadIndex - 1] : (byte)this.baseKeys;
 
 			if (joypadRow0 && joypadRow1)
@@ -73,26 +141,25 @@ namespace CrystalBoy.Emulation
 			portMemory[0x00] = newValue;
 		}
 
+		private byte ReadJoypadRegister()
+		{
+			if (ReadKeys != null)
+			{
+				readKeysEventArgs.Reset(joypadIndex);
+				ReadKeys(this, readKeysEventArgs);
+			}
+
+			unsafe { return portMemory[0x00]; }
+		}
+
 		public GameBoyKeys PressedKeys
 		{
 			get { return baseKeys; }
 			set
 			{
 				baseKeys = value;
-				UpdateKeyRegister();
+				UpdateJoypadRegister();
 			}
-		}
-
-		public void NotifyPressedKeys(GameBoyKeys pressedKeys)
-		{
-			baseKeys |= pressedKeys;
-			UpdateKeyRegister();
-		}
-
-		public void NotifyReleasedKeys(GameBoyKeys releasedKeys)
-		{
-			baseKeys &= ~releasedKeys;
-			UpdateKeyRegister();
 		}
 
 		#endregion

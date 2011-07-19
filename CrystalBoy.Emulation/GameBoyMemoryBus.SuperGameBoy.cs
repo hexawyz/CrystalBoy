@@ -41,12 +41,15 @@ namespace CrystalBoy.Emulation
 
 		public event EventHandler BorderChanged;
 
+		private NotificationHandler borderChangedHandler;
+
 		#endregion
 
 		#region Initialize
 
 		partial void InitializeSuperGameBoy()
 		{
+			borderChangedHandler = OnBorderChanged;
 			additionalKeys = new GameBoyKeys[3];
 			sgbCharacterData = new byte[0x2000];
 			sgbBorderMapData = new ushort[0x800]; // This will also include palettes 4 - 7
@@ -213,7 +216,7 @@ namespace CrystalBoy.Emulation
 
 			RenderBorder();
 
-			OnBorderChanged(EventArgs.Empty);
+			PostUINotification(borderChangedHandler);
 		}
 
 		private unsafe void SgbVideoTransfer(void* destination, void* videoMemory)

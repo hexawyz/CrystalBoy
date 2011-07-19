@@ -197,6 +197,10 @@ namespace CrystalBoy.Emulation
 			// From now on, the hardware type can only be changed after a "hard" reset of the emulated machine
 			HardwareType = hardwareType;
 
+#if WITH_THREADING
+			SuspendEmulation();
+#endif
+
 			ResetThreading();
 			ResetBootRom();
 			ResetProcessor();
@@ -212,6 +216,10 @@ namespace CrystalBoy.Emulation
 			ResetRendering();
 			ResetDebug();
 			ResetSnapshot();
+
+#if WITH_THREADING
+			ResumeEmulation();
+#endif
 		}
 
 		#endregion

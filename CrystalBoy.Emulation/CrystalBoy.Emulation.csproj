@@ -88,11 +88,11 @@
     <Compile Include="ProcessorStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PortAccess.cs" />
+    <Compile Include="ReadKeysEventArgs.cs" />
     <Compile Include="RealTimeClockState.cs" />
     <Compile Include="SuperGameBoyCommand.cs" />
     <Compile Include="VideoRenderer.cs" />
     <Compile Include="RumbleEventArgs.cs" />
-    <Compile Include="RunFrameResult.cs" />
     <Compile Include="VideoStatusSnapshot.cs" />
     <Compile Include="GameBoyMemoryBus.cs" />
     <Compile Include="GameBoyMemoryBus.Threading.cs">

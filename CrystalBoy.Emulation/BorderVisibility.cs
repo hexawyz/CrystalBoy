@@ -20,7 +20,7 @@ using System;
 
 namespace CrystalBoy.Emulation
 {
-	public enum BorderVisibility : sbyte
+	public enum BorderVisibility
 	{
 		Auto = -1,
 		Off = 0,
