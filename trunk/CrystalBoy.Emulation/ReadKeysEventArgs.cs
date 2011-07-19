@@ -20,9 +20,12 @@ using System;
 
 namespace CrystalBoy.Emulation
 {
-	public sealed class RunFrameResult
+	public sealed class ReadKeysEventArgs : EventArgs
 	{
-		public bool Finished { get; internal set; }
-		public bool Value { get; internal set; }
+		internal ReadKeysEventArgs() { }
+
+		internal void Reset(int joypadIndex) { JoypadIndex = joypadIndex; }
+
+		public int JoypadIndex { get; private set; }
 	}
 }

@@ -56,7 +56,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			screenBuffer = new byte[160 * 144 * 4];
 			clearColor = new Color4(unchecked((int)LookupTables.StandardColorLookupTable32[ClearColor]));
 			factory = new Factory(FactoryType.SingleThreaded, DebugLevel.None);
-			Reset();
+			ResetRendering();
 			renderObject.FindForm().SizeChanged += OnSizeChanged;
 		}
 
@@ -71,7 +71,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			RenderObject.FindForm().SizeChanged -= OnSizeChanged;
 		}
 
-		private void Reset()
+		private void ResetRendering()
 		{
 			DisposeBitmaps();
 			DisposeRenderTargets();
@@ -249,7 +249,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			// If needed, try to recreate the target.
 			if (windowRenderTarget.EndDraw().IsFailure)
 			{
-				Reset();
+				ResetRendering();
 				// Try to render again, but only once. (We don't want to enter an infinite recursion… AKA Stack Overflow)
 				if (retry) Render(false);
 			}

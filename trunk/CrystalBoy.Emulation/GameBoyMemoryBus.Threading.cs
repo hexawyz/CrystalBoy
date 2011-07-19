@@ -23,36 +23,62 @@ namespace CrystalBoy.Emulation
 {
 	partial class GameBoyMemoryBus
 	{
-		private RunFrameResult runFrameResult;
+		private delegate void NotificationHandler(EventArgs e);
+
+		private const double realFrameDuration = 1000d / 60d;
+
+		private SynchronizationContext synchronizationContext;
+		private SendOrPostCallback handlePostedNotification;
 #if WITH_THREADING
 		private Thread processorThread;
-		private Thread videoFrameThread;
 		private Thread audioFrameThread;
+		private SendOrPostCallback videoFrameCallback;
+		private volatile bool isRunning;
 		private volatile bool isRendering;
 
 		private bool threadingEnabled;
 #endif
 
+		#region Events
+
+		public event EventHandler FrameDone;
+		private NotificationHandler frameDoneHandler;
+
 #if WITH_THREADING
+		public event EventHandler EmulationStarted;
+		private NotificationHandler emulationStartedHandler;
+
+		public event EventHandler EmulationStopped;
+		private NotificationHandler emulationStoppedHandler;
+#endif
+
+		#endregion
+
 		partial void InitializeThreading()
 		{
+			synchronizationContext = SynchronizationContext.Current;
+			handlePostedNotification = HandlePostedNotification;
+			frameDoneHandler = OnFrameDone;
+			videoFrameCallback = RenderVideoFrame;
+#if WITH_THREADING
+			emulationStartedHandler = OnEmulationStarted;
+			emulationStoppedHandler = OnEmulationStopped;
 			if (threadingEnabled = !(Environment.ProcessorCount < 2))
 			{
 				processorThread = new Thread(RunProcessor);
-				videoFrameThread = new Thread(RunVideoFrame);
 				//audioFrameThread = new Thread(RunAudioFrame);
 
 				processorThread.Start();
-				videoFrameThread.Start();
 			}
-			runFrameResult = new RunFrameResult();
+#endif
 		}
 
+#if WITH_THREADING
 		partial void DisposeThreading()
 		{
 			threadingEnabled = false;
+			Stop();
 			DisposeThread(ref processorThread);
-			DisposeThread(ref videoFrameThread);
 			DisposeThread(ref audioFrameThread);
 		}
 
@@ -60,8 +86,7 @@ namespace CrystalBoy.Emulation
 		{
 			if (thread != null)
 			{
-				lock (thread)
-					Monitor.Pulse(thread);
+				lock (thread) Monitor.Pulse(thread);
 				thread.Join();
 
 				thread = null;
@@ -69,35 +94,83 @@ namespace CrystalBoy.Emulation
 		}
 #endif
 
-		public RunFrameResult RunFrame()
+		/// <summary>Gets or sets the synchronization context used by this instance.</summary>
+		/// <value>The synchronization context.</value>
+		public SynchronizationContext SynchronizationContext
+		{
+			get { return synchronizationContext; }
+			set { lock (this) synchronizationContext = value; }
+		}
+
+		public void RunFrame()
 		{
 #if WITH_THREADING
-			if (threadingEnabled)
-			{
-				lock (processorThread)
-				{
-					runFrameResult.Finished = false;
-					runFrameResult.Value = false;
-					Monitor.Pulse(processorThread);
-				}
-			}
+			// Prevent dumb deadlocks by checking the value of “isRunning”.
+			// However, it is still possible to induce a deadlock in complex threading configurations.
+			// In fact, method calls on GameBoyMemoryBus 
+			if (threadingEnabled) { if (!isRunning) lock (processorThread) Monitor.Pulse(processorThread); }
 			else
 #endif
 			{
-				runFrameResult.Value = processor.Emulate(true);
-				runFrameResult.Finished = true;
+				if (processor.Emulate(true)) PostUINotification(frameDoneHandler);
+#if WITH_DEBUGGING
+				else if (processor.Status == ProcessorStatus.Running) PostUINotification(breakpointHandler);
+#endif
 			}
+		}
 
-			return runFrameResult;
+		private void OnFrameDone(EventArgs e) { if (FrameDone != null) FrameDone(this, e); }
+
+		private void HandlePostedNotification(object state)
+		{
+			var handler = state as NotificationHandler;
+
+			handler(EventArgs.Empty);
+		}
+
+		private void PostUINotification(NotificationHandler handler)
+		{
+			if (synchronizationContext != null) synchronizationContext.Post(handlePostedNotification, handler);
+			else handler(EventArgs.Empty);
 		}
 
 #if WITH_THREADING
-		private void ThreadedRender()
+		public void Run()
+		{
+			isRunning = true;
+			lock (processorThread) Monitor.Pulse(processorThread);
+		}
+
+		private void OnEmulationStarted(EventArgs e) { if (EmulationStarted != null) EmulationStarted(this, e); }
+
+		public void Stop()
+		{
+			isRunning = false;
+			// Wait for the processor thread to pause…
+#pragma warning disable 642
+			lock (processorThread) ;
+#pragma warning restore 642
+		}
+
+		private void OnEmulationStopped(EventArgs e) { if (EmulationStopped != null) EmulationStopped(this, e); }
+
+		private void SuspendEmulation()
+		{
+			bool wasRunning = isRunning;
+
+			isRunning = false;
+			// Wait for the processor thread to pause, and reset “isRunning”…
+			lock (processorThread) isRunning = wasRunning;
+		}
+
+		private void ResumeEmulation() { if (isRunning) lock (processorThread) Monitor.Pulse(processorThread); }
+
+		private void UIThreadRender()
 		{
 			// This method will (should) never be called when a rendering operation is already active.
 			// The code below should thus never lock the thread for a long time.
-			lock (videoFrameThread)
-				Monitor.Pulse(videoFrameThread);
+			if (synchronizationContext != null) synchronizationContext.Post(videoFrameCallback, null);
+			else videoFrameCallback(null);
 		}
 
 		private void RunProcessor()
@@ -106,36 +179,53 @@ namespace CrystalBoy.Emulation
 			{
 				while (true)
 				{
+					bool result;
+
 					Monitor.Wait(processorThread);
 
 					if (!threadingEnabled) return;
 
-					lock (runFrameResult)
+					PostUINotification(emulationStartedHandler);
+
+					do
 					{
-						runFrameResult.Value = processor.Emulate(true);
-						runFrameResult.Finished = true;
-						Monitor.Pulse(runFrameResult);
+						// “isRunning” is a volatile variable that can be modified at any time.
+						// Reading and writing “isRunning” here is perfectly fine, however, some logic as to be followed.
+						// 	- If the processor emulation says to stop running, then we have to stop running, no matter what.
+						//	- Because Events may be triggered between the call to “processor.Emulate” and the loop condition evalutaion, altough that is unlikely:
+						//    The only value of “isRunning” that matters is the one direcly after the call to “processor.Emulate”. (Either the read one or the written one)
+						//	- Changed to “isRunning” inside of “processor.Emulate” will be taken into account, for maximum reactivity.
+						if (result = processor.Emulate(true))
+						{
+							result &= isRunning;
+							PostUINotification(frameDoneHandler);
+						}
+						else
+						{
+							if (processor.Status == ProcessorStatus.Crashed) isRunning = false;
+#if WITH_DEBUGGING
+							else if (processor.Status == ProcessorStatus.Running)
+							{
+								isRunning = false;
+								PostUINotification(breakpointHandler);
+							}
+#endif
+							else result = true;
+						}
 					}
+					while (result);
+
+					PostUINotification(emulationStoppedHandler);
 				}
 			}
 		}
 
-		private void RunVideoFrame()
+		private void RenderVideoFrame(object state)
 		{
-			lock (videoFrameThread)
-			{
-				while (true)
-				{
-					Monitor.Wait(videoFrameThread);
+			// The method will clear the isRendering field by itself
+			Render();
 
-					if (!threadingEnabled) return;
-
-					// The method will clear the isRendering field by itself
-					Render();
-
-					OnAfterRendering(EventArgs.Empty);
-				}
-			}
+			OnAfterRendering(EventArgs.Empty);
 		}
 
 		private void RunAudioFrame()

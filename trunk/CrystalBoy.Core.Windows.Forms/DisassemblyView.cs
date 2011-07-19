@@ -619,7 +619,7 @@ namespace CrystalBoy.Core.Windows.Forms
 			for (int i = 0; i < lineCount; i++)
 			{
 				text = Utility.Disassemble(memory, offset, DisassembleFlags.Default, out length);
-				instructionCache.Add(new Instruction(offset, length, text, debuggable && debuggableMemory.IsBreakPoint(offset)));
+				instructionCache.Add(new Instruction(offset, length, text, debuggable && debuggableMemory.IsBreakpoint(offset)));
 
 				if (length == 0)
 					return;

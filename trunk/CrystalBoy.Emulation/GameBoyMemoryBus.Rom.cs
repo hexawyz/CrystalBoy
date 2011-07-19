@@ -60,25 +60,21 @@ namespace CrystalBoy.Emulation
 
 		public void LoadRom(MemoryBlock externalRom)
 		{
-			RomInformation romInfo;
+			RomInformation romInformation;
 
-			if (externalRom == null)
-				throw new ArgumentNullException("externalRom");
+			if (externalRom == null) throw new ArgumentNullException("externalRom");
 
 			if ((externalRom.Length & 0x3FFF) != 0
 				|| (externalRom.Length >> 14) > 256)
 				throw new InvalidOperationException();
 
-			romInfo = new RomInformation(externalRom);
+			romInformation = new RomInformation(externalRom);
 
-			if (romInfo.RomSize != externalRom.Length)
-				throw new InvalidOperationException();
+			if (romInformation.RomSize != externalRom.Length) throw new InvalidOperationException();
 
-			this.romInformation = romInfo;
-			this.externalRomBlock = externalRom;
-			this.colorMode = ColorHardware & romInfo.ColorGameBoySupport;
+			Mapper mapper;
 
-			switch (this.romInformation.RomType)
+			switch (romInformation.RomType)
 			{
 				case RomType.RomOnly:
 				case RomType.RomRam:
@@ -113,7 +109,19 @@ namespace CrystalBoy.Emulation
 					throw new NotSupportedException("Unsupported Cartidge Type");
 			}
 
-			Reset();
+#if WITH_THREADING
+			SuspendEmulation();
+#endif
+
+			this.romInformation = romInformation;
+			this.externalRomBlock = externalRom;
+			this.mapper = mapper;
+			this.colorMode = ColorHardware & romInformation.ColorGameBoySupport;
+
+#if WITH_DEBUGGING
+			ClearBreakpoints();
+#endif
+			Reset(); // Will call “ResumeEmulation”…
 
 			// Fills the external RAM with random data.
 			// It can be loaded with real data later.
@@ -126,15 +134,18 @@ namespace CrystalBoy.Emulation
 		{
 			if (externalRomBlock != null)
 			{
+#if WITH_THREADING
+				SuspendEmulation();
+#endif
 				this.mapper = null;
 				this.externalRomBlock = null;
 				this.romInformation = null;
 				this.colorMode = ColorHardware;
-				Reset();
-			}
 #if WITH_DEBUGGING
-			ClearBreakpoints();
+				ClearBreakpoints();
 #endif
+				Reset(); // Will call “ResumeEmulation”…
+			}
 		}
 
 		#endregion

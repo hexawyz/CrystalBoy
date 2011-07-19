@@ -35,10 +35,19 @@ namespace CrystalBoy.Emulation
 
 		#endregion
 
+		#region Events
+
+		public event EventHandler Breakpoint;
+
+		private NotificationHandler breakpointHandler;
+
+		#endregion
+
 		#region Initialize
 
 		partial void InitializeDebug()
 		{
+			breakpointHandler = null;
 			breakPointList = new List<int>();
 		}
 
@@ -66,8 +75,10 @@ namespace CrystalBoy.Emulation
 
 		public int BreakpointCount { get { return breakPointList.Count; } }
 
+		private void OnBreakpoint(EventArgs e) { if (Breakpoint != null) Breakpoint(this, e); }
+
 		[CLSCompliant(false)]
-		public bool IsBreakPoint(ushort offset)
+		public bool IsBreakpoint(ushort offset)
 		{
 			int fullOffset = GetFullOffset(offset);
 

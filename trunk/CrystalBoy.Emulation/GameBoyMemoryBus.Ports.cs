@@ -172,7 +172,7 @@ namespace CrystalBoy.Emulation
 			{
 				// Joypad
 				case 0x00: // JOYP
-					KeyRegisterWrite(value);
+					WriteJoypadRegister(value);
 					break;
 				// Timer Ports
 				case 0x04: // DIV
@@ -396,6 +396,8 @@ namespace CrystalBoy.Emulation
 
 			switch (port)
 			{
+				case 0x00:
+					return ReadJoypadRegister();
 				case 0x04: // DIV
 					return GetDividerValue();
 				case 0x05: // TIMA

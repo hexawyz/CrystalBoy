@@ -222,8 +222,7 @@ namespace CrystalBoy.Emulation
 						case 0x10: /* STOP */
 							status = ProcessorStatus.Stopped;
 							cycleCount = bus.HandleProcessorStop();
-							if (cycleCount < 0)
-								return false;
+							if (cycleCount < 0) return false;
 							status = ProcessorStatus.Running;
 							cycleCount = 4;
 							break;
@@ -2837,7 +2836,7 @@ namespace CrystalBoy.Emulation
 #if WITH_DEBUGGING
 					// Handle breakpoints after running at least one instruction
 					if (bus.BreakpointCount > 0) // Check for breakpoints only if there are some
-						if (bus.IsBreakPoint(pc))
+						if (bus.IsBreakpoint(pc))
 							return false; // Break when a breakpoint is encountered
 #else
 					;

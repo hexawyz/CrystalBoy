@@ -59,7 +59,7 @@ namespace CrystalBoy.Emulation
 			set { if (clearColor != (clearColor = (short)(value & 0x7FFF))) OnClearColorChanged(EventArgs.Empty); }
 		}
 
-		protected virtual void OnClearColorChanged(EventArgs e) { if (BorderVisibileChanged != null) BorderVisibileChanged(this, e); }
+		protected virtual void OnClearColorChanged(EventArgs e) { if (ClearColorChanged != null) ClearColorChanged(this, e); }
 
 		public bool BorderVisible
 		{

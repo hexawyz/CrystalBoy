@@ -165,8 +165,8 @@ namespace CrystalBoy.Emulation
 						Utility.Swap(ref videoStatusSnapshot, ref savedVideoStatusSnapshot);
 						Utility.Swap(ref videoPortAccessList, ref savedVideoPortAccessList);
 						Utility.Swap(ref paletteAccessList, ref savedPaletteAccessList);
-						// Wake up (!) the rendering thread
-						ThreadedRender();
+						// Request rendering
+						UIThreadRender();
 					}
 				}
 				else
