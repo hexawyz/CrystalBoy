@@ -65,6 +65,7 @@ namespace CrystalBoy.Emulation
 			clockManager = new GameBoyClockManager();
 			emulationStartedHandler = OnEmulationStarted;
 			emulationStoppedHandler = OnEmulationStopped;
+			threadingEnabled = true;
 			//if (threadingEnabled = !(Environment.ProcessorCount < 2))
 			//{
 				processorThread = new Thread(RunProcessor) { IsBackground = true };

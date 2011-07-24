@@ -370,12 +370,22 @@ namespace CrystalBoy.Emulator
 		{
 			Size newSize, panelSize;
 
+			// First round
 			newSize = ClientSize;
 			panelSize = toolStripContainer.ContentPanel.ClientSize;
 			newSize.Width = newSize.Width - panelSize.Width + requestedWidth;
 			newSize.Height = newSize.Height - panelSize.Height + requestedHeight;
 
 			ClientSize = newSize;
+
+			// Second round
+			panelSize = toolStripContainer.ContentPanel.ClientSize;
+			if (panelSize.Height != requestedHeight)
+			{
+				newSize.Height = newSize.Height - panelSize.Height + requestedHeight;
+
+				ClientSize = newSize;
+			}
 		}
 
 		protected override void OnResizeBegin(EventArgs e) { if (pausedTemporarily = emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause(); }

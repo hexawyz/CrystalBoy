@@ -190,7 +190,7 @@
     <value>4</value>
   </data>
   <data name="toolStripContainer.ContentPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>292, 220</value>
+    <value>292, 221</value>
   </data>
   <data name="&gt;&gt;toolStripContainer.ContentPanel.Name" xml:space="preserve">
     <value>toolStripContainer.ContentPanel</value>
@@ -289,7 +289,7 @@
     <value>Exit the emulator.</value>
   </data>
   <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>37, 20</value>
+    <value>37, 19</value>
   </data>
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;File</value>
@@ -601,7 +601,7 @@
     <value>Show the options window</value>
   </data>
   <data name="emulationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>73, 20</value>
+    <value>73, 19</value>
   </data>
   <data name="emulationToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Emulation</value>
@@ -658,7 +658,7 @@
     <value>Show the OAM Viewer Window.</value>
   </data>
   <data name="toolsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>48, 20</value>
+    <value>48, 19</value>
   </data>
   <data name="toolsToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Tools</value>
@@ -667,13 +667,13 @@
     <value>Tools for developers…</value>
   </data>
   <data name="aboutToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>116, 22</value>
+    <value>152, 22</value>
   </data>
   <data name="aboutToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;About…</value>
   </data>
   <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>44, 20</value>
+    <value>44, 19</value>
   </data>
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Help</value>
@@ -685,7 +685,7 @@
     <value>0, 0</value>
   </data>
   <data name="mainMenuStrip.Size" type="System.Drawing.Size, System.Drawing">
-    <value>292, 24</value>
+    <value>292, 23</value>
   </data>
   <data name="mainMenuStrip.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -740,9 +740,6 @@
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>292, 266</value>
-  </data>
-  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>CrystalBoy Emulator</value>
@@ -969,6 +966,48 @@
   <data name="&gt;&gt;toolStripMenuItem6.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;gameBoyToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Name" xml:space="preserve">
+    <value>superGameBoyToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyPocketToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Name" xml:space="preserve">
+    <value>superGameBoy2ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyColorToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Name" xml:space="preserve">
+    <value>superGameBoyColorToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyAdvanceToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;superGameBoyAdvanceToolStripMenuItem.Name" xml:space="preserve">
     <value>superGameBoyAdvanceToolStripMenuItem</value>
   </data>
@@ -1046,48 +1085,6 @@
   </data>
   <data name="&gt;&gt;openFileDialog.Type" xml:space="preserve">
     <value>System.Windows.Forms.OpenFileDialog, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gameBoyToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Name" xml:space="preserve">
-    <value>superGameBoyToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyPocketToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Name" xml:space="preserve">
-    <value>superGameBoy2ToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyColorToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Name" xml:space="preserve">
-    <value>superGameBoyColorToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyAdvanceToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>
