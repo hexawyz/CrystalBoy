@@ -128,7 +128,7 @@ namespace CrystalBoy.Emulation
 				uint g = values[(i >> 5) & 0x1F];
 				uint b = values[(i >> 10) & 0x1F];
 
-				lookupTable[i] = b | (g << 8) | (r << 16) | 0xFF000000;
+				lookupTable[i] = b | (g << 8) | (r << 16) | 0xFF000000U;
 			}
 		}
 
