@@ -17,17 +17,22 @@
 #endregion
 
 using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("CrystalBoy.Core")]
-[assembly: AssemblyDescription("CrystalBoy Core")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-[assembly: CLSCompliant(true)]
-
-[assembly: ComVisible(false)]
-[assembly: Guid("66db2ac4-1dc0-45c8-a62a-a319b36f0f38")]
-
-[assembly: AssemblyVersion("1.5.0.0")]
+namespace CrystalBoy.Emulation
+{
+	/// <summary>Provides a way of delaying events.</summary>
+	/// <remarks>This interface is used in <see cref="GameBoyMemoryBus"/> to provide timing and limit the framerate.</remarks>
+	public interface IClockManager
+	{
+		/// <summary>Resets this instance.</summary>
+		/// <remarks>This method will be called every time the timing has to be restarted.</remarks>
+		void Reset();
+		/// <summary>Wait before the next event.</summary>
+		/// <remarks>
+		/// This method will be called every time an event needs to be delayed.
+		/// The wait may be active, passive or hybrid, as desired.
+		/// There may even be no delay at all.
+		/// </remarks>
+		void Wait();
+	}
+}

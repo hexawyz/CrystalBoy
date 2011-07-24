@@ -194,45 +194,56 @@ namespace CrystalBoy.Emulation
 				return;
 			}
 
-			buffer = (byte*)videoRenderer.LockScreenBuffer(out stride);
-
-			if ((savedVideoStatusSnapshot.LCDC & 0x80) != 0)
+			if (savedVideoStatusSnapshot.SuperGameBoyScreenStatus != 1)
 			{
-				if (colorMode)
+				buffer = (byte*)videoRenderer.LockScreenBuffer(out stride);
+
+				if (savedVideoStatusSnapshot.SuperGameBoyScreenStatus == 0 && (savedVideoStatusSnapshot.LCDC & 0x80) != 0)
 				{
-					FillPalettes32((ushort*)savedVideoStatusSnapshot.PaletteMemory);
-					DrawColorFrame32(buffer, stride);
+					if (colorMode)
+					{
+						FillPalettes32((ushort*)savedVideoStatusSnapshot.PaletteMemory);
+						DrawColorFrame32(buffer, stride);
+					}
+					else
+					{
+						if (greyPaletteUpdated)
+						{
+							FillPalettes32((ushort*)paletteMemory);
+							for (int i = 0; i < backgroundPalette.Length; i++)
+								backgroundPalette[i] = backgroundPalettes32[0][i];
+							for (int i = 0; i < objectPalette1.Length; i++)
+								objectPalette1[i] = spritePalettes32[0][i];
+							for (int i = 0; i < objectPalette2.Length; i++)
+								objectPalette2[i] = spritePalettes32[1][i];
+							greyPaletteUpdated = false;
+						}
+						DrawFrame32(buffer, stride);
+					}
+#if WITH_THREADING
+					// Clear the flag once the real drawing job is done, as we don't need the buffer anymore
+					isRendering = false;
+#endif
 				}
 				else
 				{
-					if (greyPaletteUpdated)
-					{
-						FillPalettes32((ushort*)paletteMemory);
-						for (int i = 0; i < backgroundPalette.Length; i++)
-							backgroundPalette[i] = backgroundPalettes32[0][i];
-						for (int i = 0; i < objectPalette1.Length; i++)
-							objectPalette1[i] = spritePalettes32[0][i];
-						for (int i = 0; i < objectPalette2.Length; i++)
-							objectPalette2[i] = spritePalettes32[1][i];
-						greyPaletteUpdated = false;
-					}
-					DrawFrame32(buffer, stride);
-				}
-#if WITH_THREADING
-				// Clear the flag once the real drawing job is done, as we don't need the buffer anymore
-				isRendering = false;
-#endif
-			}
-			else
-			{
-#if WITH_THREADING
-				// Clear the flag before drawing anything, as we don't need the saved state
-				isRendering = false;
-#endif
-				ClearBuffer32(buffer, stride, 0xFFFFFFFF);
-			}
+					uint clearColor = savedVideoStatusSnapshot.SuperGameBoyScreenStatus == 2 ?
+						0xFF000000 :
+						savedVideoStatusSnapshot.SuperGameBoyScreenStatus == 3 ?
+							LookupTables.StandardColorLookupTable32[videoRenderer.ClearColor] :
+							0xFFFFFFFF;
 
-			videoRenderer.UnlockScreenBuffer();
+#if WITH_THREADING
+					// Clear the flag before drawing anything, as we don't need the saved state
+					isRendering = false;
+#endif
+					ClearBuffer32(buffer, stride, clearColor);
+				}
+
+				videoRenderer.UnlockScreenBuffer();
+			}
+			else isRendering = false; // Clear the flag as we didn't have any use for the saved sate
+
 			videoRenderer.Render();
 		}
 

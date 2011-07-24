@@ -38,8 +38,11 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 		Factory factory;
 		WindowRenderTarget windowRenderTarget;
 		BitmapRenderTarget compositeRenderTarget;
+		BitmapRenderTarget screenRenderTarget;
 		Bitmap borderBitmap;
-		Bitmap bitmap1, bitmap2;
+		Bitmap screenBitmap;
+		Bitmap bitmap1;
+		Bitmap bitmap2;
 		Color4 clearColor;
 		RectangleF drawRectangle;
 		byte[] borderBuffer;
@@ -115,6 +118,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 				new WindowRenderTargetProperties() { Handle = RenderObject.Handle, PixelSize = RenderObject.ClientSize, PresentOptions = PresentOptions.Immediately }
 			);
 			if (BorderVisible) CreateCompositeRenderTarget();
+			screenRenderTarget = windowRenderTarget.CreateCompatibleRenderTarget(new SizeF(160, 144), new Size(160, 144));
 			windowRenderTarget.AntialiasMode = AntialiasMode.Aliased;
 			RecalculateDrawRectangle();
 		}
@@ -198,6 +202,11 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			SwapBitmaps();
 
 			bitmap1.FromMemory(screenBuffer, 160 * 4);
+
+			screenRenderTarget.BeginDraw();
+			screenRenderTarget.DrawBitmap(bitmap2, new Rectangle(0, 0, 160, 144), 1.0f, InterpolationMode.NearestNeighbor);
+			screenRenderTarget.DrawBitmap(bitmap1, new Rectangle(0, 0, 160, 144), 0.5f, InterpolationMode.NearestNeighbor);
+			screenRenderTarget.EndDraw();
 		}
 
 		private void SwapBitmaps()
@@ -234,17 +243,12 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			{
 				compositeRenderTarget.BeginDraw();
 				compositeRenderTarget.Clear(clearColor);
-				compositeRenderTarget.DrawBitmap(bitmap2, new Rectangle(48, 40, 160, 144), 1.0f, InterpolationMode.NearestNeighbor);
-				compositeRenderTarget.DrawBitmap(bitmap1, new Rectangle(48, 40, 160, 144), 0.5f, InterpolationMode.NearestNeighbor);
+				compositeRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, new Rectangle(48, 40, 160, 144), 1.0f, InterpolationMode.NearestNeighbor);
 				compositeRenderTarget.DrawBitmap(borderBitmap);
 				compositeRenderTarget.EndDraw();
 				windowRenderTarget.DrawBitmap(compositeRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
 			}
-			else
-			{
-				windowRenderTarget.DrawBitmap(bitmap2, drawRectangle, 1.0f, interpolationMode);
-				windowRenderTarget.DrawBitmap(bitmap1, drawRectangle, 0.5f, interpolationMode);
-			}
+			else windowRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
 
 			// If needed, try to recreate the target.
 			if (windowRenderTarget.EndDraw().IsFailure)

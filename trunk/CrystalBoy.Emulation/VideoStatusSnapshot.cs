@@ -64,6 +64,7 @@ namespace CrystalBoy.Emulation
 				}
 				MemoryBlock.Copy((void*)ObjectAttributeMemory, bus.ObjectAttributeMemory.Pointer, objectAttributeMemoryBlock.Length);
 			}
+			SuperGameBoyScreenStatus = bus.SuperGameBoyScreenStatus;
 		}
 
 		public byte LCDC;
@@ -74,6 +75,7 @@ namespace CrystalBoy.Emulation
 		public byte BGP;
 		public byte OBP0;
 		public byte OBP1;
+		public byte SuperGameBoyScreenStatus;
 
 		public unsafe readonly byte* PaletteMemory;
 		public unsafe readonly byte* VideoMemory;

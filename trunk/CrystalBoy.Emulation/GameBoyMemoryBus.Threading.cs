@@ -35,6 +35,7 @@ namespace CrystalBoy.Emulation
 		private SendOrPostCallback videoFrameCallback;
 		private volatile bool isRunning;
 		private volatile bool isRendering;
+		private volatile IClockManager clockManager;
 
 		private bool threadingEnabled;
 #endif
@@ -61,12 +62,13 @@ namespace CrystalBoy.Emulation
 			frameDoneHandler = OnFrameDone;
 			videoFrameCallback = RenderVideoFrame;
 #if WITH_THREADING
+			clockManager = new GameBoyClockManager();
 			emulationStartedHandler = OnEmulationStarted;
 			emulationStoppedHandler = OnEmulationStopped;
 			if (threadingEnabled = !(Environment.ProcessorCount < 2))
 			{
-				processorThread = new Thread(RunProcessor);
-				//audioFrameThread = new Thread(RunAudioFrame);
+				processorThread = new Thread(RunProcessor) { IsBackground = true };
+				//audioFrameThread = new Thread(RunAudioFrame) { IsBackground = true };
 
 				processorThread.Start();
 			}
@@ -119,6 +121,16 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
+		public void Step()
+		{
+#if WITH_THREADING
+			if (isRunning) throw new InvalidOperationException();
+
+			lock (processorThread)
+#endif
+			processor.Emulate(false);
+		}
+
 		private void OnFrameDone(EventArgs e) { if (FrameDone != null) FrameDone(this, e); }
 
 		private void HandlePostedNotification(object state)
@@ -135,6 +147,19 @@ namespace CrystalBoy.Emulation
 		}
 
 #if WITH_THREADING
+
+		public IClockManager ClockManager
+		{
+			get { return clockManager; }
+			set
+			{
+				//if (value == null) throw new ArgumentNullException("value");
+				SuspendEmulation();
+				clockManager = value;
+				ResumeEmulation();
+			}
+		}
+
 		public void Run()
 		{
 			isRunning = true;
@@ -185,10 +210,16 @@ namespace CrystalBoy.Emulation
 
 					if (!threadingEnabled) return;
 
+					var clockManager = this.clockManager ?? NullClockManager.Default;
+
 					PostUINotification(emulationStartedHandler);
+
+					clockManager.Reset();
 
 					do
 					{
+						clockManager.Wait();
+
 						// “isRunning” is a volatile variable that can be modified at any time.
 						// Reading and writing “isRunning” here is perfectly fine, however, some logic as to be followed.
 						// 	- If the processor emulation says to stop running, then we have to stop running, no matter what.

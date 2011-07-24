@@ -34,6 +34,8 @@ namespace CrystalBoy.Emulation
 		private byte joypadIndex;
 		private bool sgbPendingTransfer;
 		private bool sgbCustomBorder;
+		private byte sgbScreenStatus;
+		private byte sgbStatus;
 
 		#endregion
 
@@ -54,7 +56,6 @@ namespace CrystalBoy.Emulation
 			sgbCharacterData = new byte[0x2000];
 			sgbBorderMapData = new ushort[0x800]; // This will also include palettes 4 - 7
 			sgbCommandBuffer = new byte[7 * 16];
-			sgbCommandBufferStatus = 0;
 		}
 
 		#endregion
@@ -70,8 +71,11 @@ namespace CrystalBoy.Emulation
 			Array.Clear(sgbCharacterData, 0, sgbCharacterData.Length);
 			Array.Clear(sgbBorderMapData, 0, sgbBorderMapData.Length);
 			Array.Clear(sgbCommandBuffer, 0, sgbCommandBuffer.Length);
+			sgbCommandBufferStatus = 0;
 			sgbPendingTransfer = false;
 			sgbCustomBorder = false;
+			sgbScreenStatus = 0;
+			sgbStatus = useBootRom ? (byte)6 : (byte)0;
 		}
 
 		#endregion
@@ -117,10 +121,16 @@ namespace CrystalBoy.Emulation
 						sgbCommandBufferStatus++;
 						// Handle the last bit (end of packet)
 						// If we are at the last packet in the series, reset the buffering.
-						if (commandBufferStatus == 259 && packetIndex + 1 >= (sgbCommandBuffer[0] & 0x7))
+						if (commandBufferStatus == 259)
 						{
-							sgbCommandBufferStatus = 0;
-							ProcessSuperGameBoyCommand(false);
+							// Decrease the SGB status flag (used for bootstrap ROM emulation)
+							if (sgbStatus != 0) sgbStatus--; // The bootstrap ROM will send 6 packets not following the usual command packet format…
+
+							if (sgbStatus == 0 && packetIndex + 1 >= (sgbCommandBuffer[0] & 0x7))
+							{
+								ProcessSuperGameBoyCommand(false);
+								sgbCommandBufferStatus = 0;
+							}
 						}
 					}
 				}
@@ -149,6 +159,7 @@ namespace CrystalBoy.Emulation
 			// Ignore packets with invalid length (Should they be processed ?)
 			if (commandLength < 1) return;
 
+			// Note that when called with “doNotWait” set to true, the value of “sgbCommandBufferStatus” will always be 0…
 			switch (command)
 			{
 				case SuperGameBoyCommand.PAL01:
@@ -189,14 +200,22 @@ namespace CrystalBoy.Emulation
 					break;
 				case SuperGameBoyCommand.MASK_EN:
 					// Need to add a flag to prevent swapping the rendering buffers, and re-render the previous frame.
+					sgbScreenStatus = (byte)(sgbCommandBuffer[1] & 0x3);
 					break;
 				// Commands specific to real SGB hardware, and thus, not emulated.
 				// Those would require emulating a real SNES, and a real SGB with its SNES side and its internal GB side…
-				case SuperGameBoyCommand.ATRC_EN: // No attraction mode…
-				case SuperGameBoyCommand.ICON_EN: // No icon tweaking…
+				case SuperGameBoyCommand.ATRC_EN: // No attraction mode… (Screensaver)
+				case SuperGameBoyCommand.ICON_EN: // No icon tweaking… (Menus)
 				case SuperGameBoyCommand.DATA_SND: // No writing data at a random place in SNES memory…
 				case SuperGameBoyCommand.DATA_TRN: // No writing data at a random place in SNES memory…
-				case SuperGameBoyCommand.JUMP: // No jumping into native SGB code…
+				case SuperGameBoyCommand.JUMP: // No jumping into native SNES code…
+					break;
+				// SGB GB Bootstrap ROM “commands” used to transfer game information to the SNES ROM…
+				case (SuperGameBoyCommand)0x1E:
+				//case (SuperGameBoyCommand)0x1F: // We don't have to process this, since it will be included in the 6 packet-long buffer…
+					// This code can only be reached by the means of SGB “BIOS” emulation, because such a configuration cannot be faked by real GB code.
+					if (sgbCommandBuffer[0] == 0xF1 && sgbCommandBufferStatus == 1560) // The first byte indicates a packet length of 1 but the internal counter gives the real length of the data…
+						superFunctions = sgbCommandBuffer[0x53] == 0x33 && sgbCommandBuffer[0x4C] == 0x03; // This may disable the SGB functions or keep them enabled, depending on the received data…
 					break;
 				//default:
 				//    throw new InvalidOperationException("Unknown SGB command: 0x" + command.ToString("X"));
@@ -245,5 +264,7 @@ namespace CrystalBoy.Emulation
 				bgMap += 12;
 			}
 		}
+
+		internal byte SuperGameBoyScreenStatus { get { return sgbScreenStatus; } }
 	}
 }

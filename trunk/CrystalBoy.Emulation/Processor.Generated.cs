@@ -34,7 +34,7 @@ namespace CrystalBoy.Emulation
 {
 	partial class Processor
 	{
-		public bool Emulate(bool finishFrame)
+		internal bool Emulate(bool finishFrame)
 		{
 			// Register variables, cloned here for efficiency (maybe it's an error, but it is easy to remove if needed)
 			byte a, f, b, c, d, e, h, l, opcode;

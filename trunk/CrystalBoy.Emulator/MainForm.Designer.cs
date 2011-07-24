@@ -35,8 +35,6 @@ namespace CrystalBoy.Emulator
 			{
 				if (components != null) components.Dispose();
 				components = null;
-				if (emulatedGameBoy != null) emulatedGameBoy.Dispose();
-				emulatedGameBoy = null;
 			}
 			base.Dispose(disposing);
 		}
@@ -56,6 +54,7 @@ namespace CrystalBoy.Emulator
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
 			System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
+			this.components = new System.ComponentModel.Container();
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -91,13 +90,6 @@ namespace CrystalBoy.Emulator
 			this.hardwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.useBootstrapRomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
-			this.gameBoyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.superGameBoyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.gameBoyPocketToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.superGameBoy2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.gameBoyColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.superGameBoyColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.gameBoyAdvanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.superGameBoyAdvanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.joypadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -110,6 +102,13 @@ namespace CrystalBoy.Emulator
 			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.gameBoyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.superGameBoyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.gameBoyPocketToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.superGameBoy2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.gameBoyColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.superGameBoyColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.gameBoyAdvanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
 			toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
@@ -421,55 +420,6 @@ namespace CrystalBoy.Emulator
 			this.toolStripMenuItem6.Name = "toolStripMenuItem6";
 			resources.ApplyResources(this.toolStripMenuItem6, "toolStripMenuItem6");
 			// 
-			// gameBoyToolStripMenuItem
-			// 
-			this.gameBoyToolStripMenuItem.Name = "gameBoyToolStripMenuItem";
-			resources.ApplyResources(this.gameBoyToolStripMenuItem, "gameBoyToolStripMenuItem");
-			this.gameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoy;
-			this.gameBoyToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
-			// 
-			// superGameBoyToolStripMenuItem
-			// 
-			this.superGameBoyToolStripMenuItem.Name = "superGameBoyToolStripMenuItem";
-			resources.ApplyResources(this.superGameBoyToolStripMenuItem, "superGameBoyToolStripMenuItem");
-			this.superGameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy;
-			this.superGameBoyToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
-			// 
-			// gameBoyPocketToolStripMenuItem
-			// 
-			this.gameBoyPocketToolStripMenuItem.Name = "gameBoyPocketToolStripMenuItem";
-			resources.ApplyResources(this.gameBoyPocketToolStripMenuItem, "gameBoyPocketToolStripMenuItem");
-			this.gameBoyPocketToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyPocket;
-			this.gameBoyPocketToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
-			// 
-			// superGameBoy2ToolStripMenuItem
-			// 
-			this.superGameBoy2ToolStripMenuItem.Name = "superGameBoy2ToolStripMenuItem";
-			resources.ApplyResources(this.superGameBoy2ToolStripMenuItem, "superGameBoy2ToolStripMenuItem");
-			this.superGameBoy2ToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy2;
-			this.superGameBoy2ToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
-			// 
-			// gameBoyColorToolStripMenuItem
-			// 
-			this.gameBoyColorToolStripMenuItem.Name = "gameBoyColorToolStripMenuItem";
-			resources.ApplyResources(this.gameBoyColorToolStripMenuItem, "gameBoyColorToolStripMenuItem");
-			this.gameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyColor;
-			this.gameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
-			// 
-			// superGameBoyColorToolStripMenuItem
-			// 
-			this.superGameBoyColorToolStripMenuItem.Name = "superGameBoyColorToolStripMenuItem";
-			resources.ApplyResources(this.superGameBoyColorToolStripMenuItem, "superGameBoyColorToolStripMenuItem");
-			this.superGameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoyAdvance;
-			this.superGameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
-			// 
-			// gameBoyAdvanceToolStripMenuItem
-			// 
-			this.gameBoyAdvanceToolStripMenuItem.Name = "gameBoyAdvanceToolStripMenuItem";
-			resources.ApplyResources(this.gameBoyAdvanceToolStripMenuItem, "gameBoyAdvanceToolStripMenuItem");
-			this.gameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyAdvance;
-			this.gameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
-			// 
 			// superGameBoyAdvanceToolStripMenuItem
 			// 
 			this.superGameBoyAdvanceToolStripMenuItem.Name = "superGameBoyAdvanceToolStripMenuItem";
@@ -546,6 +496,55 @@ namespace CrystalBoy.Emulator
 			// 
 			this.openFileDialog.DefaultExt = "gb";
 			resources.ApplyResources(this.openFileDialog, "openFileDialog");
+			// 
+			// gameBoyToolStripMenuItem
+			// 
+			this.gameBoyToolStripMenuItem.Name = "gameBoyToolStripMenuItem";
+			resources.ApplyResources(this.gameBoyToolStripMenuItem, "gameBoyToolStripMenuItem");
+			this.gameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoy;
+			this.gameBoyToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// superGameBoyToolStripMenuItem
+			// 
+			this.superGameBoyToolStripMenuItem.Name = "superGameBoyToolStripMenuItem";
+			resources.ApplyResources(this.superGameBoyToolStripMenuItem, "superGameBoyToolStripMenuItem");
+			this.superGameBoyToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy;
+			this.superGameBoyToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// gameBoyPocketToolStripMenuItem
+			// 
+			this.gameBoyPocketToolStripMenuItem.Name = "gameBoyPocketToolStripMenuItem";
+			resources.ApplyResources(this.gameBoyPocketToolStripMenuItem, "gameBoyPocketToolStripMenuItem");
+			this.gameBoyPocketToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyPocket;
+			this.gameBoyPocketToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// superGameBoy2ToolStripMenuItem
+			// 
+			this.superGameBoy2ToolStripMenuItem.Name = "superGameBoy2ToolStripMenuItem";
+			resources.ApplyResources(this.superGameBoy2ToolStripMenuItem, "superGameBoy2ToolStripMenuItem");
+			this.superGameBoy2ToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy2;
+			this.superGameBoy2ToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// gameBoyColorToolStripMenuItem
+			// 
+			this.gameBoyColorToolStripMenuItem.Name = "gameBoyColorToolStripMenuItem";
+			resources.ApplyResources(this.gameBoyColorToolStripMenuItem, "gameBoyColorToolStripMenuItem");
+			this.gameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyColor;
+			this.gameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// superGameBoyColorToolStripMenuItem
+			// 
+			this.superGameBoyColorToolStripMenuItem.Name = "superGameBoyColorToolStripMenuItem";
+			resources.ApplyResources(this.superGameBoyColorToolStripMenuItem, "superGameBoyColorToolStripMenuItem");
+			this.superGameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoyAdvance;
+			this.superGameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
+			// 
+			// gameBoyAdvanceToolStripMenuItem
+			// 
+			this.gameBoyAdvanceToolStripMenuItem.Name = "gameBoyAdvanceToolStripMenuItem";
+			resources.ApplyResources(this.gameBoyAdvanceToolStripMenuItem, "gameBoyAdvanceToolStripMenuItem");
+			this.gameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.GameBoyAdvance;
+			this.gameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 

@@ -244,8 +244,7 @@ namespace CrystalBoy.Emulation
 				// Don't forget to reset the color mode flag too…
 				this.colorMode = ColorHardware && RomInformation != null ? RomInformation.ColorGameBoySupport : false;
 				// Enable SGB functions for some configurations only
-				this.superFunctions = RomInformation != null
-					&& RomInformation.SuperGameBoySupport
+				this.superFunctions = (useBootRom || RomInformation != null && RomInformation.SuperGameBoySupport)
 					&& (value == HardwareType.SuperGameBoy
 						|| value == HardwareType.SuperGameBoy2
 						|| value == HardwareType.SuperGameBoyColor

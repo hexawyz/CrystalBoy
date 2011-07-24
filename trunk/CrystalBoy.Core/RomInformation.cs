@@ -56,6 +56,16 @@ namespace CrystalBoy.Core
 						partialLogoCheck = false;
 				}
 
+			// Read the licensee code
+			makerCode = memory[0x14B];
+			this.makerCode = string.Intern
+			(
+				makerCode == 0x33 ?
+					((char)memory[0x144]).ToString() + ((char)memory[0x145]).ToString() :
+					makerCode.ToString("X2", System.Globalization.CultureInfo.InvariantCulture)
+			);
+			makerName = MakerDictionary.GetMakerName(this.makerCode);
+
 			// Detect CGB support
 			cgbFlag = memory[0x143];
 			cgbSupport = (cgbFlag & 0x80) != 0;
@@ -64,7 +74,7 @@ namespace CrystalBoy.Core
 
 			// Detect SGB support
 			sgbFlag = memory[0x146];
-			if (sgbFlag == 0x3)
+			if (sgbFlag == 0x3 && makerCode == 0x33)
 				sgbSupport = true;
 
 			// Read the name
@@ -80,16 +90,6 @@ namespace CrystalBoy.Core
 				if (c == 0) break;
 				else name += (char)c;
 			}
-
-			// Read the licensee code
-			makerCode = memory[0x14B];
-			this.makerCode = string.Intern
-			(
-				makerCode == 0x33 ?
-					((char)memory[0x144]).ToString() + ((char)memory[0x145]).ToString() :
-					makerCode.ToString("X2", System.Globalization.CultureInfo.InvariantCulture)
-			);
-			makerName = MakerDictionary.GetMakerName(this.makerCode);
 
 			// Automatic palette detection
 			if (!cgbSupport)
