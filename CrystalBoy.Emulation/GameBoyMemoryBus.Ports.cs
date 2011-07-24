@@ -211,7 +211,7 @@ namespace CrystalBoy.Emulation
 					value &= 0x7;
 					if (value == 0)
 						value = 1;
-					if (colorMode && workRamBank != value)
+					if (colorMode && workRamBank != value && (!hdmaActive || hdmaCurrentSourceHigh < 0xA0 || hdmaCurrentSourceHigh >= 0xE0))
 					{
 						workRamBank = value;
 						MapWorkRamBank();

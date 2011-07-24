@@ -109,18 +109,24 @@ namespace CrystalBoy.Emulation
 		[CLSCompliant(false)]
 		public static void GetStandardColors16(ushort[] lookupTable)
 		{
+			// This should give “High quality” color interpolation.
+			// The missing green bit is set according to the green most significant bit, so that 0x00 is perfectly black and 0x1F is perfectly white.
 			for (uint i = 0; i < lookupTable.Length; i++)
-				lookupTable[i] = (ushort)((i << 1) & 0xFFC0 | i & 0x1F);
+				lookupTable[i] = (ushort)((i << 1) & 0xFFC0 | ((i & 0x200) != 0 ? (ushort)0x20 : (ushort)0x00) | i & 0x1F);
 		}
 
 		[CLSCompliant(false)]
-		public static void GetStandardColors32(uint[] lookupTable)
+		public static unsafe void GetStandardColors32(uint[] lookupTable)
 		{
+			byte* values = stackalloc byte[0x20];
+
+			for (int i = 0; i < 0x20; i++) values[i] = (byte)Math.Round(0xFF * i / (double)0x1F);
+
 			for (uint i = 0; i < lookupTable.Length; i++)
 			{
-				uint r = 0xFF * (i & 0x1F) / 0x1F;
-				uint g = 0xFF * ((i >> 5) & 0x1F) / 0x1F;
-				uint b = 0xFF * ((i >> 10) & 0x1F) / 0x1F;
+				uint r = values[i & 0x1F];
+				uint g = values[(i >> 5) & 0x1F];
+				uint b = values[(i >> 10) & 0x1F];
 
 				lookupTable[i] = b | (g << 8) | (r << 16) | 0xFF000000;
 			}

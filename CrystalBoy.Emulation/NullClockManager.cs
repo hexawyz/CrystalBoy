@@ -17,17 +17,14 @@
 #endregion
 
 using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("CrystalBoy.Core")]
-[assembly: AssemblyDescription("CrystalBoy Core")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+namespace CrystalBoy.Emulation
+{
+	internal sealed class NullClockManager : IClockManager
+	{
+		public static readonly IClockManager Default = new NullClockManager();
 
-[assembly: CLSCompliant(true)]
-
-[assembly: ComVisible(false)]
-[assembly: Guid("66db2ac4-1dc0-45c8-a62a-a319b36f0f38")]
-
-[assembly: AssemblyVersion("1.5.0.0")]
+		public void Reset() { }
+		public void Wait() { }
+	}
+}

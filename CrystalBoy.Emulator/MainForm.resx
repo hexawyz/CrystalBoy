@@ -131,13 +131,37 @@
   <data name="statusStrip.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>None</value>
   </data>
+  <data name="toolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>157, 17</value>
+  </data>
+  <data name="toolStripStatusLabel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleLeft</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="frameRateToolStripStatusLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="frameRateToolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>70, 17</value>
+  </data>
+  <data name="frameRateToolStripStatusLabel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleLeft</value>
+  </data>
+  <data name="emulationStatusToolStripStatusLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="emulationStatusToolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>50, 17</value>
+  </data>
+  <data name="emulationStatusToolStripStatusLabel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleLeft</value>
+  </data>
   <data name="statusStrip.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
   <data name="statusStrip.Size" type="System.Drawing.Size, System.Drawing">
     <value>292, 22</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="statusStrip.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
@@ -222,9 +246,48 @@
   <data name="mainMenuStrip.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>None</value>
   </data>
+  <data name="openToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+O</value>
+  </data>
+  <data name="openToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>211, 22</value>
+  </data>
+  <data name="openToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Load…</value>
+  </data>
+  <data name="openToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Load a Game Boy ROM…</value>
+  </data>
+  <data name="romInformationToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+I</value>
+  </data>
+  <data name="romInformationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>211, 22</value>
+  </data>
+  <data name="romInformationToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Rom information…</value>
+  </data>
+  <data name="romInformationToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Show the ROM Information Window…</value>
+  </data>
   <metadata name="toolStripMenuItem2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <data name="toolStripMenuItem2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>208, 6</value>
+  </data>
+  <data name="exitToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+X</value>
+  </data>
+  <data name="exitToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>211, 22</value>
+  </data>
+  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
+    <value>E&amp;xit</value>
+  </data>
+  <data name="exitToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Exit the emulator.</value>
+  </data>
   <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 20</value>
   </data>
@@ -291,6 +354,21 @@
   <data name="toolStripMenuItem4.Size" type="System.Drawing.Size, System.Drawing">
     <value>171, 6</value>
   </data>
+  <data name="audioEnabledToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>147, 22</value>
+  </data>
+  <data name="audioEnabledToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Enabled</value>
+  </data>
+  <data name="muteToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
+    <value>Ctrl+M</value>
+  </data>
+  <data name="muteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>147, 22</value>
+  </data>
+  <data name="muteToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Mute</value>
+  </data>
   <data name="audioToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>174, 22</value>
   </data>
@@ -301,259 +379,34 @@
     <value>Audio options…</value>
   </data>
   <data name="borderAutoToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>100, 22</value>
   </data>
   <data name="borderAutoToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Auto</value>
   </data>
   <data name="toolStripMenuItem8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>149, 6</value>
+    <value>97, 6</value>
   </data>
   <data name="borderOnToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>100, 22</value>
   </data>
   <data name="borderOnToolStripMenuItem.Text" xml:space="preserve">
     <value>O&amp;n</value>
   </data>
   <data name="borderOffToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>100, 22</value>
   </data>
   <data name="borderOffToolStripMenuItem.Text" xml:space="preserve">
     <value>O&amp;ff</value>
   </data>
   <data name="borderToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
+    <value>142, 22</value>
   </data>
   <data name="borderToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;Border</value>
   </data>
   <data name="toolStripMenuItem9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>149, 6</value>
-  </data>
-  <data name="zoomToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="zoomToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Zoom</value>
-  </data>
-  <data name="zoomToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Select a default zoom level…</value>
-  </data>
-  <data name="rendererToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="rendererToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Renderer</value>
-  </data>
-  <data name="rendererToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Choose the video renderer…</value>
-  </data>
-  <metadata name="toolStripMenuItem5.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <data name="toolStripMenuItem5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>149, 6</value>
-  </data>
-  <data name="interpolationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="interpolationToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Interpolation</value>
-  </data>
-  <data name="interpolationToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Enable or disable interpolation.</value>
-  </data>
-  <data name="videoToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
-  </data>
-  <data name="videoToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Video</value>
-  </data>
-  <data name="videoToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Video options…</value>
-  </data>
-  <data name="hardwareToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
-  </data>
-  <data name="hardwareToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Hardware</value>
-  </data>
-  <data name="hardwareToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Emulated hardware…</value>
-  </data>
-  <data name="joypadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
-  </data>
-  <data name="joypadToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Keys</value>
-  </data>
-  <metadata name="toolStripMenuItem7.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <data name="toolStripMenuItem7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>171, 6</value>
-  </data>
-  <data name="optionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>174, 22</value>
-  </data>
-  <data name="optionsToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Options…</value>
-  </data>
-  <data name="optionsToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Show the options window</value>
-  </data>
-  <data name="emulationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>73, 20</value>
-  </data>
-  <data name="emulationToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Emulation</value>
-  </data>
-  <data name="emulationToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Emulation options…</value>
-  </data>
-  <data name="toolsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>48, 20</value>
-  </data>
-  <data name="toolsToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Tools</value>
-  </data>
-  <data name="toolsToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Tools for developers…</value>
-  </data>
-  <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>44, 20</value>
-  </data>
-  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Help</value>
-  </data>
-  <data name="helpToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Information about the application…</value>
-  </data>
-  <data name="mainMenuStrip.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="mainMenuStrip.Size" type="System.Drawing.Size, System.Drawing">
-    <value>292, 24</value>
-  </data>
-  <data name="mainMenuStrip.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;mainMenuStrip.Name" xml:space="preserve">
-    <value>mainMenuStrip</value>
-  </data>
-  <data name="&gt;&gt;mainMenuStrip.Type" xml:space="preserve">
-    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;mainMenuStrip.Parent" xml:space="preserve">
-    <value>toolStripContainer.TopToolStripPanel</value>
-  </data>
-  <data name="&gt;&gt;mainMenuStrip.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.Name" xml:space="preserve">
-    <value>toolStripContainer.TopToolStripPanel</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripPanel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.Parent" xml:space="preserve">
-    <value>toolStripContainer</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.Name" xml:space="preserve">
-    <value>toolStripContainer</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripContainer, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;toolStripContainer.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="toolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>157, 17</value>
-  </data>
-  <data name="toolStripStatusLabel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleLeft</value>
-  </data>
-  <data name="frameRateToolStripStatusLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="frameRateToolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>70, 17</value>
-  </data>
-  <data name="frameRateToolStripStatusLabel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleLeft</value>
-  </data>
-  <data name="emulationStatusToolStripStatusLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="emulationStatusToolStripStatusLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>50, 17</value>
-  </data>
-  <data name="emulationStatusToolStripStatusLabel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
-    <value>MiddleLeft</value>
-  </data>
-  <data name="openToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+O</value>
-  </data>
-  <data name="openToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>211, 22</value>
-  </data>
-  <data name="openToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Load…</value>
-  </data>
-  <data name="openToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Load a Game Boy ROM…</value>
-  </data>
-  <data name="romInformationToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+I</value>
-  </data>
-  <data name="romInformationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>211, 22</value>
-  </data>
-  <data name="romInformationToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Rom information…</value>
-  </data>
-  <data name="romInformationToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Show the ROM Information Window…</value>
-  </data>
-  <metadata name="toolStripMenuItem2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <data name="toolStripMenuItem2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>208, 6</value>
-  </data>
-  <data name="exitToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+X</value>
-  </data>
-  <data name="exitToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>211, 22</value>
-  </data>
-  <data name="exitToolStripMenuItem.Text" xml:space="preserve">
-    <value>E&amp;xit</value>
-  </data>
-  <data name="exitToolStripMenuItem.ToolTipText" xml:space="preserve">
-    <value>Exit the emulator.</value>
-  </data>
-  <data name="audioEnabledToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="audioEnabledToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Enabled</value>
-  </data>
-  <data name="muteToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+M</value>
-  </data>
-  <data name="muteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>152, 22</value>
-  </data>
-  <data name="muteToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Mute</value>
+    <value>139, 6</value>
   </data>
   <data name="zoom100toolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>102, 22</value>
@@ -590,6 +443,48 @@
   </data>
   <data name="zoom400toolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Zoom to 400%.</value>
+  </data>
+  <data name="zoomToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>142, 22</value>
+  </data>
+  <data name="zoomToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Zoom</value>
+  </data>
+  <data name="zoomToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Select a default zoom level…</value>
+  </data>
+  <data name="rendererToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>142, 22</value>
+  </data>
+  <data name="rendererToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Renderer</value>
+  </data>
+  <data name="rendererToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Choose the video renderer…</value>
+  </data>
+  <metadata name="toolStripMenuItem5.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripMenuItem5.Size" type="System.Drawing.Size, System.Drawing">
+    <value>139, 6</value>
+  </data>
+  <data name="interpolationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>142, 22</value>
+  </data>
+  <data name="interpolationToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Interpolation</value>
+  </data>
+  <data name="interpolationToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Enable or disable interpolation.</value>
+  </data>
+  <data name="videoToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>174, 22</value>
+  </data>
+  <data name="videoToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Video</value>
+  </data>
+  <data name="videoToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Video options…</value>
   </data>
   <data name="useBootstrapRomToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>210, 22</value>
@@ -675,6 +570,45 @@
   <data name="superGameBoyAdvanceToolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Emulate Game Boy Advance's Game Boy Color Hardware, combined with Super Game Boy functions.</value>
   </data>
+  <data name="hardwareToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>174, 22</value>
+  </data>
+  <data name="hardwareToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Hardware</value>
+  </data>
+  <data name="hardwareToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Emulated hardware…</value>
+  </data>
+  <data name="joypadToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>174, 22</value>
+  </data>
+  <data name="joypadToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Keys</value>
+  </data>
+  <metadata name="toolStripMenuItem7.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <data name="toolStripMenuItem7.Size" type="System.Drawing.Size, System.Drawing">
+    <value>171, 6</value>
+  </data>
+  <data name="optionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>174, 22</value>
+  </data>
+  <data name="optionsToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Options…</value>
+  </data>
+  <data name="optionsToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Show the options window</value>
+  </data>
+  <data name="emulationToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>73, 20</value>
+  </data>
+  <data name="emulationToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Emulation</value>
+  </data>
+  <data name="emulationToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Emulation options…</value>
+  </data>
   <data name="debuggerToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
     <value>Ctrl+D</value>
   </data>
@@ -723,11 +657,74 @@
   <data name="oamViewerToolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Show the OAM Viewer Window.</value>
   </data>
+  <data name="toolsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>48, 20</value>
+  </data>
+  <data name="toolsToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Tools</value>
+  </data>
+  <data name="toolsToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Tools for developers…</value>
+  </data>
   <data name="aboutToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>116, 22</value>
   </data>
   <data name="aboutToolStripMenuItem.Text" xml:space="preserve">
     <value>&amp;About…</value>
+  </data>
+  <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>44, 20</value>
+  </data>
+  <data name="helpToolStripMenuItem.Text" xml:space="preserve">
+    <value>&amp;Help</value>
+  </data>
+  <data name="helpToolStripMenuItem.ToolTipText" xml:space="preserve">
+    <value>Information about the application…</value>
+  </data>
+  <data name="mainMenuStrip.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="mainMenuStrip.Size" type="System.Drawing.Size, System.Drawing">
+    <value>292, 24</value>
+  </data>
+  <data name="mainMenuStrip.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;mainMenuStrip.Name" xml:space="preserve">
+    <value>mainMenuStrip</value>
+  </data>
+  <data name="&gt;&gt;mainMenuStrip.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;mainMenuStrip.Parent" xml:space="preserve">
+    <value>toolStripContainer.TopToolStripPanel</value>
+  </data>
+  <data name="&gt;&gt;mainMenuStrip.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.Name" xml:space="preserve">
+    <value>toolStripContainer.TopToolStripPanel</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripPanel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.Parent" xml:space="preserve">
+    <value>toolStripContainer</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.TopToolStripPanel.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.Name" xml:space="preserve">
+    <value>toolStripContainer</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripContainer, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;toolStripContainer.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <metadata name="openFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>143, 17</value>
@@ -743,6 +740,9 @@
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>292, 266</value>
+  </data>
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>CrystalBoy Emulator</value>
@@ -969,48 +969,6 @@
   <data name="&gt;&gt;toolStripMenuItem6.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;gameBoyToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Name" xml:space="preserve">
-    <value>superGameBoyToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyPocketToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Name" xml:space="preserve">
-    <value>superGameBoy2ToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyColorToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Name" xml:space="preserve">
-    <value>superGameBoyColorToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Name" xml:space="preserve">
-    <value>gameBoyAdvanceToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;superGameBoyAdvanceToolStripMenuItem.Name" xml:space="preserve">
     <value>superGameBoyAdvanceToolStripMenuItem</value>
   </data>
@@ -1088,6 +1046,48 @@
   </data>
   <data name="&gt;&gt;openFileDialog.Type" xml:space="preserve">
     <value>System.Windows.Forms.OpenFileDialog, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gameBoyToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Name" xml:space="preserve">
+    <value>superGameBoyToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyPocketToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyPocketToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Name" xml:space="preserve">
+    <value>superGameBoy2ToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;superGameBoy2ToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyColorToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyColorToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Name" xml:space="preserve">
+    <value>superGameBoyColorToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;superGameBoyColorToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Name" xml:space="preserve">
+    <value>gameBoyAdvanceToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;gameBoyAdvanceToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
     <value>MainForm</value>

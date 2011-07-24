@@ -20,62 +20,74 @@ using System;
 
 namespace CrystalBoy.Emulation
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	partial class GameBoyMemoryBus
 	{
-		public sealed class JoypadState
+		#region JoypadState Structure
+
+		// Note: This structure does not hold any valuable data, and is merely used as an interface to GameBoyMemoryBus' internals.
+		/// <summary>Represents the state of the joypad(s) of an emulated game boy system.</summary>
+		/// <remarks>Four joypads are emulated.</remarks>
+		public struct JoypadState
 		{
-			private GameBoyMemoryBus bus;
+			private GameBoyMemoryBus @this; // “This” will better emphazize the fact that this structure does not hold any valuable data.
 
-			internal JoypadState(GameBoyMemoryBus bus) { this.bus = bus; }
+			internal JoypadState(GameBoyMemoryBus bus) { this.@this = bus; }
 
+			/// <summary>Gets or sets the pressed <see cref="CrystalBoy.Emulation.GameBoyKeys"/> for the joypad with the specified index.</summary>
+			/// <value>The pressed keys.</value>
 			public GameBoyKeys this[int joypadIndex]
 			{
 				get
 				{
 					if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
 
-					return joypadIndex == 0 ? bus.baseKeys : bus.additionalKeys[joypadIndex - 1];
+					return joypadIndex == 0 ? @this.baseKeys : @this.additionalKeys[joypadIndex - 1];
 				}
 				set
 				{
 					if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
 
-					if (joypadIndex == 0) bus.baseKeys = value;
-					else bus.additionalKeys[joypadIndex - 1] = value;
-					if (joypadIndex == bus.joypadIndex) bus.UpdateJoypadRegister();
+					if (joypadIndex == 0) @this.baseKeys = value;
+					else @this.additionalKeys[joypadIndex - 1] = value;
+					if (joypadIndex == @this.joypadIndex) @this.UpdateJoypadRegister();
 				}
 			}
 
 			public void NotifyPressedKeys(GameBoyKeys pressedKeys)
 			{
-				bus.baseKeys |= pressedKeys;
-				if (bus.joypadIndex == 0) bus.UpdateJoypadRegister();
+				@this.baseKeys |= pressedKeys;
+				if (@this.joypadIndex == 0) @this.UpdateJoypadRegister();
 			}
 
 			public void NotifyPressedKeys(int joypadIndex, GameBoyKeys pressedKeys)
 			{
 				if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
 
-				if (joypadIndex == 0) bus.baseKeys |= pressedKeys;
-				else bus.additionalKeys[joypadIndex - 1] |= pressedKeys;
-				if (joypadIndex == bus.joypadIndex) bus.UpdateJoypadRegister();
+				if (joypadIndex == 0) @this.baseKeys |= pressedKeys;
+				else @this.additionalKeys[joypadIndex - 1] |= pressedKeys;
+				if (joypadIndex == @this.joypadIndex) @this.UpdateJoypadRegister();
 			}
 
 			public void NotifyReleasedKeys(GameBoyKeys releasedKeys)
 			{
-				bus.baseKeys &= ~releasedKeys;
-				if (bus.joypadIndex == 0) bus.UpdateJoypadRegister();
+				@this.baseKeys &= ~releasedKeys;
+				if (@this.joypadIndex == 0) @this.UpdateJoypadRegister();
 			}
 
 			public void NotifyReleasedKeys(int joypadIndex, GameBoyKeys releasedKeys)
 			{
 				if (joypadIndex < 0 || joypadIndex >= 4) throw new ArgumentOutOfRangeException("joypadIndex");
 
-				if (joypadIndex == 0) bus.baseKeys &= ~releasedKeys;
-				else bus.additionalKeys[joypadIndex - 1] &= releasedKeys;
-				if (joypadIndex == bus.joypadIndex) bus.UpdateJoypadRegister();
+				if (joypadIndex == 0) @this.baseKeys &= ~releasedKeys;
+				else @this.additionalKeys[joypadIndex - 1] &= releasedKeys;
+				if (joypadIndex == @this.joypadIndex) @this.UpdateJoypadRegister();
 			}
 		}
+
+		#endregion
 
 		#region Variables
 
@@ -152,15 +164,26 @@ namespace CrystalBoy.Emulation
 			unsafe { return portMemory[0x00]; }
 		}
 
+		/// <summary>Gets or sets the pressed keys for the main joypad.</summary>
+		/// <remarks>
+		/// The main joypad is the one and only joypad on game boy hardware.
+		/// Only Super Game Boy hardware allows up to four joypads in SGB mode, thanks to the SNES hardware.
+		/// </remarks>
+		/// <value>The pressed keys.</value>
 		public GameBoyKeys PressedKeys
 		{
 			get { return baseKeys; }
 			set
 			{
 				baseKeys = value;
-				UpdateJoypadRegister();
+				if (joypadIndex == 0) UpdateJoypadRegister();
 			}
 		}
+
+		/// <summary>Gets access to the joypad state of this instance.</summary>
+		/// <remarks>Use the returned value to read or update the state of any of the four joypads.</remarks>
+		/// <value>The <see cref="JoypadState"/> for this instance.</value>
+		public JoypadState Joypads { get { return new JoypadState(); } }
 
 		#endregion
 	}

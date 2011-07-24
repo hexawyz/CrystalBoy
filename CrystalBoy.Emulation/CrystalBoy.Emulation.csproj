@@ -67,6 +67,8 @@
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
     <Compile Include="BorderVisibility.cs" />
+    <Compile Include="GameBoyClockManager.cs" />
+    <Compile Include="IClockManager.cs" />
     <Compile Include="Mappers\RomController.cs" />
     <Compile Include="Mappers\MemoryBankController.cs" />
     <Compile Include="Mappers\MemoryBankController1.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="GameBoyKeys.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="FrameEventArgs.cs" />
+    <Compile Include="NullClockManager.cs" />
     <Compile Include="PaletteAccess.cs" />
     <Compile Include="Port.cs" />
     <Compile Include="Processor.cs" />

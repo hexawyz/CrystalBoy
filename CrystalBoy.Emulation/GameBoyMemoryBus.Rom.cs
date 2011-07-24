@@ -40,11 +40,7 @@ namespace CrystalBoy.Emulation
 
 		#region Reset
 
-		partial void ResetRom()
-		{
-			if (mapper != null)
-				mapper.Reset();
-		}
+		partial void ResetRom() { if (mapper != null) mapper.Reset(); }
 
 		#endregion
 

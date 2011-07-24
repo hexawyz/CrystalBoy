@@ -47,7 +47,8 @@ namespace CrystalBoy.Emulator
 		public MainForm()
 		{
 			InitializeComponent();
-			emulatedGameBoy = new EmulatedGameBoy();
+			if (components == null) components = new System.ComponentModel.Container();
+			emulatedGameBoy = new EmulatedGameBoy(components);
 			emulatedGameBoy.TryUsingBootRom = Settings.Default.UseBootstrapRom;
 			emulatedGameBoy.EnableFramerateLimiter = Settings.Default.LimitSpeed;
 			emulatedGameBoy.RomChanged += OnRomChanged;
@@ -418,15 +419,26 @@ namespace CrystalBoy.Emulator
 			base.OnDeactivate(e);
 		}
 
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			// Make sure that the emulated system is stopped before closing
+			emulatedGameBoy.Pause();
+			UnloadRom();
+			// Calling DoEvents here will make sure that everything gets executed in order, but it should work without.
+			Application.DoEvents();
+			base.OnClosing(e);
+		}
+
 		protected override void OnClosed(EventArgs e)
 		{
-			UnloadRom();
-			Settings.Default.ContentSize = toolStripContainer.ContentPanel.ClientSize;
+			Size renderSize = toolStripContainer.ContentPanel.ClientSize;
+
+			Settings.Default.ContentSize = videoRenderer.BorderVisible ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
 
-		private void OnRomChanged(object sender, EventArgs e) { }
+		private void OnRomChanged(object sender, EventArgs e) { SetBorderVisibility(Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder); }
 
 		private void OnEmulationStatusChanged(object sender, EventArgs e) { UpdateEmulationStatus(); }
 
@@ -461,10 +473,7 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Close();
-		}
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e) { Close(); }
 
 		#endregion
 

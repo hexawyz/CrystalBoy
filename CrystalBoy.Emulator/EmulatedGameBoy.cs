@@ -26,7 +26,8 @@ using System.ComponentModel;
 
 namespace CrystalBoy.Emulator
 {
-	sealed class EmulatedGameBoy : IComponent, IDisposable
+	[DesignerCategory("Component")]
+	sealed class EmulatedGameBoy : IComponent, IClockManager, IDisposable
 	{
 		private GameBoyMemoryBus bus;
 		private EmulationStatus emulationStatus;
@@ -54,21 +55,25 @@ namespace CrystalBoy.Emulator
 			remove { bus.BorderChanged -= value; }
 		}
 
-		public EmulatedGameBoy()
+		public EmulatedGameBoy() : this(null) { }
+		public EmulatedGameBoy(IContainer container)
 		{
 			bus = new GameBoyMemoryBus();
 			frameStopwatch = new Stopwatch();
 			frameRateStopwatch = new Stopwatch();
 #if WITH_THREADING
+			bus.EmulationStarted += OnEmulationStarted;	
 			bus.EmulationStopped += OnEmulationStopped;
+			bus.ClockManager = this;
 #else
 			Application.Idle += OnApplicationIdle;
 #endif
 			bus.ReadKeys += new EventHandler<ReadKeysEventArgs>(OnReadKeys);
 			emulationStatus = bus.UseBootRom ? EmulationStatus.Paused : EmulationStatus.Stopped;
+			if (container != null) container.Add(this);
 		}
 
-		#region IComponent Members
+		#region IComponent Implementation
 
 		public event EventHandler Disposed;
 
@@ -76,10 +81,53 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
+		#region IClockManager Implementation
+
+		void IClockManager.Reset()
+		{
+			lastFrameTime = 0;
+			currentFrameTime = 0;
+
+			frameRateStopwatch.Reset();
+			frameRateStopwatch.Start();
+			frameStopwatch.Reset();
+			frameStopwatch.Start();
+		}
+
+		void IClockManager.Wait()
+		{
+			if (enableFramerateLimiter)
+			{
+				long timer = frameStopwatch.ElapsedMilliseconds;
+
+				if (timer < 17) // Exact timing for one frame at 60fps is 16⅔ ms
+				{
+					if (timer < 16)
+					{
+						// Conversion from long to int is safe since the value is less than 17.
+						// Sleep is a really bad tool for precise timing, but it will play its role when needed.
+						System.Threading.Thread.Sleep(16 - (int)timer);
+					}
+
+					// Do some active wait, even though this is bad…
+					while (frameStopwatch.Elapsed.TotalMilliseconds < (1000d / 60d)) ;
+				}
+			}
+
+			lastFrameTime = currentFrameTime;
+			currentFrameTime = frameRateStopwatch.Elapsed.TotalMilliseconds;
+
+			frameStopwatch.Reset();
+			frameStopwatch.Start();
+		}
+
+		#endregion
+
 		private void OnReadKeys(object sender, ReadKeysEventArgs e) { if (e.JoypadIndex == 0) bus.PressedKeys = ReadKeys(); }
 
 #if WITH_THREADING
-		private void  OnEmulationStopped(object sender, EventArgs e) { Pause(Processor.Status == ProcessorStatus.Running); }
+		private void OnEmulationStarted(object sender, EventArgs e) { EmulationStatus = EmulationStatus.Running; }
+		private void OnEmulationStopped(object sender, EventArgs e) { Pause(!IsDisposed && Processor.Status == ProcessorStatus.Running); }
 #endif
 
 		public void Dispose()
@@ -92,13 +140,14 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
+		public bool IsDisposed { get { return bus == null; } }
+
 		public void Reset() { Reset(bus.HardwareType); }
 
 		public void Reset(HardwareType hardwareType)
 		{
 			bus.Reset(hardwareType);
-			if (emulationStatus == EmulationStatus.Stopped && bus.UseBootRom)
-				emulationStatus = EmulationStatus.Paused;
+			if (emulationStatus == EmulationStatus.Stopped && bus.UseBootRom) EmulationStatus = EmulationStatus.Paused;
 			OnAfterReset(EventArgs.Empty);
 		}
 
@@ -172,13 +221,21 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		public bool EnableFramerateLimiter { get { return enableFramerateLimiter; } set { enableFramerateLimiter = value; } }
+		public bool EnableFramerateLimiter
+		{
+			get { return enableFramerateLimiter; }
+#if false
+			set { bus.ClockManager = (enableFramerateLimiter = value) ? this : null; }
+#else
+			set { enableFramerateLimiter = value; }
+#endif
+		}
 
 		public void Step()
 		{
 			if (EmulationStatus == EmulationStatus.Paused)
 			{
-				Processor.Emulate(false);
+				Bus.Step();
 				OnBreak(EventArgs.Empty);
 			}
 		}
@@ -191,41 +248,26 @@ namespace CrystalBoy.Emulator
 
 		public void Run()
 		{
+#if WITH_THREADING
+			bus.Run();
+#else
 			if (EmulationStatus == EmulationStatus.Paused)
 			{
-				ResetCounter();
+				(this as IClockManager).Reset();
 				EmulationStatus = EmulationStatus.Running;
-#if WITH_THREADING
-				bus.Run();
-#endif
 			}
+#endif
 		}
 
-		public void Pause()
-		{
-			if (emulationStatus == EmulationStatus.Running)
-				Pause(false);
-		}
-
-		private void ResetCounter()
-		{
-			lastFrameTime = 0;
-			currentFrameTime = 0;
-
-			frameRateStopwatch.Reset();
-			frameRateStopwatch.Start();
-			frameStopwatch.Reset();
-			frameStopwatch.Start();
-		}
+#if WITH_THREADING
+		public void Pause() { if (!IsDisposed) bus.Stop(); }
+#else
+		public void Pause() { if (emulationStatus == EmulationStatus.Running) Pause(false); }
+#endif
 
 		private void Pause(bool breakpoint)
 		{
-#if WITH_THREADING
-			bus.Stop();
-#endif
 			EmulationStatus = EmulationStatus.Paused;
-
-			frameRateStopwatch.Stop();
 
 			if (breakpoint) OnBreak(EventArgs.Empty);
 			else OnPause(EventArgs.Empty);
@@ -237,13 +279,15 @@ namespace CrystalBoy.Emulator
 			set { bus.PressedKeys = value; }
 		}
 
-		//public void NotifyPressedKeys(GameBoyKeys pressedKeys) { bus.NotifyPressedKeys(pressedKeys); }
+		public void NotifyPressedKeys(GameBoyKeys pressedKeys) { bus.Joypads.NotifyPressedKeys(pressedKeys); }
 
-		//public void NotifyReleasedKeys(GameBoyKeys releasedKeys) { bus.NotifyReleasedKeys(releasedKeys); }
+		public void NotifyReleasedKeys(GameBoyKeys releasedKeys) { bus.Joypads.NotifyReleasedKeys(releasedKeys); }
 
 		private void RunFrameInternal() { bus.RunFrame(); }
 
+#if PINVOKE
 		private bool IsKeyDown(Keys vKey) { return (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0; }
+#endif
 
 		private GameBoyKeys ReadKeys()
 		{
@@ -280,29 +324,7 @@ namespace CrystalBoy.Emulator
 			while (emulationStatus == EmulationStatus.Running &&
 				!NativeMethods.PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
 			{
-				if (enableFramerateLimiter)
-				{
-					long timer = frameStopwatch.ElapsedMilliseconds;
-
-					if (timer < 17) // Exact timing for one frame at 60fps is 16⅔ ms
-					{
-						if (timer < 16)
-						{
-							// Conversion from long to int is safe since the value is less than 17.
-							// Sleep is a really bad tool for precise timing, but it will play its role when needed.
-							System.Threading.Thread.Sleep(16 - (int)timer);
-						}
-
-						// Do some active wait, even though this is bad…
-						while (frameStopwatch.Elapsed.TotalMilliseconds < (1000d / 60d)) ;
-					}
-				}
-
-				lastFrameTime = currentFrameTime;
-				currentFrameTime = frameRateStopwatch.Elapsed.TotalMilliseconds;
-
-				frameStopwatch.Reset();
-				frameStopwatch.Start();
+				(this as IClockManager).Wait();
 				RunFrameInternal();
 			}
 #else
