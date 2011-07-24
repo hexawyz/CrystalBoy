@@ -65,13 +65,13 @@ namespace CrystalBoy.Emulation
 			clockManager = new GameBoyClockManager();
 			emulationStartedHandler = OnEmulationStarted;
 			emulationStoppedHandler = OnEmulationStopped;
-			if (threadingEnabled = !(Environment.ProcessorCount < 2))
-			{
+			//if (threadingEnabled = !(Environment.ProcessorCount < 2))
+			//{
 				processorThread = new Thread(RunProcessor) { IsBackground = true };
 				//audioFrameThread = new Thread(RunAudioFrame) { IsBackground = true };
 
 				processorThread.Start();
-			}
+			//}
 #endif
 		}
 
@@ -224,8 +224,8 @@ namespace CrystalBoy.Emulation
 						// Reading and writing “isRunning” here is perfectly fine, however, some logic as to be followed.
 						// 	- If the processor emulation says to stop running, then we have to stop running, no matter what.
 						//	- Because Events may be triggered between the call to “processor.Emulate” and the loop condition evalutaion, altough that is unlikely:
-						//    The only value of “isRunning” that matters is the one direcly after the call to “processor.Emulate”. (Either the read one or the written one)
-						//	- Changed to “isRunning” inside of “processor.Emulate” will be taken into account, for maximum reactivity.
+						//    The only value of “isRunning” that matters is the one directly after the call to “processor.Emulate”. (Either the read one or the written one)
+						//	- Changes to “isRunning” inside of “processor.Emulate” will be taken into account, for maximum reactivity.
 						if (result = processor.Emulate(true))
 						{
 							result &= isRunning;
