@@ -443,7 +443,7 @@ namespace CrystalBoy.Emulator
 		{
 			Size renderSize = toolStripContainer.ContentPanel.ClientSize;
 
-			Settings.Default.ContentSize = videoRenderer.BorderVisible ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
+			Settings.Default.ContentSize = Settings.Default.BorderVisibility != BorderVisibility.On && videoRenderer.BorderVisible ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
@@ -659,6 +659,12 @@ namespace CrystalBoy.Emulator
 			if (!MapViewerForm.Visible)
 				MapViewerForm.Show(this);
 		}
+
+		#endregion
+
+		#region Help
+
+		private void aboutToolStripMenuItem_Click(object sender, EventArgs e) { AboutForm.Default.ShowDialog(this); }
 
 		#endregion
 

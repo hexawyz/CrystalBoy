@@ -66,6 +66,7 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
+    <Compile Include="AudioBuffer.cs" />
     <Compile Include="BorderVisibility.cs" />
     <Compile Include="GameBoyClockManager.cs" />
     <Compile Include="IClockManager.cs" />
@@ -130,6 +131,9 @@
     <Compile Include="GameBoyMemoryBus.Ports.cs">
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
+		<Compile Include="GameBoyMemoryBus.Audio.cs">
+			<DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
+		</Compile>
     <Compile Include="GameBoyMemoryBus.Video.cs">
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
