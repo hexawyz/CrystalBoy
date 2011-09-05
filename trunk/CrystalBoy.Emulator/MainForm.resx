@@ -190,7 +190,7 @@
     <value>4</value>
   </data>
   <data name="toolStripContainer.ContentPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>292, 221</value>
+    <value>292, 202</value>
   </data>
   <data name="&gt;&gt;toolStripContainer.ContentPanel.Name" xml:space="preserve">
     <value>toolStripContainer.ContentPanel</value>
@@ -685,7 +685,7 @@
     <value>0, 0</value>
   </data>
   <data name="mainMenuStrip.Size" type="System.Drawing.Size, System.Drawing">
-    <value>292, 23</value>
+    <value>292, 42</value>
   </data>
   <data name="mainMenuStrip.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>

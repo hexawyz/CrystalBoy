@@ -77,6 +77,7 @@ namespace CrystalBoy.Emulation
 		partial void DisposeInterrupt();
 		partial void DisposeMemory();
 		partial void DisposeRom();
+		partial void DisposeAudio();
 		partial void DisposeVideo();
 		partial void DisposeSuperGameBoy();
 		partial void DisposeJoypad();
@@ -103,6 +104,7 @@ namespace CrystalBoy.Emulation
 				DisposeInterrupt();
 				DisposeMemory();
 				DisposeRom();
+				DisposeAudio();
 				DisposeVideo();
 				DisposeSuperGameBoy();
 				DisposeJoypad();
@@ -129,6 +131,7 @@ namespace CrystalBoy.Emulation
 		partial void InitializeMemory();
 		partial void InitializeBootRom();
 		partial void InitializeRom();
+		partial void InitializeAudio();
 		partial void InitializeVideo();
 		partial void InitializeSuperGameBoy();
 		partial void InitializeJoypad();
@@ -152,6 +155,7 @@ namespace CrystalBoy.Emulation
 			InitializeMemory();
 			InitializeBootRom();
 			InitializeRom();
+			InitializeAudio();
 			InitializeVideo();
 			InitializeSuperGameBoy();
 			InitializeJoypad();
@@ -176,6 +180,7 @@ namespace CrystalBoy.Emulation
 		partial void ResetInterrupt();
 		partial void ResetMemory();
 		partial void ResetRom();
+		partial void ResetAudio();
 		partial void ResetVideo();
 		partial void ResetSuperGameBoy();
 		partial void ResetJoypad();
@@ -209,6 +214,7 @@ namespace CrystalBoy.Emulation
 			ResetInterrupt();
 			ResetMemory();
 			ResetRom();
+			ResetAudio();
 			ResetVideo();
 			ResetSuperGameBoy();
 			ResetJoypad();

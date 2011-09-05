@@ -55,6 +55,7 @@
     <Compile Include="Direct3D9Renderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TransformedTexturedVertex.cs" />
+    <Compile Include="XAudio2Renderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CrystalBoy.Emulation\CrystalBoy.Emulation.csproj">

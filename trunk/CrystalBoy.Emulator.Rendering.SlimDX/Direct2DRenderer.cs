@@ -35,22 +35,22 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 	[DisplayName("Direct2D")]
 	public sealed class Direct2DRenderer : VideoRenderer<Control>
 	{
-		Factory factory;
-		WindowRenderTarget windowRenderTarget;
-		BitmapRenderTarget compositeRenderTarget;
-		BitmapRenderTarget screenRenderTarget;
-		Bitmap borderBitmap;
-		Bitmap screenBitmap;
-		Bitmap bitmap1;
-		Bitmap bitmap2;
-		Color4 clearColor;
-		RectangleF drawRectangle;
-		byte[] borderBuffer;
-		byte[] screenBuffer;
-		GCHandle borderBufferHandle;
-		GCHandle screenBufferHandle;
-		bool borderBufferLocked;
-		bool screenBufferLocked;
+		private Factory factory;
+		private WindowRenderTarget windowRenderTarget;
+		private BitmapRenderTarget compositeRenderTarget;
+		private BitmapRenderTarget screenRenderTarget;
+		private Bitmap borderBitmap;
+		private Bitmap screenBitmap;
+		private Bitmap bitmap1;
+		private Bitmap bitmap2;
+		private Color4 clearColor;
+		private RectangleF drawRectangle;
+		private byte[] borderBuffer;
+		private byte[] screenBuffer;
+		private GCHandle borderBufferHandle;
+		private GCHandle screenBufferHandle;
+		private bool borderBufferLocked;
+		private bool screenBufferLocked;
 
 		public Direct2DRenderer(Control renderObject)
 			: base(renderObject)
