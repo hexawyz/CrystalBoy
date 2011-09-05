@@ -41,7 +41,7 @@ namespace CrystalBoy.Emulation
 		public AudioBuffer(T[] buffer)
 		{
 			if (buffer == null) throw new ArgumentNullException("buffer");
-			if (rawBuffer.Length == 0 || (rawBuffer.Length & 1) != 0) throw new IndexOutOfRangeException();
+			if (buffer.Length == 0 || (buffer.Length & 1) != 0) throw new IndexOutOfRangeException();
 
 			rawBuffer = buffer;
 		}
@@ -65,7 +65,7 @@ namespace CrystalBoy.Emulation
 		internal void SetRawBuffer(T[] buffer) // This method allows to reuse the same object over and over again. That's all there is to it.
 		{
 			if (buffer == null) throw new ArgumentNullException("buffer");
-			if (rawBuffer.Length == 0 || (rawBuffer.Length & 1) != 0) throw new IndexOutOfRangeException();
+			if (buffer.Length == 0 || (buffer.Length & 1) != 0) throw new IndexOutOfRangeException();
 
 			position = 0;
 			rawBuffer = buffer;
