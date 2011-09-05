@@ -26,8 +26,6 @@ namespace CrystalBoy.Emulation
 	{
 		internal AudioBuffer() { }
 
-		public abstract int ChannelCount { get; }
-
 		public abstract int Position { get; }
 
 		public abstract int Length { get; }
