@@ -135,10 +135,10 @@ namespace CrystalBoy.Emulator
 		private static readonly Type[] supportedRenderObjectTypes = { typeof(Control), typeof(IWin32Window) };
 
 		private static readonly List<Assembly> pluginAssemblyList = new List<Assembly>();
-		private static readonly Dictionary<Type, string> rendererDictionary = new Dictionary<Type, string>();
+		private static readonly List<PluginInformation> pluginList = new List<PluginInformation>();
 
-		public static readonly ReadOnlyCollection<Assembly> pluginAssemblyCollection = new ReadOnlyCollection<Assembly>(pluginAssemblyList);
-		public static readonly Dictionary<Type, string> RendererDictionary = rendererDictionary; // Need to implement a read only dictionary later
+		public static readonly ReadOnlyCollection<Assembly> PluginAssemblyCollection = new ReadOnlyCollection<Assembly>(pluginAssemblyList);
+		public static readonly ReadOnlyCollection<PluginInformation> PluginCollection = new ReadOnlyCollection<PluginInformation>(pluginList);
 
 		#region Plugin Management
 
@@ -224,19 +224,23 @@ namespace CrystalBoy.Emulator
 
 									if (parentTypeDefinition == typeof(AudioRenderer<,>))
 									{
-										if (IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedSampleTypes)
-											&& IsGenericArgumentTypeSupported(parentTypeGenericArguments[1], supportedRenderObjectTypes)
+										// We need to have the same (matching) generic arguments for the derived and the base class…
+										int genericArgumentCount = (parentTypeGenericArguments[0].IsGenericParameter ? 1 : 0) + (parentTypeGenericArguments[1].IsGenericParameter ? 1 : 0);
+
+										if (genericArgumentCount == type.GetGenericArguments().Length
+											&& IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedSampleTypes, true, true, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint)
+											&& IsGenericArgumentTypeSupported(parentTypeGenericArguments[1], supportedRenderObjectTypes, true, true, GenericParameterAttributes.ReferenceTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.ReferenceTypeConstraint)
 											&& type.GetConstructor(new[] { parentTypeGenericArguments[1] }) != null)
 										{
-											AddRenderMethod(type);
+											pluginList.Add(new PluginInformation(type));
 											break;
 										}
 									}
 									else if (parentTypeDefinition == typeof(AudioRenderer<>)) // Assuming that AudioRenderer<> is the only (mandatory) direct subclass to AudioRenderer, this should handle everything not handled before…
 									{
-										if (IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedSampleTypes)
+										if (IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedSampleTypes, type.IsGenericType, !type.IsGenericType, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint)
 											&& type.GetConstructor(Type.EmptyTypes) != null)
-											AddRenderMethod(type);
+											pluginList.Add(new PluginInformation(type));
 										break;
 									}
 								}
@@ -246,7 +250,7 @@ namespace CrystalBoy.Emulator
 						else if (type.IsSubclassOf(typeof(VideoRenderer)))
 						{
 							// The maximum number of generic arguments we allow for VideoRenderer is 1
-							if (genericArguments.Length > 2) continue;
+							if (genericArguments.Length > 1) continue;
 
 							// VideoRenderer can come in two flavors:
 							// A subclass of VideoRenderer<> with a constructor taking the render object, where the generic argument matches the rules mentioned before.
@@ -262,17 +266,17 @@ namespace CrystalBoy.Emulator
 
 									if (parentTypeDefinition == typeof(VideoRenderer<>))
 									{
-										if ((parentTypeGenericArguments[0].IsGenericParameter || parentTypeGenericArguments[0] == typeof(Control) && !type.IsGenericType)
+										if (IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedRenderObjectTypes, type.IsGenericType, !type.IsGenericType, GenericParameterAttributes.ReferenceTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.ReferenceTypeConstraint)
 											&& type.GetConstructor(new[] { parentTypeGenericArguments[0] }) != null)
 										{
-											AddRenderMethod(type);
+											pluginList.Add(new PluginInformation(type));
 											break;
 										}
 									}
 								}
 								else if (parentType == typeof(VideoRenderer))
 								{
-									if (!type.IsGenericType && type.GetConstructor(Type.EmptyTypes) != null) AddRenderMethod(type);
+									if (!type.IsGenericType && type.GetConstructor(Type.EmptyTypes) != null) pluginList.Add(new PluginInformation(type));
 									break;
 								}
 							}
@@ -295,17 +299,21 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		private static void AddRenderMethod(Type renderMethodType)
+		private static bool IsGenericArgumentTypeSupported
+		(
+			Type argumentType,
+			Type[] supportedTypes,
+			bool allowOpen = false,
+			bool allowClosed = true,
+			GenericParameterAttributes allowedParameterAttributes = GenericParameterAttributes.SpecialConstraintMask | GenericParameterAttributes.DefaultConstructorConstraint | GenericParameterAttributes.VarianceMask,
+			GenericParameterAttributes requiredParameterAttributes = GenericParameterAttributes.None
+		)
 		{
-			DisplayNameAttribute[] displayNameAttributes = (DisplayNameAttribute[])renderMethodType.GetCustomAttributes(typeof(DisplayNameAttribute), false);
-			string name = string.Intern(displayNameAttributes.Length > 0 ? displayNameAttributes[0].DisplayName : renderMethodType.Name);
-
-			rendererDictionary.Add(renderMethodType, name);
-		}
-
-		private static bool IsGenericArgumentTypeSupported(Type argumentType, Type[] supportedTypes)
-		{
-			if (argumentType.IsGenericParameter) return true;
+			if (argumentType.IsGenericParameter)
+				return allowOpen
+					&& (argumentType.GenericParameterAttributes & ~allowedParameterAttributes) == GenericParameterAttributes.None
+					&& (argumentType.GenericParameterAttributes & requiredParameterAttributes) == requiredParameterAttributes;
+			else if (!allowClosed) return false;
 
 			foreach (var supportedType in supportedTypes)
 				if (argumentType == supportedType) return true;
@@ -335,6 +343,9 @@ namespace CrystalBoy.Emulator
 
 			// Load plugin assembles and check for external plugins
 			LoadPluginAssemblies();
+
+			// Attempt to clean the garbage left by the plugin loading process
+			GC.Collect();
 
 			Application.Run(new MainForm());
 		}

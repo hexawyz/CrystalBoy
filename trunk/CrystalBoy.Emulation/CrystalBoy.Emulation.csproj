@@ -68,6 +68,7 @@
     </Compile>
     <Compile Include="AudioBuffer.cs" />
     <Compile Include="AudioRenderer.cs" />
+    <Compile Include="AudioSampleGenerator.cs" />
     <Compile Include="AudioStatusSnapshot.cs" />
     <Compile Include="BorderVisibility.cs" />
     <Compile Include="GameBoyClockManager.cs" />

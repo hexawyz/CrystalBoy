@@ -17,8 +17,8 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace CrystalBoy.Emulation
 {
@@ -32,6 +32,8 @@ namespace CrystalBoy.Emulation
 
 		public abstract Type SampleType { get; }
 
+		public int BitsPerSample { get { return 8 * Marshal.SizeOf(SampleType); } }
+
 		public int Frequency { get { return 44100; } }
 
 		public Array RawBuffer { get { return GetRawBuffer(); } set { SetRawBuffer(value); } }
@@ -43,7 +45,9 @@ namespace CrystalBoy.Emulation
 		protected virtual object GetRenderObject() { return null; }
 
 		// We'd want these to be protected AND internal but it is not possible…
-		internal abstract Array GetRawBuffer(); 
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		internal abstract Array GetRawBuffer();
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		internal abstract void SetRawBuffer(Array value);
 	}
 

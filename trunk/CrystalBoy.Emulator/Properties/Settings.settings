@@ -34,5 +34,8 @@
     <Setting Name="BorderVisibility" Type="CrystalBoy.Emulation.BorderVisibility" Scope="User">
       <Value Profile="(Default)">Auto</Value>
     </Setting>
+    <Setting Name="AudioRenderer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">XAudio2Renderer</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
