@@ -41,7 +41,8 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 		public unsafe XAudio2Renderer()
 		{
 			waveFormat = new WaveFormat();
-			waveFormat.AverageBytesPerSecond = (waveFormat.BitsPerSample = (short)(Marshal.SizeOf(typeof(TElement)) * 8)) / 8 * (waveFormat.SamplesPerSecond = (waveFormat.Channels = 2) * 44100);
+			waveFormat.FormatTag = WaveFormatTag.Pcm;
+			waveFormat.AverageBytesPerSecond = (waveFormat.BlockAlignment = (short)((waveFormat.BitsPerSample = (short)BitsPerSample) / 8 * (waveFormat.Channels = 2))) * (waveFormat.SamplesPerSecond = Frequency);
 			xAudio = new XAudio2(XAudio2Flags.None, ProcessorSpecifier.AnyProcessor);
 			masteringVoice = new MasteringVoice(xAudio, 2, 44100);
 			sourceVoice = new SourceVoice(xAudio, waveFormat);
@@ -64,6 +65,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			else if (audioBuffer.AudioData != null)
 			{
 				sourceVoice.FlushSourceBuffers();
+				sourceVoice.Stop();
 				audioBuffer.AudioData.Dispose();
 				audioBuffer.AudioData = null;
 			}
@@ -75,6 +77,7 @@ namespace CrystalBoy.Emulator.Rendering.SlimDX
 			audioBuffer.LoopLength = rawBuffer.Length / 2;
 			audioBuffer.LoopCount = XAudio2.LoopInfinite;
 			sourceVoice.SubmitSourceBuffer(audioBuffer);
+			sourceVoice.Start();
 		}
 
 		public override TElement[] RawBuffer

@@ -135,5 +135,17 @@ namespace CrystalBoy.Emulator.Properties {
                 this["BorderVisibility"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("XAudio2Renderer")]
+        public string AudioRenderer {
+            get {
+                return ((string)(this["AudioRenderer"]));
+            }
+            set {
+                this["AudioRenderer"] = value;
+            }
+        }
     }
 }

@@ -20,14 +20,15 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using CrystalBoy.Core;
+using System.ComponentModel;
 
 namespace CrystalBoy.Emulation
 {
 	partial class GameBoyMemoryBus
 	{
-		private const int AudioFrameDuration = 735;
-
-		private AudioBuffer<short> audioBuffer;
+		private AudioBuffer audioBuffer;
+		private AudioSampleGenerator audioSampleGenerator;
+		private AudioRenderer audioRenderer;
 		private bool audioRenderingEnabled;
 
 		internal ushort Channel1_SweepInternalFrequency;
@@ -37,7 +38,21 @@ namespace CrystalBoy.Emulation
 
 		partial void InitializeAudio() { audioBuffer = new AudioBuffer<short>(new short[2 * 2 * 44100 / 60]); }
 
-		public AudioBuffer<short> AudioBuffer { get { return audioBuffer; } }
+		public AudioBuffer AudioBuffer { get { return audioBuffer; } }
+
+		public AudioRenderer AudioRenderer
+		{
+			get { return audioRenderer; }
+			set
+			{
+				if (audioRenderer != null) audioBuffer.CloneAndDiscardRawBuffer();
+
+				if ((audioRenderer = value) != null)
+				{
+
+				}
+			}
+		}
 
 		public bool AudioRenderingEnabled
 		{
@@ -51,24 +66,37 @@ namespace CrystalBoy.Emulation
 		{
 			if (!audioRenderingEnabled) return;
 
-			bool soundEnabled = false;
-			byte length1, length2, length3, length4;
-			ushort frequency1, frequency2, frequency3;
+			audioSampleGenerator.FillBuffer();
+		}
 
-			for (int i = 0; i < AudioFrameDuration; i++)
+		[DisplayName("16-bit Sound")]
+		private sealed class Int16AudioSampleGenerator : AudioSampleGenerator<Int16>
+		{
+			public Int16AudioSampleGenerator(AudioBuffer<short> audioBuffer) : base(audioBuffer) { }
+
+			public override void FillBuffer()
 			{
-				int maxCycle = i * FrameDuration / AudioFrameDuration;
+				bool soundEnabled = false;
+				byte length1, length2, length3, length4;
+				ushort frequency1, frequency2, frequency3;
 
-				if (!soundEnabled)
+				int audioFrameDuration = 44100 / 60;
+
+				for (int i = 0; i < audioFrameDuration; i++)
 				{
-					audioBuffer.PutSample(0, 0);
-					continue;
+					int maxCycle = i * FrameDuration / audioFrameDuration;
+
+					if (!soundEnabled)
+					{
+						AudioBuffer.PutSample(0, 0);
+						continue;
+					}
+
+					// For easy mixing, the amplitude for any of those channels must be constrained between -8188 and 8188
+					short sample1 = i < 368 ? (short)-8188 : (short)8188, sample2 = 0, sample3 = 0, sample4 = 0; // Fill the buffer with dummy sound for testing the plugin…
+
+					AudioBuffer.PutSample((short)(sample1 + sample2 + sample3 + sample4), (short)(sample1 + sample2 + sample3 + sample4));
 				}
-
-				// For easy mixing, the amplitude for any of those channels must be constrained between -8188 and 8188
-				short sample1 = i < 368 ? (short)-8188 : (short)8188, sample2 = 0, sample3 = 0, sample4 = 0; // Fill the buffer with dummy sound for testing the plugin…
-
-				audioBuffer.PutSample((short)(sample1 + sample2 + sample3 + sample4), (short)(sample1 + sample2 + sample3 + sample4));
 			}
 		}
 	}

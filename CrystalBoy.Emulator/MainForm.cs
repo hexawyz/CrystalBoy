@@ -38,7 +38,8 @@ namespace CrystalBoy.Emulator
 		private EmulatedGameBoy emulatedGameBoy;
 		private VideoRenderer videoRenderer;
 		private AudioRenderer audioRenderer;
-		private Dictionary<Type, ToolStripMenuItem> rendererMenuItemDictionary;
+		private Dictionary<Type, ToolStripMenuItem> videoRendererMenuItemDictionary;
+		private Dictionary<Type, ToolStripMenuItem> audioRendererMenuItemDictionary;
 		private BinaryWriter ramSaveWriter;
 		private BinaryReader ramSaveReader;
 		private bool pausedTemporarily;
@@ -63,22 +64,28 @@ namespace CrystalBoy.Emulator
 			UpdateEmulationStatus();
 			UpdateFrameRate();
 			SetStatusTextHandler();
-			CreateRenderMethodMenuItems();
+			CreateRendererMenuItems();
 		}
 
-		private void CreateRenderMethodMenuItems()
+		private void CreateRendererMenuItems()
 		{
-			rendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
+			videoRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
+			audioRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
 
-			foreach (var renderer in Program.RendererDictionary)
+			foreach (var plugin in Program.PluginCollection)
 			{
-				bool isAudioRenderer = renderer.Key.IsSubclassOf(typeof(AudioRenderer));
-				var rendererMenuItem = new ToolStripMenuItem(renderer.Value);
+				bool isAudioRenderer = plugin.Type.IsSubclassOf(typeof(AudioRenderer));
+
+				// Skip the plugins which are neither AudioRenderer nor VideoRenderer, for future-proofing the code a little bit.
+				if (!(isAudioRenderer || plugin.Type.IsSubclassOf(typeof(VideoRenderer)))) continue;
+
+				var rendererMenuItem = new ToolStripMenuItem(plugin.DisplayName);
 
 				rendererMenuItem.Click += isAudioRenderer ? new EventHandler(audioRendererMenuItem_Click) : new EventHandler(videoRendererMenuItem_Click);
-				rendererMenuItem.Tag = renderer.Key;
+				rendererMenuItem.ToolTipText = plugin.Description;
+				rendererMenuItem.Tag = plugin.Type;
 
-				rendererMenuItemDictionary.Add(renderer.Key, rendererMenuItem);
+				(isAudioRenderer ? audioRendererMenuItemDictionary : videoRendererMenuItemDictionary).Add(plugin.Type, rendererMenuItem);
 
 				(isAudioRenderer ? audioRendererToolStripMenuItem : videoRendererToolStripMenuItem).DropDownItems.Add(rendererMenuItem);
 			}
@@ -104,22 +111,84 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		private VideoRenderer CreateVideoRenderer(Type rendererType)
+		#region Audio Renderer Management
+
+		private AudioRenderer CreateAudioRenderer(Type rendererType)
 		{
-			Type[] typeArray;
+			Type[] constructorParameterTypes;
 
 			// Assume the plugin filter has been passed at loading (it should have !)
 			if (rendererType.IsGenericType)
-				rendererType = rendererType.MakeGenericType(typeArray = new[] { typeof(Control) });
+			{
+				var genericArguments = rendererType.GetGenericArguments();
+
+				if (genericArguments.Length == 2)
+				{
+					rendererType = rendererType.MakeGenericType(new[] { typeof(short), typeof(Control) });
+					constructorParameterTypes = new[] { typeof(Control) };
+				}
+				else if ((genericArguments[0].GenericParameterAttributes & GenericParameterAttributes.NotNullableValueTypeConstraint) != GenericParameterAttributes.None)
+				{
+					rendererType = rendererType.MakeGenericType(new[] { typeof(short) });
+					constructorParameterTypes = Type.EmptyTypes;
+				}
+				else rendererType = rendererType.MakeGenericType(constructorParameterTypes = new[] { typeof(Control) });
+			}
+			else if (rendererType.IsSubclassOf(typeof(AudioRenderer<short, Control>)))
+				constructorParameterTypes = new[] { typeof(Control) };
+			else if (rendererType.IsSubclassOf(typeof(AudioRenderer<short, IWin32Window>)))
+				constructorParameterTypes = new[] { typeof(IWin32Window) };
+			else constructorParameterTypes = Type.EmptyTypes;
+
+			// Not using Activator.CreateInstance here because it doesn't allow to check the exact signature… (Does it really matters ? Somehow…)
+			ConstructorInfo constructor = rendererType.GetConstructor(constructorParameterTypes);
+
+			return (AudioRenderer)constructor.Invoke(constructorParameterTypes.Length > 0 ? new[] { toolStripContainer.ContentPanel } : new object[0]);
+		}
+
+		private void SwitchAudioRenderer(Type rendererType)
+		{
+			if (audioRenderer != null)
+			{
+				emulatedGameBoy.Bus.AudioRenderer = null;
+				audioRenderer.Dispose();
+				audioRenderer = null;
+			}
+
+			audioRenderer = CreateAudioRenderer(rendererType);
+
+			ToolStripMenuItem selectedRendererMenuItem = audioRendererMenuItemDictionary[rendererType];
+
+			foreach (ToolStripMenuItem renderMethodMenuItem in audioRendererMenuItemDictionary.Values)
+				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedRendererMenuItem;
+
+			// Store the FullName once we know the type of render method to use
+			Settings.Default.AudioRenderer = rendererType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
+
+			emulatedGameBoy.Bus.AudioRenderer = audioRenderer;
+		}
+
+		#endregion
+
+		#region Video Renderer Management
+
+		private VideoRenderer CreateVideoRenderer(Type rendererType)
+		{
+			Type[] constructorParameterTypes;
+
+			// Assume the plugin filter has been passed at loading (it should have !)
+			if (rendererType.IsGenericType)
+				rendererType = rendererType.MakeGenericType(constructorParameterTypes = new[] { typeof(Control) });
 			else if (rendererType.IsSubclassOf(typeof(VideoRenderer<Control>)))
-				typeArray = new[] { typeof(Control) };
+				constructorParameterTypes = new[] { typeof(Control) };
 			else if (rendererType.IsSubclassOf(typeof(VideoRenderer<IWin32Window>)))
-				typeArray = new[] { typeof(IWin32Window) };
-			else typeArray = Type.EmptyTypes;
+				constructorParameterTypes = new[] { typeof(IWin32Window) };
+			else constructorParameterTypes = Type.EmptyTypes;
 
-			ConstructorInfo constructor = rendererType.GetConstructor(typeArray);
+			// Not using Activator.CreateInstance here because it doesn't allow to check the exact signature… (Does it really matters ? Somehow…)
+			ConstructorInfo constructor = rendererType.GetConstructor(constructorParameterTypes);
 
-			return (VideoRenderer)constructor.Invoke(typeArray.Length > 0 ? new[] { toolStripContainer.ContentPanel } : new object[0]);
+			return (VideoRenderer)constructor.Invoke(constructorParameterTypes.Length > 0 ? new[] { toolStripContainer.ContentPanel } : new object[0]);
 		}
 
 		private void SwitchVideoRenderer(Type rendererType)
@@ -135,9 +204,9 @@ namespace CrystalBoy.Emulator
 			videoRenderer.Interpolation = false;
 			videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
 
-			ToolStripMenuItem selectedRendererMenuItem = rendererMenuItemDictionary[rendererType];
+			ToolStripMenuItem selectedRendererMenuItem = videoRendererMenuItemDictionary[rendererType];
 
-			foreach (ToolStripMenuItem renderMethodMenuItem in rendererMenuItemDictionary.Values)
+			foreach (ToolStripMenuItem renderMethodMenuItem in videoRendererMenuItemDictionary.Values)
 				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedRendererMenuItem;
 
 			// Store the FullName once we know the type of render method to use
@@ -146,32 +215,41 @@ namespace CrystalBoy.Emulator
 			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
 		}
 
-		private void InitializeVideoRenderer()
+		#endregion
+
+		private void InitializePlugins()
 		{
-			string rendererName = Settings.Default.VideoRenderer;
-			Type rendererType = Type.GetType(rendererName); // Try to find the type by simple reflexion (will work for embedded types and AssemblyQualifiedNames)
+			string audioRendererName = Settings.Default.AudioRenderer;
+			string videoRendererName = Settings.Default.VideoRenderer;
 
-			if (rendererType != null)
-				SwitchVideoRenderer(rendererType);
-			else // If simple reflexion failed, try using Name and FullName matches (there may be multiple matches in that case but it is better to avoid writing the full AssemblyQualifiedName in initial configurtaion files)
-			{
-				Type firstRenderer = null;
+			// Try to find the type by simple reflexion (will work for embedded types and AssemblyQualifiedNames)
+			Type audioRendererType = Type.GetType(audioRendererName);
+			Type videoRendererType = Type.GetType(videoRendererName);
 
-				foreach (var renderer in Program.RendererDictionary)
+			Type firstAudioRendererType = null;
+			Type firstVideoRendererType = null;
+
+			// If simple reflexion fails, try using Name and FullName matches (there may be multiple matches in that case but it is better to avoid writing the full AssemblyQualifiedName in initial configurtaion files)
+			if (audioRendererType == null && videoRendererType == null)
+				foreach (var plugin in Program.PluginCollection)
 				{
-					if (firstRenderer == null) firstRenderer = renderer.Key;
+					bool isAudioRenderer = plugin.Type.IsSubclassOf(typeof(AudioRenderer));
+					bool isVideoRenderer = !isAudioRenderer && plugin.Type.IsSubclassOf(typeof(VideoRenderer));
 
-					if (renderer.Key.Name == rendererName || renderer.Key.FullName == rendererName)
-					{
-						SwitchVideoRenderer(renderer.Key);
-						return;
-					}
+					if (audioRendererType == null && isAudioRenderer) audioRendererType = plugin.Type;
+					else if (firstVideoRendererType == null && isVideoRenderer) firstVideoRendererType = plugin.Type;
+
+					if (audioRendererType == null && (plugin.Type.Name == audioRendererName || plugin.Type.FullName == audioRendererName))
+						audioRendererType = plugin.Type;
+					if (videoRendererType == null && (plugin.Type.Name == videoRendererName || plugin.Type.FullName == videoRendererName))
+						videoRendererType = plugin.Type;
 				}
 
-				// If nothing was found, try using the first render method found, or throw an exception if nothing can be done
-				if (firstRenderer != null) SwitchVideoRenderer(firstRenderer);
-				else throw new InvalidOperationException();
-			}
+			audioRendererType = audioRendererType ?? firstAudioRendererType;
+			videoRendererType = videoRendererType ?? firstVideoRendererType;
+
+			if (audioRendererType != null) SwitchAudioRenderer(audioRendererType);
+			if (videoRendererType != null) SwitchVideoRenderer(videoRendererType);
 		}
 
 		#endregion
@@ -425,7 +503,7 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnShown(EventArgs e)
 		{
-			InitializeVideoRenderer();
+			InitializePlugins();
 			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
 			base.OnShown(e);
 		}
