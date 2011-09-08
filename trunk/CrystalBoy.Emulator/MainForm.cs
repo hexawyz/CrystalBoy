@@ -37,7 +37,8 @@ namespace CrystalBoy.Emulator
 		private RomInformationForm romInformationForm;
 		private EmulatedGameBoy emulatedGameBoy;
 		private VideoRenderer videoRenderer;
-		private Dictionary<Type, ToolStripMenuItem> renderMethodMenuItemDictionary;
+		private AudioRenderer audioRenderer;
+		private Dictionary<Type, ToolStripMenuItem> rendererMenuItemDictionary;
 		private BinaryWriter ramSaveWriter;
 		private BinaryReader ramSaveReader;
 		private bool pausedTemporarily;
@@ -67,18 +68,19 @@ namespace CrystalBoy.Emulator
 
 		private void CreateRenderMethodMenuItems()
 		{
-			renderMethodMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
+			rendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
 
-			foreach (var renderMethod in Program.RenderMethodDictionary)
+			foreach (var renderer in Program.RendererDictionary)
 			{
-				ToolStripMenuItem renderMethodMenuItem = new ToolStripMenuItem(renderMethod.Value);
+				bool isAudioRenderer = renderer.Key.IsSubclassOf(typeof(AudioRenderer));
+				var rendererMenuItem = new ToolStripMenuItem(renderer.Value);
 
-				renderMethodMenuItem.Click += new EventHandler(renderMethodMenuItem_Click);
-				renderMethodMenuItem.Tag = renderMethod.Key;
+				rendererMenuItem.Click += isAudioRenderer ? new EventHandler(audioRendererMenuItem_Click) : new EventHandler(videoRendererMenuItem_Click);
+				rendererMenuItem.Tag = renderer.Key;
 
-				renderMethodMenuItemDictionary.Add(renderMethod.Key, renderMethodMenuItem);
+				rendererMenuItemDictionary.Add(renderer.Key, rendererMenuItem);
 
-				rendererToolStripMenuItem.DropDownItems.Add(renderMethodMenuItem);
+				(isAudioRenderer ? audioRendererToolStripMenuItem : videoRendererToolStripMenuItem).DropDownItems.Add(rendererMenuItem);
 			}
 		}
 
@@ -102,14 +104,25 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		private VideoRenderer<Control> CreateRenderMethod(Type renderMethodType)
+		private VideoRenderer CreateVideoRenderer(Type rendererType)
 		{
-			ConstructorInfo constructor = renderMethodType.GetConstructor(new Type[] { typeof(Control) });
+			Type[] typeArray;
 
-			return (VideoRenderer<Control>)constructor.Invoke(new object[] { toolStripContainer.ContentPanel });
+			// Assume the plugin filter has been passed at loading (it should have !)
+			if (rendererType.IsGenericType)
+				rendererType = rendererType.MakeGenericType(typeArray = new[] { typeof(Control) });
+			else if (rendererType.IsSubclassOf(typeof(VideoRenderer<Control>)))
+				typeArray = new[] { typeof(Control) };
+			else if (rendererType.IsSubclassOf(typeof(VideoRenderer<IWin32Window>)))
+				typeArray = new[] { typeof(IWin32Window) };
+			else typeArray = Type.EmptyTypes;
+
+			ConstructorInfo constructor = rendererType.GetConstructor(typeArray);
+
+			return (VideoRenderer)constructor.Invoke(typeArray.Length > 0 ? new[] { toolStripContainer.ContentPanel } : new object[0]);
 		}
 
-		private void SwitchRenderMethod(Type renderMethodType)
+		private void SwitchVideoRenderer(Type rendererType)
 		{
 			if (videoRenderer != null)
 			{
@@ -118,45 +131,45 @@ namespace CrystalBoy.Emulator
 				videoRenderer = null;
 			}
 
-			videoRenderer = CreateRenderMethod(renderMethodType);
+			videoRenderer = CreateVideoRenderer(rendererType);
 			videoRenderer.Interpolation = false;
 			videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
 
-			ToolStripMenuItem selectedMethodMenuItem = renderMethodMenuItemDictionary[renderMethodType];
+			ToolStripMenuItem selectedRendererMenuItem = rendererMenuItemDictionary[rendererType];
 
-			foreach (ToolStripMenuItem renderMethodMenuItem in renderMethodMenuItemDictionary.Values)
-				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedMethodMenuItem;
+			foreach (ToolStripMenuItem renderMethodMenuItem in rendererMenuItemDictionary.Values)
+				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedRendererMenuItem;
 
 			// Store the FullName once we know the type of render method to use
-			Settings.Default.VideoRenderer = renderMethodType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
+			Settings.Default.VideoRenderer = rendererType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 
 			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
 		}
 
-		private void InitializeRenderMethod()
+		private void InitializeVideoRenderer()
 		{
-			string renderMethodName = Settings.Default.VideoRenderer;
-			Type renderMethodType = Type.GetType(renderMethodName); // Try to find the type by simple reflexion (will work for embedded types and AssemblyQualifiedNames)
+			string rendererName = Settings.Default.VideoRenderer;
+			Type rendererType = Type.GetType(rendererName); // Try to find the type by simple reflexion (will work for embedded types and AssemblyQualifiedNames)
 
-			if (renderMethodType != null)
-				SwitchRenderMethod(renderMethodType);
+			if (rendererType != null)
+				SwitchVideoRenderer(rendererType);
 			else // If simple reflexion failed, try using Name and FullName matches (there may be multiple matches in that case but it is better to avoid writing the full AssemblyQualifiedName in initial configurtaion files)
 			{
-				Type firstRenderMethod = null;
+				Type firstRenderer = null;
 
-				foreach (var renderMethod in Program.RenderMethodDictionary)
+				foreach (var renderer in Program.RendererDictionary)
 				{
-					if (firstRenderMethod == null) firstRenderMethod = renderMethod.Key;
+					if (firstRenderer == null) firstRenderer = renderer.Key;
 
-					if (renderMethod.Key.Name == renderMethodName || renderMethod.Key.FullName == renderMethodName)
+					if (renderer.Key.Name == rendererName || renderer.Key.FullName == rendererName)
 					{
-						SwitchRenderMethod(renderMethod.Key);
+						SwitchVideoRenderer(renderer.Key);
 						return;
 					}
 				}
 
 				// If nothing was found, try using the first render method found, or throw an exception if nothing can be done
-				if (firstRenderMethod != null) SwitchRenderMethod(firstRenderMethod);
+				if (firstRenderer != null) SwitchVideoRenderer(firstRenderer);
 				else throw new InvalidOperationException();
 			}
 		}
@@ -412,7 +425,7 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnShown(EventArgs e)
 		{
-			InitializeRenderMethod();
+			InitializeVideoRenderer();
 			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
 			base.OnShown(e);
 		}
@@ -525,11 +538,16 @@ namespace CrystalBoy.Emulator
 			interpolationToolStripMenuItem.Checked = videoRenderer.Interpolation;
 		}
 
-		private void renderMethodMenuItem_Click(object sender, EventArgs e)
+		private void audioRendererMenuItem_Click(object sender, EventArgs e)
+		{
+			ToolStripMenuItem renderMethodMenuItem = (ToolStripMenuItem)sender;
+		}
+
+		private void videoRendererMenuItem_Click(object sender, EventArgs e)
 		{
 			ToolStripMenuItem renderMethodMenuItem = (ToolStripMenuItem)sender;
 
-			SwitchRenderMethod((Type)renderMethodMenuItem.Tag);
+			SwitchVideoRenderer((Type)renderMethodMenuItem.Tag);
 		}
 
 		#region Border

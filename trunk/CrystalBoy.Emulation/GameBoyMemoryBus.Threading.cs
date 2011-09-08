@@ -18,6 +18,7 @@
 
 using System;
 using System.Threading;
+using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
@@ -34,7 +35,8 @@ namespace CrystalBoy.Emulation
 		private Thread audioFrameThread;
 		private SendOrPostCallback videoFrameCallback;
 		private volatile bool isRunning;
-		private volatile bool isRendering;
+		private volatile bool isRenderingVideo;
+		//private volatile bool isRenderingAudio; // Go on with locking for now since it is safer… Possibly need to rewrite this later once the audio emulation is ok.
 		private volatile IClockManager clockManager;
 
 		private bool threadingEnabled;
@@ -60,19 +62,17 @@ namespace CrystalBoy.Emulation
 			synchronizationContext = SynchronizationContext.Current;
 			handlePostedNotification = HandlePostedNotification;
 			frameDoneHandler = OnFrameDone;
-			videoFrameCallback = RenderVideoFrame;
+			videoFrameCallback = RenderVideoFrameCallback;
 #if WITH_THREADING
 			clockManager = new GameBoyClockManager();
 			emulationStartedHandler = OnEmulationStarted;
 			emulationStoppedHandler = OnEmulationStopped;
 			threadingEnabled = true;
-			//if (threadingEnabled = !(Environment.ProcessorCount < 2))
-			//{
-				processorThread = new Thread(RunProcessor) { IsBackground = true };
-				//audioFrameThread = new Thread(RunAudioFrame) { IsBackground = true };
+			processorThread = new Thread(RunProcessor) { IsBackground = true };
+			audioFrameThread = new Thread(RunAudioRenderer) { IsBackground = true };
 
-				processorThread.Start();
-			//}
+			processorThread.Start();
+			audioFrameThread.Start();
 #endif
 		}
 
@@ -252,15 +252,81 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-		private void RenderVideoFrame(object state)
+		private void OnFrameReady()
+		{
+			OnBeforeRendering(frameEventArgs);
+
+			if (sgbPendingTransfer)
+			{
+				ProcessSuperGameBoyCommand(true);
+				sgbPendingTransfer = false;
+			}
+
+			// For now, keep the audio and video rendering paths separate…
+			// It is probably a good idea to merge them, thus avoiding to test threadingEnabled twice…
+
+#if WITH_THREADING
+			if (threadingEnabled)
+			{
+				lock (audioFrameThread)
+				{
+					// Locking here WILL slow the emulation down… (This might not be a problem for running at 60 fps on modern 1.5GHz+ computers though…)
+					// We'll have to wait for the previous frame's audio rendering to be done…
+					// By using a real multithreaded sound engine, we could spread the emulation across 3 processors.
+					// A good multithreaded sound engine would of course have a slightly different design than the multithreaded video engine:
+					// Contrarily to video rendering, we cannot afford to miss a frame for only a few ms of delay…
+					// We should however be able to write data to the buffer faster than it can be consumed, as with video data…
+					Utility.Swap(ref audioStatusSnapshot, ref savedAudioStatusSnapshot);
+					Utility.Swap(ref audioPortAccessList, ref savedAudioPortAccessList);
+					Monitor.Pulse(audioFrameThread);
+				}
+			}
+			else
+			{
+#else
+				RenderAudioFrame();
+#endif
+#if WITH_THREADING
+			}
+#endif
+
+			if (!frameEventArgs.SkipFrame)
+			{
+#if WITH_THREADING
+				if (threadingEnabled)
+				{
+					if (!isRenderingVideo)
+					{
+						// Set the flag, effectively locking the saved state
+						isRenderingVideo = true;
+						// Swap the buffers
+						Utility.Swap(ref videoStatusSnapshot, ref savedVideoStatusSnapshot);
+						Utility.Swap(ref videoPortAccessList, ref savedVideoPortAccessList);
+						Utility.Swap(ref paletteAccessList, ref savedPaletteAccessList);
+						// Request rendering
+						UIThreadRender();
+					}
+				}
+				else
+				{
+#endif
+					RenderVideoFrame();
+					OnAfterRendering(EventArgs.Empty);
+#if WITH_THREADING
+				}
+#endif
+			}
+		}
+
+		private void RenderVideoFrameCallback(object state)
 		{
 			// The method will clear the isRendering field by itself
-			Render();
+			RenderVideoFrame();
 
 			OnAfterRendering(EventArgs.Empty);
 		}
 
-		private void RunAudioFrame()
+		private void RunAudioRenderer()
 		{
 			lock (audioFrameThread)
 			{
@@ -269,6 +335,8 @@ namespace CrystalBoy.Emulation
 					Monitor.Wait(audioFrameThread);
 
 					if (!threadingEnabled) return;
+
+					RenderAudioFrame();
 				}
 			}
 		}

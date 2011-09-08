@@ -25,22 +25,51 @@ namespace CrystalBoy.Emulation
 {
 	partial class GameBoyMemoryBus
 	{
+		private const int AudioFrameDuration = 735;
+
 		private AudioBuffer<short> audioBuffer;
-		private bool audioEnabled;
+		private bool audioRenderingEnabled;
+
+		internal ushort Channel1_SweepInternalFrequency;
+		internal ushort Channel1_Frequency;
+		internal ushort Channel1_Enveloppe;
+		internal ushort Channel2_Frequency;
 
 		partial void InitializeAudio() { audioBuffer = new AudioBuffer<short>(new short[2 * 2 * 44100 / 60]); }
 
 		public AudioBuffer<short> AudioBuffer { get { return audioBuffer; } }
 
-		public bool AudioEnable
+		public bool AudioRenderingEnabled
 		{
-			get { return audioEnabled; }
-			set { audioEnabled = value; }
+			get { return audioRenderingEnabled; }
+			set { audioRenderingEnabled = value; }
 		}
 
-		private void RenderAudio()
+		public bool SoundEnabled { get { return (ReadPort(Port.NR52) & 0x80) != 0; } }
+
+		private void RenderAudioFrame()
 		{
-			if (!audioEnabled) return;
+			if (!audioRenderingEnabled) return;
+
+			bool soundEnabled = false;
+			byte length1, length2, length3, length4;
+			ushort frequency1, frequency2, frequency3;
+
+			for (int i = 0; i < AudioFrameDuration; i++)
+			{
+				int maxCycle = i * FrameDuration / AudioFrameDuration;
+
+				if (!soundEnabled)
+				{
+					audioBuffer.PutSample(0, 0);
+					continue;
+				}
+
+				// For easy mixing, the amplitude for any of those channels must be constrained between -8188 and 8188
+				short sample1 = i < 368 ? (short)-8188 : (short)8188, sample2 = 0, sample3 = 0, sample4 = 0; // Fill the buffer with dummy sound for testing the plugin…
+
+				audioBuffer.PutSample((short)(sample1 + sample2 + sample3 + sample4), (short)(sample1 + sample2 + sample3 + sample4));
+			}
 		}
 	}
 }

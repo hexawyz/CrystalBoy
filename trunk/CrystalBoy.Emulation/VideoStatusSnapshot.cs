@@ -17,13 +17,11 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
-	internal class VideoStatusSnapshot
+	internal sealed class VideoStatusSnapshot
 	{
 		private GameBoyMemoryBus bus;
 		private MemoryBlock videoMemoryBlock;

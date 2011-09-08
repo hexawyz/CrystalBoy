@@ -17,42 +17,72 @@
 #endregion
 
 using System;
+using System.IO;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using SlimDX;
 using SlimDX.Multimedia;
 using SlimDX.XAudio2;
-using System.IO;
 
 namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
-	public sealed class XAudio2Renderer : IDisposable
+	[DisplayName("XAudio 2")]
+	[Description("Renders audio using XAudio 2 / SlimDX.")]
+	public sealed class XAudio2Renderer<TElement> : CrystalBoy.Emulation.AudioRenderer<TElement>
+		where TElement : struct
 	{
-		private byte[] rawBuffer;
+		private TElement[] rawBuffer;
 		private WaveFormat waveFormat;
 		private XAudio2 xAudio;
 		private MasteringVoice masteringVoice;
 		private SourceVoice sourceVoice;
 		private AudioBuffer audioBuffer;
 
-		public XAudio2Renderer()
+		public unsafe XAudio2Renderer()
 		{
 			waveFormat = new WaveFormat();
-			waveFormat.AverageBytesPerSecond = (waveFormat.BitsPerSample = 16) / 8 * (waveFormat.SamplesPerSecond = (waveFormat.Channels = 2) * 44100);
-			rawBuffer = new byte[waveFormat.BitsPerSample / 8 * waveFormat.Channels * (2 * 44100 / 60)];
+			waveFormat.AverageBytesPerSecond = (waveFormat.BitsPerSample = (short)(Marshal.SizeOf(typeof(TElement)) * 8)) / 8 * (waveFormat.SamplesPerSecond = (waveFormat.Channels = 2) * 44100);
 			xAudio = new XAudio2(XAudio2Flags.None, ProcessorSpecifier.AnyProcessor);
 			masteringVoice = new MasteringVoice(xAudio, 2, 44100);
 			sourceVoice = new SourceVoice(xAudio, waveFormat);
-			audioBuffer = new AudioBuffer()
-			{
-				AudioData = new MemoryStream(rawBuffer, false),
-				AudioBytes = rawBuffer.Length,
-				LoopBegin = 0,
-				LoopLength = 2 * 44100 / 60,
-				LoopCount = XAudio2.LoopInfinite
-			};
+			ResetBuffer(null);
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
+			sourceVoice.FlushSourceBuffers();
+			audioBuffer.Dispose();
+			sourceVoice.Dispose();
 			xAudio.StopEngine();
 		}
+
+		private static TElement[] CreateDefaultBuffer() { return new TElement[2 * (2 * 44100 / 60)]; }
+
+		private void ResetBuffer(TElement[] value)
+		{
+			if (audioBuffer == null) audioBuffer = new AudioBuffer();
+			else if (audioBuffer.AudioData != null)
+			{
+				sourceVoice.FlushSourceBuffers();
+				audioBuffer.AudioData.Dispose();
+				audioBuffer.AudioData = null;
+			}
+
+			rawBuffer = value ?? CreateDefaultBuffer();
+
+			audioBuffer.AudioData = new DataStream(rawBuffer, true, true);
+			audioBuffer.AudioBytes = (int)audioBuffer.AudioData.Length;
+			audioBuffer.LoopLength = rawBuffer.Length / 2;
+			audioBuffer.LoopCount = XAudio2.LoopInfinite;
+			sourceVoice.SubmitSourceBuffer(audioBuffer);
+		}
+
+		public override TElement[] RawBuffer
+		{
+			get { return rawBuffer; }
+			set { ResetBuffer(value); }
+		}
+
+		public override bool CanSetRawBuffer { get { return true; } }
 	}
 }

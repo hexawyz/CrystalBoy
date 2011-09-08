@@ -1,0 +1,28 @@
+﻿<Window x:Class="CrystalBoy.VisualAssembler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:va="clr-namespace:CrystalBoy.VisualAssembler"
+        Title="MainWindow" Height="350" Width="525">
+	<Window.CommandBindings>
+		<CommandBinding Command="New" Executed="New_Executed" />
+		<CommandBinding Command="Open" Executed="Open_Executed" />
+		<CommandBinding Command="va:Commands.Exit"  Executed="Exit_Executed" />
+	</Window.CommandBindings>
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="23" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		<Menu>
+			<MenuItem Header="File">
+				<MenuItem Command="New" />
+				<MenuItem Command="Open" />
+				<Separator />
+				<MenuItem Command="Save" />
+				<MenuItem Command="SaveAs" />
+				<Separator />
+				<MenuItem Command="va:Commands.Exit" />
+			</MenuItem>
+		</Menu>
+	</Grid>
+</Window>

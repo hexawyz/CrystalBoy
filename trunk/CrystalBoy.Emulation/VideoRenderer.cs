@@ -76,21 +76,27 @@ namespace CrystalBoy.Emulation
 		}
 
 		protected virtual void OnInterpolationChanged(EventArgs e) { if (InterpolationChanged != null) InterpolationChanged(this, e); }
+
+		public object RenderObject { get { return GetRenderObject(); } }
+
+		protected virtual object GetRenderObject() { return null; }
 	}
 
 	[CLSCompliant(false)]
-	public abstract class VideoRenderer<T> : VideoRenderer
-		where T: class
+	public abstract class VideoRenderer<TRenderObject> : VideoRenderer
+		where TRenderObject : class
 	{
-		T renderObject;
+		TRenderObject renderObject;
 
-		public VideoRenderer(T renderObject)
+		public VideoRenderer(TRenderObject renderObject)
 		{
 			if (renderObject == null)
 				throw new ArgumentNullException("renderObject");
 			this.renderObject = renderObject;
 		}
 
-		public T RenderObject { get { return renderObject; } }
+		public new TRenderObject RenderObject { get { return renderObject; } }
+
+		protected sealed override object GetRenderObject() { return renderObject; }
 	}
 }

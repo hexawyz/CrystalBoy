@@ -72,6 +72,8 @@ namespace CrystalBoy.Emulator
 			this.audioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.audioEnabledToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.muteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem10 = new System.Windows.Forms.ToolStripSeparator();
+			this.audioRendererToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.videoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.borderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.borderAutoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,7 +86,7 @@ namespace CrystalBoy.Emulator
 			this.zoom200toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom300toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom400toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.rendererToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.videoRendererToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.interpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.hardwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.useBootstrapRomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -275,7 +277,9 @@ namespace CrystalBoy.Emulator
 			// 
 			this.audioToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.audioEnabledToolStripMenuItem,
-            this.muteToolStripMenuItem});
+            this.muteToolStripMenuItem,
+            this.toolStripMenuItem10,
+            this.audioRendererToolStripMenuItem});
 			this.audioToolStripMenuItem.Name = "audioToolStripMenuItem";
 			resources.ApplyResources(this.audioToolStripMenuItem, "audioToolStripMenuItem");
 			// 
@@ -289,13 +293,23 @@ namespace CrystalBoy.Emulator
 			this.muteToolStripMenuItem.Name = "muteToolStripMenuItem";
 			resources.ApplyResources(this.muteToolStripMenuItem, "muteToolStripMenuItem");
 			// 
+			// toolStripMenuItem10
+			// 
+			this.toolStripMenuItem10.Name = "toolStripMenuItem10";
+			resources.ApplyResources(this.toolStripMenuItem10, "toolStripMenuItem10");
+			// 
+			// audioRendererToolStripMenuItem
+			// 
+			this.audioRendererToolStripMenuItem.Name = "audioRendererToolStripMenuItem";
+			resources.ApplyResources(this.audioRendererToolStripMenuItem, "audioRendererToolStripMenuItem");
+			// 
 			// videoToolStripMenuItem
 			// 
 			this.videoToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.borderToolStripMenuItem,
             this.toolStripMenuItem9,
             this.zoomToolStripMenuItem,
-            this.rendererToolStripMenuItem,
+            this.videoRendererToolStripMenuItem,
             toolStripMenuItem5,
             this.interpolationToolStripMenuItem});
 			this.videoToolStripMenuItem.Name = "videoToolStripMenuItem";
@@ -376,10 +390,10 @@ namespace CrystalBoy.Emulator
 			resources.ApplyResources(this.zoom400toolStripMenuItem, "zoom400toolStripMenuItem");
 			this.zoom400toolStripMenuItem.Click += new System.EventHandler(this.zoom400toolStripMenuItem_Click);
 			// 
-			// rendererToolStripMenuItem
+			// videoRendererToolStripMenuItem
 			// 
-			this.rendererToolStripMenuItem.Name = "rendererToolStripMenuItem";
-			resources.ApplyResources(this.rendererToolStripMenuItem, "rendererToolStripMenuItem");
+			this.videoRendererToolStripMenuItem.Name = "videoRendererToolStripMenuItem";
+			resources.ApplyResources(this.videoRendererToolStripMenuItem, "videoRendererToolStripMenuItem");
 			// 
 			// toolStripMenuItem5
 			// 
@@ -473,7 +487,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.superGameBoyAdvanceToolStripMenuItem.Name = "superGameBoyAdvanceToolStripMenuItem";
 			resources.ApplyResources(this.superGameBoyAdvanceToolStripMenuItem, "superGameBoyAdvanceToolStripMenuItem");
-			this.superGameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoy;
+			this.superGameBoyAdvanceToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoyAdvance;
 			this.superGameBoyAdvanceToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
 			// 
 			// joypadToolStripMenuItem
@@ -598,7 +612,7 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripMenuItem superGameBoyToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem superGameBoy2ToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem romInformationToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem rendererToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem videoRendererToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoomToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom100toolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom200toolStripMenuItem;
@@ -625,6 +639,8 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
 		private System.Windows.Forms.ToolStripMenuItem borderOnToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
+		private System.Windows.Forms.ToolStripMenuItem audioRendererToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem10;
 	}
 }
 

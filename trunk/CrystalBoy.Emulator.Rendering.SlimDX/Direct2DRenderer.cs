@@ -33,6 +33,7 @@ using CrystalBoy.Emulation;
 namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
 	[DisplayName("Direct2D")]
+	[Description("Renders video using Direct2D / SlimDX.")]
 	public sealed class Direct2DRenderer : VideoRenderer<Control>
 	{
 		private Factory factory;
