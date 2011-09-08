@@ -28,6 +28,7 @@ using CrystalBoy.Emulation;
 namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
 	[DisplayName("Direct3D 9")]
+	[Description("Renders video using Direct3D 9 / SlimDX.")]
 	public sealed class Direct3D9Renderer : VideoRenderer<Control>
 	{
 		Direct3D direct3D;

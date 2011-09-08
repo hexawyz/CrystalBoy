@@ -30,15 +30,21 @@ namespace CrystalBoy.Emulation
 
 		public abstract int Length { get; }
 
-		public abstract Type ElementType { get; }
+		public Array RawBuffer { get { return GetRawBuffer(); } }
+
+		public abstract Type SampleType { get; }
+
+		// We'd want this to be protected AND internal but it is not possible…
+		internal abstract Array GetRawBuffer();
 	}
 
-	public sealed class AudioBuffer<T> : AudioBuffer where T : struct
+	public sealed class AudioBuffer<TSample> : AudioBuffer
+		where TSample : struct
 	{
-		private T[] rawBuffer;
+		private TSample[] rawBuffer;
 		private int position;
 
-		public AudioBuffer(T[] buffer)
+		public AudioBuffer(TSample[] buffer)
 		{
 			if (buffer == null) throw new ArgumentNullException("buffer");
 			if (buffer.Length == 0 || (buffer.Length & 1) != 0) throw new IndexOutOfRangeException();
@@ -46,7 +52,7 @@ namespace CrystalBoy.Emulation
 			rawBuffer = buffer;
 		}
 
-		public void PutSample(T left, T right)
+		public void PutSample(TSample left, TSample right)
 		{
 			rawBuffer[position++] = left;
 			rawBuffer[position++] = right;
@@ -58,11 +64,13 @@ namespace CrystalBoy.Emulation
 
 		public override int Length { get { return rawBuffer.Length; } }
 
-		public T[] RawBuffer { get { return rawBuffer; } }
+		public new TSample[] RawBuffer { get { return rawBuffer; } }
 
-		public override Type ElementType { get { return typeof(T); } }
+		public override Type SampleType { get { return typeof(TSample); } }
 
-		internal void SetRawBuffer(T[] buffer) // This method allows to reuse the same object over and over again. That's all there is to it.
+		internal override Array GetRawBuffer() { return RawBuffer; }
+
+		internal void SetRawBuffer(TSample[] buffer) // This method allows to reuse the same object over and over again. That's all there is to it.
 		{
 			if (buffer == null) throw new ArgumentNullException("buffer");
 			if (buffer.Length == 0 || (buffer.Length & 1) != 0) throw new IndexOutOfRangeException();

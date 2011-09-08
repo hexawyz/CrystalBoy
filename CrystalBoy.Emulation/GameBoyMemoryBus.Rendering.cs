@@ -110,7 +110,7 @@ namespace CrystalBoy.Emulation
 			{
 				videoRenderer.Reset();
 				RenderBorder();
-				Render();
+				RenderVideoFrame();
 			}
 		}
 
@@ -142,45 +142,7 @@ namespace CrystalBoy.Emulation
 
 		#region Rendering
 
-		private void OnFrameReady()
-		{
-			OnBeforeRendering(frameEventArgs);
-
-			if (sgbPendingTransfer)
-			{
-				ProcessSuperGameBoyCommand(true);
-				sgbPendingTransfer = false;
-			}
-
-			if (!frameEventArgs.SkipFrame)
-			{
-#if WITH_THREADING
-				if (threadingEnabled)
-				{
-					if (!isRendering)
-					{
-						// Set the flag, effectively locking the saved state
-						isRendering = true;
-						// Swap the buffers
-						Utility.Swap(ref videoStatusSnapshot, ref savedVideoStatusSnapshot);
-						Utility.Swap(ref videoPortAccessList, ref savedVideoPortAccessList);
-						Utility.Swap(ref paletteAccessList, ref savedPaletteAccessList);
-						// Request rendering
-						UIThreadRender();
-					}
-				}
-				else
-				{
-#endif
-					Render();
-					OnAfterRendering(EventArgs.Empty);
-#if WITH_THREADING
-				}
-#endif
-			}
-		}
-
-		private unsafe void Render()
+		private unsafe void RenderVideoFrame()
 		{
 			byte* buffer;
 			int stride;
@@ -189,7 +151,7 @@ namespace CrystalBoy.Emulation
 			{
 #if WITH_THREADING
 				// Clear the flag because we didn't draw anything at all…
-				isRendering = false;
+				isRenderingVideo = false;
 #endif
 				return;
 			}
@@ -222,7 +184,7 @@ namespace CrystalBoy.Emulation
 					}
 #if WITH_THREADING
 					// Clear the flag once the real drawing job is done, as we don't need the buffer anymore
-					isRendering = false;
+					isRenderingVideo = false;
 #endif
 				}
 				else
@@ -235,14 +197,14 @@ namespace CrystalBoy.Emulation
 
 #if WITH_THREADING
 					// Clear the flag before drawing anything, as we don't need the saved state
-					isRendering = false;
+					isRenderingVideo = false;
 #endif
 					ClearBuffer32(buffer, stride, clearColor);
 				}
 
 				videoRenderer.UnlockScreenBuffer();
 			}
-			else isRendering = false; // Clear the flag as we didn't have any use for the saved sate
+			else isRenderingVideo = false; // Clear the flag as we didn't have any use for the saved sate
 
 			videoRenderer.Render();
 		}

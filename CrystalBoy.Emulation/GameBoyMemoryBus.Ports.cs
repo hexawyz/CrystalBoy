@@ -26,6 +26,9 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
+		// Snapshot of the audio ports, used for frame rendering
+		AudioStatusSnapshot audioStatusSnapshot;
+		AudioStatusSnapshot savedAudioStatusSnapshot;
 		// Snapshot of the video ports, used for frame rendering
 		VideoStatusSnapshot videoStatusSnapshot;
 		VideoStatusSnapshot savedVideoStatusSnapshot;
@@ -37,6 +40,7 @@ namespace CrystalBoy.Emulation
 		List<PaletteAccess> savedPaletteAccessList;
 		// Recorded audio port accesses, used for audio frame rendering
 		List<PortAccess> audioPortAccessList;
+		List<PortAccess> savedAudioPortAccessList;
 
 		int bgpIndex, obpIndex;
 		bool bgpInc, obpInc;
@@ -61,6 +65,7 @@ namespace CrystalBoy.Emulation
 			this.savedVideoStatusSnapshot = new VideoStatusSnapshot(this);
 			this.savedVideoPortAccessList = new List<PortAccess>(1000);
 			this.savedPaletteAccessList = new List<PaletteAccess>(1000);
+			this.savedAudioPortAccessList = new List<PortAccess>(1000);
 #else
 			this.savedVideoStatusSnapshot = videoStatusSnapshot;
 			this.savedVideoPortAccessList = videoPortAccessList;
