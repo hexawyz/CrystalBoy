@@ -119,24 +119,10 @@ namespace CrystalBoy.Emulator
 
 			// Assume the plugin filter has been passed at loading (it should have !)
 			if (rendererType.IsGenericType)
-			{
-				var genericArguments = rendererType.GetGenericArguments();
-
-				if (genericArguments.Length == 2)
-				{
-					rendererType = rendererType.MakeGenericType(new[] { typeof(short), typeof(Control) });
-					constructorParameterTypes = new[] { typeof(Control) };
-				}
-				else if ((genericArguments[0].GenericParameterAttributes & GenericParameterAttributes.NotNullableValueTypeConstraint) != GenericParameterAttributes.None)
-				{
-					rendererType = rendererType.MakeGenericType(new[] { typeof(short) });
-					constructorParameterTypes = Type.EmptyTypes;
-				}
-				else rendererType = rendererType.MakeGenericType(constructorParameterTypes = new[] { typeof(Control) });
-			}
-			else if (rendererType.IsSubclassOf(typeof(AudioRenderer<short, Control>)))
+				rendererType = rendererType.MakeGenericType(constructorParameterTypes = new[] { typeof(Control) });
+			else if (rendererType.IsSubclassOf(typeof(AudioRenderer<Control>)))
 				constructorParameterTypes = new[] { typeof(Control) };
-			else if (rendererType.IsSubclassOf(typeof(AudioRenderer<short, IWin32Window>)))
+			else if (rendererType.IsSubclassOf(typeof(AudioRenderer<IWin32Window>)))
 				constructorParameterTypes = new[] { typeof(IWin32Window) };
 			else constructorParameterTypes = Type.EmptyTypes;
 

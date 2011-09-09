@@ -57,18 +57,6 @@ namespace CrystalBoy.Emulation
 		/// <returns>An <see cref="Array"/> representing the buffer currently in use.</returns>
 		[EditorBrowsable(EditorBrowsableState.Never)]
 		internal abstract Array GetRawBuffer(); // We'd want this to be protected AND internal but it is not possible…
-
-		/// <summary>Sets the raw buffer.</summary>
-		/// <remarks>The provided array must be one-dimensional and of the correct element type.</remarks>
-		/// <param name="buffer">The buffer to use as a raw buffer.</param>
-		internal abstract void SetRawBuffer(Array buffer);
-
-		/// <summary>Replaces the current buffer by a clone.</summary>
-		/// <remarks>
-		/// Plugging an <see cref="AudioRenderer"/> and an <see cref="AudioBuffer"/> requires to share a common buffer,
-		/// but for unpluging, we need to make sure the two are using separate buffers again…
-		/// </remarks>
-		internal abstract void CloneAndDiscardRawBuffer();
 	}
 
 	public sealed class AudioBuffer<TSample> : AudioBuffer
@@ -119,29 +107,5 @@ namespace CrystalBoy.Emulation
 		/// The raw buffer is stored and provided by the <see cref="AudioBuffer{TSample}"/> generic subclass.
 		/// </remarks>
 		internal sealed override Array GetRawBuffer() { return RawBuffer; }
-
-		/// <summary>Sets the raw buffer.</summary>
-		/// <param name="buffer">The buffer to use as a raw buffer.</param>
-		/// <remarks>The provided array must be one-dimensional and of the correct element type.</remarks>
-		internal sealed override void SetRawBuffer(Array buffer) { SetRawBuffer((TSample[])buffer); }
-
-		/// <summary>Sets the raw buffer.</summary>
-		/// <param name="buffer">The buffer to use as a raw buffer.</param>
-		/// <remarks>This method allows to reuse the same object with different raw buffers.</remarks>
-		internal void SetRawBuffer(TSample[] buffer)
-		{
-			if (buffer == null) throw new ArgumentNullException("buffer");
-			if (buffer.Length == 0 || (buffer.Length & 1) != 0) throw new IndexOutOfRangeException();
-
-			position = 0;
-			rawBuffer = buffer;
-		}
-
-		/// <summary>Replaces the current buffer by a clone.</summary>
-		/// <remarks>
-		/// Plugging an <see cref="AudioRenderer"/> and an <see cref="AudioBuffer"/> requires to share a common buffer,
-		/// but for unpluging, we need to make sure the two are using separate buffers again…
-		/// </remarks>
-		internal sealed override void CloneAndDiscardRawBuffer() { rawBuffer = rawBuffer.Clone() as TSample[]; }
 	}
 }
