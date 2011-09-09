@@ -24,53 +24,122 @@ namespace CrystalBoy.Emulation
 {
 	public unsafe abstract class AudioRenderer : IDisposable
 	{
-		internal AudioRenderer() { Reset(); }
+		private AudioBuffer audioBuffer;
+
+		/// <summary>Initializes a new instance of the <see cref="AudioRenderer"/> class.</summary>
+		public AudioRenderer() { Reset(); }
+
+		~AudioRenderer() { Dispose(false); }
 
 		public virtual void Reset() { }
 
-		public abstract void Dispose();
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-		public abstract Type SampleType { get; }
+		public virtual void Dispose(bool disposing) { }
 
-		public int BitsPerSample { get { return 8 * Marshal.SizeOf(SampleType); } }
+		public Type SampleType { get { return audioBuffer != null ? audioBuffer.SampleType : null; } }
+
+		public int BitsPerSample { get { return audioBuffer != null ? 8 * Marshal.SizeOf(SampleType) : 0; } }
 
 		public int Frequency { get { return 44100; } }
 
-		public Array RawBuffer { get { return GetRawBuffer(); } set { SetRawBuffer(value); } }
+		/// <summary>Gets or sets the audio buffer.</summary>
+		/// <remarks>
+		/// Changing the audio buffer is done in four steps:
+		/// <list type="number">
+		/// <item><description>Validate the proposed buffer by calling <see cref="IsAcceptableBuffer"/>.</description></item>
+		/// <item><description>Prepare the change by calling <see cref="BeginBufferChange"/>.</description></item>
+		/// <item><description>Actually change the buffer.</description></item>
+		/// <item><description>Terminate the change by calling <see cref="EndBufferChange"/>.</description></item>
+		/// </list>
+		/// </remarks>
+		/// <value>The audio buffer.</value>
+		public AudioBuffer AudioBuffer
+		{
+			get { return audioBuffer; }
+			set
+			{
+				if (value != audioBuffer)
+				{
+					if (!IsAcceptableBuffer(value))
+						throw new ArgumentOutOfRangeException("value");
 
-		public abstract bool CanSetRawBuffer { get; }
+					BeginBufferChange();
 
+					audioBuffer = value;
+
+					EndBufferChange();
+				}
+			}
+		}
+
+		/// <summary>Gets the object associated with this renderer.</summary>
+		/// <remarks>
+		/// This object will typically be a window or a control.
+		/// The implementation in <see cref="AudioRenderer"/> always returns <c>null</c>.
+		/// </remarks>
+		/// <value>The object associated with this renderer.</value>
 		public object RenderObject { get { return GetRenderObject(); } }
 
-		protected virtual object GetRenderObject() { return null; }
+		internal virtual object GetRenderObject() { return null; }
 
-		// We'd want these to be protected AND internal but it is not possible…
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		internal abstract Array GetRawBuffer();
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		internal abstract void SetRawBuffer(Array value);
+		/// <summary>This method is called before changing the buffer.</summary>
+		/// <remarks>
+		/// The default implementation does nothing.
+		/// Override this method if you need to implement a specific behavior before changing the buffer.
+		/// </remarks>
+		protected virtual void BeginBufferChange() { }
+
+		/// <summary>This method is called after changing the buffer.</summary>
+		/// <remarks>
+		/// The default implementation does nothing.
+		/// Override this method if you need to implement a specific behavior after changing the buffer.
+		/// </remarks>
+		protected virtual void EndBufferChange() { }
+
+		/// <summary>Determines whether the specified audio buffer is an acceptable buffer.</summary>
+		/// <param name="audioBuffer">The proposed audio buffer.</param>
+		/// <remarks>
+		/// This method will consider <c>null</c> as a valid buffer, even though it is not a buffer.
+		/// The following methods will be called to help determine if the buffer is acceptable:
+		/// <list type="bullet">
+		/// <item><description><see cref="IsSampleTypeSupported"/></description></item>
+		/// </list>
+		/// </remarks>
+		/// <returns><c>true</c> if the specified audio buffer is acceptable; otherwise, <c>false</c>.</returns>
+		public bool IsAcceptableBuffer(AudioBuffer audioBuffer)
+		{
+			if (audioBuffer == null) return true;
+
+			return IsSampleTypeSupported(audioBuffer.SampleType) && IsFrequencySupported(44100);
+		}
+
+		public bool IsSampleTypeSupported(Type type)
+		{
+			// The tests here should be enough to eliminate most of the reference types and weird types.
+			// The only remaining test to make is to try creating a pointer out of the type…
+			return !(type.IsClass || type.IsInterface || type == typeof(void) || type.HasElementType || type.IsEnum || type.IsGenericParameter || type.ContainsGenericParameters)
+				&& IsSampleTypeSupportedInternal(type);
+		}
+
+		protected virtual bool IsSampleTypeSupportedInternal(Type sampleType) { return true; }
+
+		public bool IsFrequencySupported(int frequency) { return frequency % 60 == 0 && IsFrequencySupportedInternal(frequency); }
+
+		protected virtual bool IsFrequencySupportedInternal(int frequency) { return true; }
 	}
 
-	public unsafe abstract class AudioRenderer<TSample> : AudioRenderer
-		where TSample : struct
-	{
-		public AudioRenderer() : base() { }
-
-		public sealed override Type SampleType { get { return typeof(TSample); } }
-
-		public new abstract TSample[] RawBuffer { get; set; }
-
-		internal override Array GetRawBuffer() { return RawBuffer; }
-
-		internal override void SetRawBuffer(Array value) { RawBuffer = (TSample[])value; } // Hint: We *WANT* this to throw an InvalidCastException
-	}
-
-	public abstract class AudioRenderer<TSample, TRenderObject> : AudioRenderer<TSample>
-		where TSample : struct
+	public abstract class AudioRenderer<TRenderObject> : AudioRenderer
 		where TRenderObject : class
 	{
 		TRenderObject renderObject;
 
+		/// <summary>Initializes a new instance of the <see cref="AudioRenderer{TRenderObject}"/> class.</summary>
+		/// <param name="renderObject">The object associated with this new renderer instance.</param>
 		public AudioRenderer(TRenderObject renderObject)
 		{
 			if (renderObject == null)
@@ -78,8 +147,11 @@ namespace CrystalBoy.Emulation
 			this.renderObject = renderObject;
 		}
 
+		/// <summary>Gets the object associated with this renderer.</summary>
+		/// <remarks>This object will typically be a window or a control, whose value will have been passed as a parameter in the consructor to <see cref="AudioRenderer{TRenderObject}"/></remarks>
+		/// <value>The object associated with this renderer.</value>
 		public new TRenderObject RenderObject { get { return renderObject; } }
 
-		protected sealed override object GetRenderObject() { return renderObject; }
+		internal sealed override object GetRenderObject() { return renderObject; }
 	}
 }

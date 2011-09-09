@@ -203,16 +203,18 @@ namespace CrystalBoy.Emulator
 						// Typically, the application will use integral types for audio samples, and Control or IWin32Window for render objects.
 						var genericArguments = type.IsGenericType ? type.GetGenericArguments() : Type.EmptyTypes;
 
+						// We only allow for one generic argument, as of now…
+						if (genericArguments.Length > 1) continue;
+
 						var parentType = type;
 
-						if (type.IsSubclassOf(typeof(AudioRenderer)))
-						{
-							// The maximum number of generic arguments we allow for AudioRenderer is 2
-							if (genericArguments.Length > 2) continue;
+						var genericRendererType = !type.IsSubclassOf(typeof(AudioRenderer)) ? !type.IsSubclassOf(typeof(VideoRenderer)) ? null : typeof(VideoRenderer<>) : typeof(AudioRenderer<>);
 
-							// AudioRenderer can come in two flavors:
-							// A subclass of AudioRenderer<,> with a constructor taking the render object, where both generic arguments matches the rules mentioned before.
-							// A subclass of AudioRenderer<> with an empty constructor, where the generic argument matches the rules mentioned before.
+						if (genericRendererType != null)
+						{
+							// A renderer can come in two flavors:
+							// A generic version with a constructor taking the render object, where the generic argument matches the rules mentioned before.
+							// A non-generic version with an empty constructor.
 							do
 							{
 								parentType = type.BaseType;
@@ -222,49 +224,7 @@ namespace CrystalBoy.Emulator
 									var parentTypeDefinition = parentType.GetGenericTypeDefinition();
 									var parentTypeGenericArguments = parentType.GetGenericArguments();
 
-									if (parentTypeDefinition == typeof(AudioRenderer<,>))
-									{
-										// We need to have the same (matching) generic arguments for the derived and the base class…
-										int genericArgumentCount = (parentTypeGenericArguments[0].IsGenericParameter ? 1 : 0) + (parentTypeGenericArguments[1].IsGenericParameter ? 1 : 0);
-
-										if (genericArgumentCount == type.GetGenericArguments().Length
-											&& IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedSampleTypes, true, true, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint)
-											&& IsGenericArgumentTypeSupported(parentTypeGenericArguments[1], supportedRenderObjectTypes, true, true, GenericParameterAttributes.ReferenceTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.ReferenceTypeConstraint)
-											&& type.GetConstructor(new[] { parentTypeGenericArguments[1] }) != null)
-										{
-											pluginList.Add(new PluginInformation(type));
-											break;
-										}
-									}
-									else if (parentTypeDefinition == typeof(AudioRenderer<>)) // Assuming that AudioRenderer<> is the only (mandatory) direct subclass to AudioRenderer, this should handle everything not handled before…
-									{
-										if (IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedSampleTypes, type.IsGenericType, !type.IsGenericType, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.NotNullableValueTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint)
-											&& type.GetConstructor(Type.EmptyTypes) != null)
-											pluginList.Add(new PluginInformation(type));
-										break;
-									}
-								}
-							}
-							while (true);
-						}
-						else if (type.IsSubclassOf(typeof(VideoRenderer)))
-						{
-							// The maximum number of generic arguments we allow for VideoRenderer is 1
-							if (genericArguments.Length > 1) continue;
-
-							// VideoRenderer can come in two flavors:
-							// A subclass of VideoRenderer<> with a constructor taking the render object, where the generic argument matches the rules mentioned before.
-							// A subclass of VideoRenderer with an empty constructor.
-							do
-							{
-								parentType = type.BaseType;
-
-								if (parentType.IsGenericType)
-								{
-									var parentTypeDefinition = parentType.GetGenericTypeDefinition();
-									var parentTypeGenericArguments = parentType.GetGenericArguments();
-
-									if (parentTypeDefinition == typeof(VideoRenderer<>))
+									if (parentTypeDefinition == genericRendererType)
 									{
 										if (IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedRenderObjectTypes, type.IsGenericType, !type.IsGenericType, GenericParameterAttributes.ReferenceTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.ReferenceTypeConstraint)
 											&& type.GetConstructor(new[] { parentTypeGenericArguments[0] }) != null)
@@ -274,7 +234,7 @@ namespace CrystalBoy.Emulator
 										}
 									}
 								}
-								else if (parentType == typeof(VideoRenderer))
+								else if (parentType == genericRendererType.BaseType)
 								{
 									if (!type.IsGenericType && type.GetConstructor(Type.EmptyTypes) != null) pluginList.Add(new PluginInformation(type));
 									break;

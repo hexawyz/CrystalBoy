@@ -36,7 +36,12 @@ namespace CrystalBoy.Emulation
 		internal ushort Channel1_Enveloppe;
 		internal ushort Channel2_Frequency;
 
-		partial void InitializeAudio() { audioBuffer = new AudioBuffer<short>(new short[2 * 2 * 44100 / 60]); }
+		partial void InitializeAudio()
+		{
+			audioRenderingEnabled = true;
+			audioBuffer = new AudioBuffer<short>(new short[2 * 2 * 44100 / 60]);
+			audioSampleGenerator = new Int16AudioSampleGenerator(audioBuffer as AudioBuffer<short>);
+		}
 
 		public AudioBuffer AudioBuffer { get { return audioBuffer; } }
 
@@ -45,11 +50,14 @@ namespace CrystalBoy.Emulation
 			get { return audioRenderer; }
 			set
 			{
-				if (audioRenderer != null) audioBuffer.CloneAndDiscardRawBuffer();
-
-				if ((audioRenderer = value) != null)
+				if (value != audioRenderer)
 				{
+					if (audioRenderer != null) audioRenderer.AudioBuffer = null;
 
+					if ((audioRenderer = value) != null)
+					{
+						audioRenderer.AudioBuffer = audioBuffer;
+					}
 				}
 			}
 		}
@@ -66,12 +74,14 @@ namespace CrystalBoy.Emulation
 		{
 			if (!audioRenderingEnabled) return;
 
-			audioSampleGenerator.FillBuffer();
+			if (audioSampleGenerator != null) audioSampleGenerator.FillBuffer();
 		}
 
 		[DisplayName("16-bit Sound")]
 		private sealed class Int16AudioSampleGenerator : AudioSampleGenerator<Int16>
 		{
+			Random random = new Random();
+
 			public Int16AudioSampleGenerator(AudioBuffer<short> audioBuffer) : base(audioBuffer) { }
 
 			public override void FillBuffer()
@@ -88,12 +98,13 @@ namespace CrystalBoy.Emulation
 
 					if (!soundEnabled)
 					{
-						AudioBuffer.PutSample(0, 0);
+						short stupid = (short)random.Next(-8188, 8189);
+						AudioBuffer.PutSample(stupid, stupid);
 						continue;
 					}
 
 					// For easy mixing, the amplitude for any of those channels must be constrained between -8188 and 8188
-					short sample1 = i < 368 ? (short)-8188 : (short)8188, sample2 = 0, sample3 = 0, sample4 = 0; // Fill the buffer with dummy sound for testing the plugin…
+					short sample1 = 0, sample2 = 0, sample3 = 0, sample4 = 0; // Fill the buffer with dummy sound for testing the plugin…
 
 					AudioBuffer.PutSample((short)(sample1 + sample2 + sample3 + sample4), (short)(sample1 + sample2 + sample3 + sample4));
 				}

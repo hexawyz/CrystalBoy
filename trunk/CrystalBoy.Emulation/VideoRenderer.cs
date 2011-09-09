@@ -79,7 +79,7 @@ namespace CrystalBoy.Emulation
 
 		public object RenderObject { get { return GetRenderObject(); } }
 
-		protected virtual object GetRenderObject() { return null; }
+		internal virtual object GetRenderObject() { return null; }
 	}
 
 	[CLSCompliant(false)]
@@ -97,6 +97,6 @@ namespace CrystalBoy.Emulation
 
 		public new TRenderObject RenderObject { get { return renderObject; } }
 
-		protected sealed override object GetRenderObject() { return renderObject; }
+		internal sealed override object GetRenderObject() { return renderObject; }
 	}
 }

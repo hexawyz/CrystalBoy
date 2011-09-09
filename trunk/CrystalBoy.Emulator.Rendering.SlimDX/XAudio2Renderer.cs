@@ -23,69 +23,84 @@ using System.Runtime.InteropServices;
 using SlimDX;
 using SlimDX.Multimedia;
 using SlimDX.XAudio2;
+using XAudioBuffer = SlimDX.XAudio2.AudioBuffer; // Avoid confusion between SlimDX.XAudio2.AudioBuffer and CrystalBoy.Emulation.AudioBuffer
+using CrystalBoy.Emulation;
 
 namespace CrystalBoy.Emulator.Rendering.SlimDX
 {
 	[DisplayName("XAudio 2")]
 	[Description("Renders audio using XAudio 2 / SlimDX.")]
-	public sealed class XAudio2Renderer<TElement> : CrystalBoy.Emulation.AudioRenderer<TElement>
-		where TElement : struct
+	public sealed class XAudio2Renderer : CrystalBoy.Emulation.AudioRenderer
 	{
-		private TElement[] rawBuffer;
 		private WaveFormat waveFormat;
 		private XAudio2 xAudio;
 		private MasteringVoice masteringVoice;
 		private SourceVoice sourceVoice;
-		private AudioBuffer audioBuffer;
+		private XAudioBuffer audioBuffer;
 
 		public unsafe XAudio2Renderer()
 		{
 			waveFormat = new WaveFormat();
 			waveFormat.FormatTag = WaveFormatTag.Pcm;
-			waveFormat.AverageBytesPerSecond = (waveFormat.BlockAlignment = (short)((waveFormat.BitsPerSample = (short)BitsPerSample) / 8 * (waveFormat.Channels = 2))) * (waveFormat.SamplesPerSecond = Frequency);
 			xAudio = new XAudio2(XAudio2Flags.None, ProcessorSpecifier.AnyProcessor);
 			masteringVoice = new MasteringVoice(xAudio, 2, 44100);
-			sourceVoice = new SourceVoice(xAudio, waveFormat);
-			ResetBuffer(null);
 		}
 
-		public override void Dispose()
+		public override void Dispose(bool disposing)
 		{
-			sourceVoice.FlushSourceBuffers();
-			audioBuffer.Dispose();
-			sourceVoice.Dispose();
-			xAudio.StopEngine();
+			if (disposing)
+			{
+				if (sourceVoice != null)
+				{
+					sourceVoice.FlushSourceBuffers();
+					sourceVoice.Stop();
+					sourceVoice.Dispose();
+					sourceVoice = null;
+				}
+				if (audioBuffer != null)
+				{
+					audioBuffer.AudioData.Dispose();
+					audioBuffer.AudioData = null; // Just to be clean…
+					audioBuffer.Dispose();
+					audioBuffer = null;
+				}
+				if (xAudio != null)
+				{
+					xAudio.StopEngine();
+					xAudio.Dispose();
+					xAudio = null;
+				}
+			}
 		}
 
-		private static TElement[] CreateDefaultBuffer() { return new TElement[2 * (2 * 44100 / 60)]; }
-
-		private void ResetBuffer(TElement[] value)
+		protected override void BeginBufferChange()
 		{
-			if (audioBuffer == null) audioBuffer = new AudioBuffer();
-			else if (audioBuffer.AudioData != null)
+			if (audioBuffer != null && audioBuffer.AudioData != null)
 			{
 				sourceVoice.FlushSourceBuffers();
 				sourceVoice.Stop();
+				sourceVoice.Dispose();
+				sourceVoice = null;
 				audioBuffer.AudioData.Dispose();
 				audioBuffer.AudioData = null;
 			}
-
-			rawBuffer = value ?? CreateDefaultBuffer();
-
-			audioBuffer.AudioData = new DataStream(rawBuffer, true, true);
-			audioBuffer.AudioBytes = (int)audioBuffer.AudioData.Length;
-			audioBuffer.LoopLength = rawBuffer.Length / 2;
-			audioBuffer.LoopCount = XAudio2.LoopInfinite;
-			sourceVoice.SubmitSourceBuffer(audioBuffer);
-			sourceVoice.Start();
 		}
 
-		public override TElement[] RawBuffer
+		protected override void EndBufferChange()
 		{
-			get { return rawBuffer; }
-			set { ResetBuffer(value); }
-		}
+			if (AudioBuffer != null)
+			{
+				if (audioBuffer == null) audioBuffer = new XAudioBuffer();
 
-		public override bool CanSetRawBuffer { get { return true; } }
+				audioBuffer.AudioData = new DataStream(AudioBuffer.RawBuffer, true, true);
+				audioBuffer.AudioBytes = (int)audioBuffer.AudioData.Length;
+				audioBuffer.LoopLength = AudioBuffer.RawBuffer.Length / 2;
+				audioBuffer.LoopCount = XAudio2.LoopInfinite;
+				waveFormat.AverageBytesPerSecond = (waveFormat.BlockAlignment = (short)((waveFormat.BitsPerSample = (short)BitsPerSample) / 8 * (waveFormat.Channels = 2))) * (waveFormat.SamplesPerSecond = Frequency);
+				sourceVoice = new SourceVoice(xAudio, waveFormat);
+				sourceVoice.SubmitSourceBuffer(audioBuffer);
+				sourceVoice.Start();
+			}
+		}
 	}
 }
