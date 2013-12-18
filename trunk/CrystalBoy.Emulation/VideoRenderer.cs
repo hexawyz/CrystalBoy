@@ -22,6 +22,13 @@ using System.Text;
 
 namespace CrystalBoy.Emulation
 {
+	/// <summary>Base class for a video renderer.</summary>
+	/// <remarks>
+	/// All video renderers must inherit from this class.
+	/// Generally, video renderers will not inherit directly from this class,
+	/// but will instead inherit from the generic class <see cref="VideoRenderer{TRenderObject}"/>,
+	/// which provides strong coupling with a particular host.
+	/// </remarks>
 	[CLSCompliant(false)]
 	public unsafe abstract class VideoRenderer : IDisposable
 	{
@@ -29,19 +36,34 @@ namespace CrystalBoy.Emulation
 		private bool interpolation;
 		private bool borderVisible;
 
+		/// <summary>Occurs when the <see cref="ClearColor"/> property is changed.</summary>
 		public event EventHandler ClearColorChanged;
-		public event EventHandler BorderVisibileChanged;
+		/// <summary>Occurs when the <see cref="BorderVisible"/> property is changed.</summary>
+		public event EventHandler BorderVisibleChanged;
+		/// <summary>Occurs when the <see cref="Interpolation"/> property is changed.</summary>
 		public event EventHandler InterpolationChanged;
 
+		/// <summary>Initializes a new instance of the class <see cref="VideoRenderer"/>.</summary>
 		public VideoRenderer() { Reset(); }
 
+		/// <summary>Resets the video renderer.</summary>
 		public virtual void Reset() { ClearColor = 0x7FFF; }
 
+		/// <summary>Disposes the managed resources allocated by this instance.</summary>
 		public abstract void Dispose();
+		/// <summary>Locks the image buffer for the border, and returns a pointer to the updatable video memory.</summary>
+		/// <param name="stride"></param>
+		/// <returns></returns>
 		public abstract void* LockBorderBuffer(out int stride);
+		/// <summary>Unlocks the image buffer for the border.</summary>
 		public abstract void UnlockBorderBuffer();
+		/// <summary>Locks the image buffer for the screen, and returns a pointer to the updatable video memory.</summary>
+		/// <param name="stride"></param>
+		/// <returns></returns>
 		public abstract void* LockScreenBuffer(out int stride);
+		/// <summary>Unlocks the image buffer for the screen.</summary>
 		public abstract void UnlockScreenBuffer();
+		/// <summary>Presents the image to the screen.</summary>
 		public abstract void Render();
 
 		/// <summary>Gets a value indicating whether the video renderer supports interpolation.</summary>
@@ -53,41 +75,86 @@ namespace CrystalBoy.Emulation
 		/// <value><c>true</c> if the video renderer supports interpolation; otherwise, <c>false</c>.</value>
 		public virtual bool SupportsInterpolation { get { return false; } }
 
+		/// <summary>Gets or sets the color used for clearing the render surface.</summary>
 		public short ClearColor
 		{
 			get { return clearColor; }
 			set { if (clearColor != (clearColor = (short)(value & 0x7FFF))) OnClearColorChanged(EventArgs.Empty); }
 		}
 
-		protected virtual void OnClearColorChanged(EventArgs e) { if (ClearColorChanged != null) ClearColorChanged(this, e); }
+		/// <summary>Handles a change in the value of the property <see cref="ClearColor"/>.</summary>
+		/// <param name="e">Data associated with the event.</param>
+		protected virtual void OnClearColorChanged(EventArgs e)
+		{
+			var handle = ClearColorChanged;
 
+			if (handle != null)
+				handle(this, e);
+		}
+
+		/// <summary>Gets or sets a flag indicating whether the SGB border is visible.</summary>
 		public bool BorderVisible
 		{
 			get { return borderVisible; }
 			set { if (borderVisible != (borderVisible = value)) OnBorderVisibleChanged(EventArgs.Empty); }
 		}
 
-		protected virtual void OnBorderVisibleChanged(EventArgs e) { if (BorderVisibileChanged != null) BorderVisibileChanged(this, e); }
+		/// <summary>Handles a change in the value of the property <see cref="BorderVisible"/>.</summary>
+		/// <param name="e">Data associated with the event.</param>
+		protected virtual void OnBorderVisibleChanged(EventArgs e)
+		{
+			var handle = BorderVisibleChanged;
 
+			if (handle != null)
+				handle(this, e);
+		}
+
+		/// <summary>Gets or sets a flag indicating whether interpolation is enabled.</summary>
 		public bool Interpolation
 		{
 			get { return interpolation; }
 			set { if (interpolation != (interpolation = value)) OnInterpolationChanged(EventArgs.Empty); }
 		}
 
-		protected virtual void OnInterpolationChanged(EventArgs e) { if (InterpolationChanged != null) InterpolationChanged(this, e); }
+		/// <summary>Handles a change in the value of the property <see cref="Interpolation"/>.</summary>
+		/// <param name="e">Data associated with the event.</param>
+		protected virtual void OnInterpolationChanged(EventArgs e)
+		{
+			var handle = InterpolationChanged;
 
+			if (handle != null)
+				handle(this, e);
+		}
+
+		/// <summary>Gets the render object associated with this instance.</summary>
 		public object RenderObject { get { return GetRenderObject(); } }
 
-		internal virtual object GetRenderObject() { return null; }
+		/// <summary>Gets the render object associated with this instance.</summary>
+		/// <remarks>
+		/// To allow for mor flexibility in design, the management of the render object is delegated to the derived class,
+		/// and this method is used to access the render object in an universal manner.
+		/// This method should be implemented by simply returning the private render object stored in the derived class.
+		/// </remarks>
+		/// <returns>The render object associated with this instance.</returns>
+		protected virtual object GetRenderObject() { return null; }
 	}
 
+	/// <summary>This class is the base class for a video renderer supporting a specific type of render object.</summary>
+	/// <remarks>
+	/// The render object is a host specific object. Where host specific means that the type of object is related to the specific implementation of the emulator.
+	/// Usually, this will be a graphic object specific to the graphics framework used.
+	/// An emulator implemented with Windows Forms for the interface would use different plugins than an emulator implemented using DirectFB on linux, and this difference
+	/// would be enforced by the specific type of <see cref="VideoRenderer"/> that the implementation looks up.
+	/// </remarks>
+	/// <typeparam name="TRenderObject">The type of render objects supported by the class.</typeparam>
 	[CLSCompliant(false)]
 	public abstract class VideoRenderer<TRenderObject> : VideoRenderer
 		where TRenderObject : class
 	{
 		TRenderObject renderObject;
 
+		/// <summary>Initializes a new instance of the class <see cref="VideoRenderer{TRenderObject}"/>.</summary>
+		/// <param name="renderObject">The render object to which the new instance will be bound.</param>
 		public VideoRenderer(TRenderObject renderObject)
 		{
 			if (renderObject == null)
@@ -95,8 +162,16 @@ namespace CrystalBoy.Emulation
 			this.renderObject = renderObject;
 		}
 
+		/// <summary>Gets the render object associated with this instance.</summary>
+		/// <remarks>
+		/// This property masks <see cref="VideoRenderer.RenderObject"/> from the base class while returning the exact same value.
+		/// The only difference is that this property returns a value typed as <typeparamref name="TRenderObject"/>.
+		/// </remarks>
 		public new TRenderObject RenderObject { get { return renderObject; } }
 
-		internal sealed override object GetRenderObject() { return renderObject; }
+		/// <summary>Gets the render object associated with this instance.</summary>
+		/// <remarks>This method simply returns the render object stored in this instance.</remarks>
+		/// <returns>The render object associated with this instance.</returns>
+		protected sealed override object GetRenderObject() { return renderObject; }
 	}
 }

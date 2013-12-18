@@ -335,32 +335,42 @@ namespace CrystalBoy.Emulator
 
 		private void OnRomChanged(EventArgs e)
 		{
-			if (RomChanged != null)
-				RomChanged(this, e);
+			var handler = RomChanged;
+
+			if (handler != null)
+				handler(this, e);
 		}
 
 		private void OnPause(EventArgs e)
 		{
-			if (Paused != null)
-				Paused(this, e);
+			var handler = Paused;
+
+			if (handler != null)
+				handler(this, e);
 		}
 
 		private void OnBreak(EventArgs e)
 		{
-			if (Break != null)
-				Break(this, e);
+			var handler = Break;
+
+			if (handler != null)
+				handler(this, e);
 		}
 
 		private void OnAfterReset(EventArgs e)
 		{
-			if (AfterReset != null)
-				AfterReset(this, e);
+			var handler = AfterReset;
+
+			if (handler != null)
+				handler(this, e);
 		}
 
 		private void OnEmulationStatusChanged(EventArgs e)
 		{
-			if (EmulationStatusChanged != null)
-				EmulationStatusChanged(this, e);
+			var handler = EmulationStatusChanged;
+
+			if (handler != null)
+				handler(this, e);
 		}
 	}
 }

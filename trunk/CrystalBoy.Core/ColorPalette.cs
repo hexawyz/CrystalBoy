@@ -42,7 +42,7 @@ namespace CrystalBoy.Core
 
 		/// <summary>Creates a <see cref="ColorPalette"/> using the specified data and offset.</summary>
 		/// <remarks>
-		/// This implementation is used internally by <see cref="FixedCOlorPalette"/> and assumes that the provided data is always valid.
+		/// This implementation is used internally by <see cref="FixedColorPalette"/> and assumes that the provided data is always valid.
 		/// This method does not throw any exception.
 		/// </remarks>
 		/// <param name="data">The palette data.</param>
