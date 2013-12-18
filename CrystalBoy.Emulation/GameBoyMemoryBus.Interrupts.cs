@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using CrystalBoy.Core;
+using System.Threading;
 
 namespace CrystalBoy.Emulation
 {
@@ -26,7 +27,7 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		byte requestedInterrupts;
+		private volatile int requestedInterrupts;
 
 		#endregion
 
@@ -77,18 +78,42 @@ namespace CrystalBoy.Emulation
 			return temp == int.MaxValue ? -1 : temp;
 		}
 
-		public void InterruptRequest(Interrupt interrupt) { requestedInterrupts |= (byte)interrupt; }
+		public void InterruptRequest(Interrupt interrupt)
+		{
+			InterruptRequest((byte)interrupt);
+		}
 
-		public void InterruptRequest(byte interrupt) { requestedInterrupts |= interrupt; }
+		public void InterruptRequest(byte interrupt)
+		{
+			while (true)
+			{
+				var requestedInterrupts = this.requestedInterrupts;
+#pragma warning disable 0420
+				if (Interlocked.CompareExchange(ref this.requestedInterrupts, requestedInterrupts | interrupt, requestedInterrupts) == requestedInterrupts)
+					return;
+#pragma warning restore 0420
+			}
+		}
 
-		public void InterruptHandled(Interrupt interrupt) { requestedInterrupts &= (byte)~interrupt; }
+		public void InterruptHandled(Interrupt interrupt) { InterruptHandled((byte)interrupt); }
 
-		public void InterruptHandled(byte interrupt) { requestedInterrupts &= (byte)~interrupt; }
+		public void InterruptHandled(byte interrupt)
+		{
+			while (true)
+			{
+				var requestedInterrupts = this.requestedInterrupts;
+
+#pragma warning disable 0420
+				if (Interlocked.CompareExchange(ref this.requestedInterrupts, requestedInterrupts & ~interrupt, requestedInterrupts) == requestedInterrupts)
+					return;
+#pragma warning restore 0420
+			}
+		}
 
 		public byte RequestedInterrupts
 		{
-			get { return requestedInterrupts; }
-			set { requestedInterrupts = (byte)(value & 0x1F); }
+			get { return (byte)requestedInterrupts; }
+			set { requestedInterrupts = value & 0x1F; }
 		}
 
 		public unsafe byte EnabledInterrupts { get { return portMemory[0xFF]; } }

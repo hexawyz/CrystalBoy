@@ -36,6 +36,10 @@ namespace CrystalBoy.Emulation
 		/// <value>The length of the raw buffer.</value>
 		public abstract int Length { get; }
 
+		/// <summary>Gets the size of the buffer in bytes.</summary>
+		/// <value>The size of the buffer in bytes.</value>
+		public int SizeInBytes { get { return Marshal.SizeOf(SampleType) * Length; } }
+
 		/// <summary>Gets the raw buffer currently in use.</summary>
 		/// <value>The raw buffer.</value>
 		public Array RawBuffer { get { return GetRawBuffer(); } }
@@ -46,7 +50,7 @@ namespace CrystalBoy.Emulation
 
 		/// <summary>Gets the number of bits per sample .</summary>
 		/// <value>The number of bits per sample.</value>
-		public int BitsPerSample { get { return 8 * Marshal.SizeOf(SampleType); } }
+		public int BitsPerSample { get { return Marshal.SizeOf(SampleType) << 3; } }
 
 		/// <summary>Returns the current raw buffer.</summary>
 		/// <remarks>

@@ -17,6 +17,7 @@
   &lt;string&gt;Rendering.GdiPlus.dll&lt;/string&gt;
   &lt;string&gt;Rendering.Direct3D.dll&lt;/string&gt;
   &lt;string&gt;Rendering.SlimDX.dll&lt;/string&gt;
+  &lt;string&gt;Rendering.SharpDX.dll&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="LimitSpeed" Type="System.Boolean" Scope="User">

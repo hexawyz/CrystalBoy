@@ -92,7 +92,7 @@ namespace CrystalBoy.Emulation
 		#region Variables
 
 		private ReadKeysEventArgs readKeysEventArgs;
-		private GameBoyKeys baseKeys;
+		private volatile GameBoyKeys baseKeys;
 		private bool joypadRow0;
 		private bool joypadRow1;
 
