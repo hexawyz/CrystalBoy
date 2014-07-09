@@ -22,12 +22,15 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using CrystalBoy.Emulation;
+using System.Threading.Tasks;
 
 namespace CrystalBoy.Emulator.Rendering.GdiPlus
 {
 	[DisplayName("GDI+")]
 	public sealed class GdiPlusRenderer : VideoRenderer<Control>
 	{
+		private static readonly Task CompletedTask = Task.FromResult(true);
+
 		Bitmap borderBitmap;
 		Bitmap screenBitmap;
 		BitmapData bitmapData;
@@ -47,28 +50,38 @@ namespace CrystalBoy.Emulator.Rendering.GdiPlus
 			screenBitmap.Dispose();
 		}
 
-		public override unsafe void* LockBorderBuffer(out int stride)
+		public override unsafe VideoBufferReference LockBorderBuffer()
 		{
+			// Calls to GDI+ should be thread-safe for the most part, so we only have to take a little bit of care for ensuring correctness.
 			borderBitmap.LockBits(new Rectangle(0, 0, 256, 224), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb, bitmapData);
-			stride = bitmapData.Stride;
-			return (void*)bitmapData.Scan0;
+			return new VideoBufferReference(bitmapData.Scan0, bitmapData.Stride);
 		}
 
-		public override void UnlockBorderBuffer()
+		public override unsafe Task<VideoBufferReference> LockBorderBufferAsync() { return Task.FromResult(LockBorderBuffer()); }
+
+		public override void UnlockBorderBuffer() { borderBitmap.UnlockBits(bitmapData); }
+
+		public override Task UnlockBorderBufferAsync()
 		{
-			borderBitmap.UnlockBits(bitmapData);
+			UnlockBorderBuffer();
+			return CompletedTask;
 		}
 
-		public override unsafe void* LockScreenBuffer(out int stride)
+		public override unsafe VideoBufferReference LockScreenBuffer()
 		{
+			// Calls to GDI+ should be thread-safe for the most part, so we only have to take a little bit of care for ensuring correctness.
 			screenBitmap.LockBits(new Rectangle(0, 0, 160, 144), ImageLockMode.WriteOnly, PixelFormat.Format32bppRgb, bitmapData);
-			stride = bitmapData.Stride;
-			return (void*)bitmapData.Scan0;
+			return new VideoBufferReference(bitmapData.Scan0, bitmapData.Stride);
 		}
 
-		public override void UnlockScreenBuffer()
+		public override unsafe Task<VideoBufferReference> LockScreenBufferAsync() { return Task.FromResult(LockScreenBuffer()); }
+
+		public override void UnlockScreenBuffer() { screenBitmap.UnlockBits(bitmapData); }
+
+		public override Task UnlockScreenBufferAsync()
 		{
-			screenBitmap.UnlockBits(bitmapData);
+			UnlockScreenBuffer();
+			return CompletedTask;
 		}
 
 		public override bool SupportsInterpolation { get { return true; } }
@@ -83,6 +96,8 @@ namespace CrystalBoy.Emulator.Rendering.GdiPlus
 
 		public override void Render()
 		{
+			// Calls to GDI+ should be thread-safe for the most part, so we only have to take a little bit of care for ensuring correctness.
+			// CreateGraphics is one of the few thread-safe members of Control. :)
 			Graphics g = RenderObject.CreateGraphics();
 
 			g.CompositingMode = CompositingMode.SourceCopy;
@@ -93,6 +108,12 @@ namespace CrystalBoy.Emulator.Rendering.GdiPlus
 			g.DrawImage(screenBitmap, RenderObject.ClientRectangle);
 
 			g.Dispose();
+		}
+
+		public override Task RenderAsync()
+		{
+			Render();
+			return CompletedTask;
 		}
 	}
 }

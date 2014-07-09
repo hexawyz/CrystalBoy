@@ -19,6 +19,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CrystalBoy.Emulation
 {
@@ -28,19 +30,26 @@ namespace CrystalBoy.Emulation
 	/// Generally, video renderers will not inherit directly from this class,
 	/// but will instead inherit from the generic class <see cref="VideoRenderer{TRenderObject}"/>,
 	/// which provides strong coupling with a particular host.
+	/// All members of this class should be callable from another thread.
+	/// The implementor must take care of the synchrnonization where needed for its specific case.
+	/// For the time being, implementors can safely assume that drawing operations will only be called sequentially, even while coming from non UI threads.
+	/// I.e. While required to be thread-safe, the renderers do not need to be multithread-safe.
 	/// </remarks>
 	[CLSCompliant(false)]
 	public unsafe abstract class VideoRenderer : IDisposable
 	{
-		private short clearColor = 0x7FFF; // Set this value to its default in order not to trigger the ClearColorChanged event inside the constructor.
-		private bool interpolation;
-		private bool borderVisible;
+		private volatile short clearColor = 0x7FFF; // Set this value to its default in order not to trigger the ClearColorChanged event inside the constructor.
+		private volatile bool interpolation;
+		private volatile bool borderVisible;
 
 		/// <summary>Occurs when the <see cref="ClearColor"/> property is changed.</summary>
+		/// <remarks>This event may be raised on any thread. Handlers should handle the synchrnonization as needed.</remarks>
 		public event EventHandler ClearColorChanged;
 		/// <summary>Occurs when the <see cref="BorderVisible"/> property is changed.</summary>
+		/// <remarks>This event may be raised on any thread. Handlers should handle the synchrnonization as needed.</remarks>
 		public event EventHandler BorderVisibleChanged;
 		/// <summary>Occurs when the <see cref="Interpolation"/> property is changed.</summary>
+		/// <remarks>This event may be raised on any thread. Handlers should handle the synchrnonization as needed.</remarks>
 		public event EventHandler InterpolationChanged;
 
 		/// <summary>Initializes a new instance of the class <see cref="VideoRenderer"/>.</summary>
@@ -51,20 +60,57 @@ namespace CrystalBoy.Emulation
 
 		/// <summary>Disposes the managed resources allocated by this instance.</summary>
 		public abstract void Dispose();
+
 		/// <summary>Locks the image buffer for the border, and returns a pointer to the updatable video memory.</summary>
-		/// <param name="stride"></param>
-		/// <returns></returns>
-		public abstract void* LockBorderBuffer(out int stride);
+		/// <remarks>
+		/// The buffer returned should to be big enough to hold a 256x224 pixels image in the correct format. (Currently 32bpp)
+		/// Failure to return a valid buffer will lead to random crashes of the application.
+		/// </remarks>
+		/// <returns>A reference to the locked buffer.</returns>
+		public virtual VideoBufferReference LockBorderBuffer() { return LockBorderBufferAsync().Result; }
+		/// <summary>Asynchronously lock the image buffer for the border, and returns a pointer to the updatable video memory.</summary>
+		/// <remarks>
+		/// The buffer returned should to be big enough to hold a 256x224 pixels image in the correct format. (Currently 32bpp)
+		/// Failure to return a valid buffer will lead to random crashes of the application.
+		/// </remarks>
+		/// <returns>A task representing the asynchronous operation. The <see cref="Task{T}.Result"/> property will contain a reference to the locked buffer.</returns>
+		public abstract Task<VideoBufferReference> LockBorderBufferAsync();
 		/// <summary>Unlocks the image buffer for the border.</summary>
-		public abstract void UnlockBorderBuffer();
+		public virtual void UnlockBorderBuffer() { UnlockBorderBufferAsync().Wait(); }
+		/// <summary>Asynchronously unlock the image buffer for the border.</summary>
+		public abstract Task UnlockBorderBufferAsync();
+
 		/// <summary>Locks the image buffer for the screen, and returns a pointer to the updatable video memory.</summary>
-		/// <param name="stride"></param>
-		/// <returns></returns>
-		public abstract void* LockScreenBuffer(out int stride);
+		/// <remarks>
+		/// The buffer returned should to be big enough to hold a 160x144 pixels image in the correct format. (Currently 32bpp)
+		/// Failure to return a valid buffer will lead to random crashes of the application.
+		/// </remarks>
+		/// <returns>A reference to the locked buffer.</returns>
+		public virtual VideoBufferReference LockScreenBuffer() { return LockScreenBufferAsync().Result; }
+		/// <summary>Asynchronously lock the image buffer for the screen, and returns a pointer to the updatable video memory.</summary>
+		/// <remarks>
+		/// The buffer returned should be big enough to hold a 160x144 pixels image in the correct format. (Currently 32bpp)
+		/// Failure to return a valid buffer will lead to random crashes of the application.
+		/// </remarks>
+		/// <returns>A task representing the asynchronous operation. The <see cref="Task{T}.Result"/> property will contain a reference to the locked buffer.</returns>
+		public abstract Task<VideoBufferReference> LockScreenBufferAsync();
 		/// <summary>Unlocks the image buffer for the screen.</summary>
-		public abstract void UnlockScreenBuffer();
+		public virtual void UnlockScreenBuffer() { UnlockScreenBufferAsync().Wait(); }
+		/// <summary>Asynchronously unlock the image buffer for the screen.</summary>
+		public abstract Task UnlockScreenBufferAsync();
+
 		/// <summary>Presents the image to the screen.</summary>
-		public abstract void Render();
+		/// <remarks>
+		/// The buffers should have been released before calling this method.
+		/// If not the case, the video renderer may legitimately crash, depending on the implementation.
+		/// </remarks>
+		public virtual void Render() { RenderAsync().Wait(); }
+		/// <summary>Asynchronously present the image to the rendering device.</summary>
+		/// <remarks>
+		/// The buffers should have been released before calling this method.
+		/// If not the case, the video renderer may legitimately crash, depending on the implementation.
+		/// </remarks>
+		public abstract Task RenderAsync();
 
 		/// <summary>Gets a value indicating whether the video renderer supports interpolation.</summary>
 		/// <remarks>
@@ -79,7 +125,13 @@ namespace CrystalBoy.Emulation
 		public short ClearColor
 		{
 			get { return clearColor; }
-			set { if (clearColor != (clearColor = (short)(value & 0x7FFF))) OnClearColorChanged(EventArgs.Empty); }
+			set
+			{
+				var c = this.clearColor;
+				// The value of clearColor may change between those two lines, but in should not cause too much harm
+				if (c != (this.clearColor = value))
+					OnInterpolationChanged(EventArgs.Empty);
+			}
 		}
 
 		/// <summary>Handles a change in the value of the property <see cref="ClearColor"/>.</summary>
@@ -96,7 +148,13 @@ namespace CrystalBoy.Emulation
 		public bool BorderVisible
 		{
 			get { return borderVisible; }
-			set { if (borderVisible != (borderVisible = value)) OnBorderVisibleChanged(EventArgs.Empty); }
+			set
+			{
+				var b = this.borderVisible;
+				// The value of borderVisible may change between those two lines, but in should not cause too much harm
+				if (b != (this.borderVisible = value))
+					OnBorderVisibleChanged(EventArgs.Empty);
+			}
 		}
 
 		/// <summary>Handles a change in the value of the property <see cref="BorderVisible"/>.</summary>
@@ -113,7 +171,13 @@ namespace CrystalBoy.Emulation
 		public bool Interpolation
 		{
 			get { return interpolation; }
-			set { if (interpolation != (interpolation = value)) OnInterpolationChanged(EventArgs.Empty); }
+			set
+			{
+				var b = this.interpolation;
+				// The value of interpolation may change between those two lines, but in should not cause too much harm
+				if (b != (this.interpolation = value))
+					OnInterpolationChanged(EventArgs.Empty);
+			}
 		}
 
 		/// <summary>Handles a change in the value of the property <see cref="Interpolation"/>.</summary>

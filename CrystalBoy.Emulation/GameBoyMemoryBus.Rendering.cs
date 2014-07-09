@@ -144,9 +144,6 @@ namespace CrystalBoy.Emulation
 
 		private unsafe void RenderVideoFrame()
 		{
-			byte* buffer;
-			int stride;
-
 			if (videoRenderer == null)
 			{
 #if WITH_THREADING
@@ -158,14 +155,14 @@ namespace CrystalBoy.Emulation
 
 			if (savedVideoStatusSnapshot.SuperGameBoyScreenStatus != 1)
 			{
-				buffer = (byte*)videoRenderer.LockScreenBuffer(out stride);
+				var buffer = videoRenderer.LockScreenBuffer();
 
 				if (savedVideoStatusSnapshot.SuperGameBoyScreenStatus == 0 && (savedVideoStatusSnapshot.LCDC & 0x80) != 0)
 				{
 					if (colorMode)
 					{
 						FillPalettes32((ushort*)savedVideoStatusSnapshot.PaletteMemory);
-						DrawColorFrame32(buffer, stride);
+						DrawColorFrame32((byte*)buffer.DataPointer, buffer.Stride);
 					}
 					else
 					{
@@ -180,7 +177,7 @@ namespace CrystalBoy.Emulation
 								objectPalette2[i] = spritePalettes32[1][i];
 							greyPaletteUpdated = false;
 						}
-						DrawFrame32(buffer, stride);
+						DrawFrame32((byte*)buffer.DataPointer, buffer.Stride);
 					}
 #if WITH_THREADING
 					// Clear the flag once the real drawing job is done, as we don't need the buffer anymore
@@ -199,7 +196,7 @@ namespace CrystalBoy.Emulation
 					// Clear the flag before drawing anything, as we don't need the saved state
 					isRenderingVideo = false;
 #endif
-					ClearBuffer32(buffer, stride, clearColor);
+					ClearBuffer32((byte*)buffer.DataPointer, buffer.Stride, clearColor);
 				}
 
 				videoRenderer.UnlockScreenBuffer();
@@ -213,10 +210,9 @@ namespace CrystalBoy.Emulation
 		{
 			try
 			{
-				int stride;
-				byte* bufferPointer = (byte*)videoRenderer.LockBorderBuffer(out stride);
+				var buffer = videoRenderer.LockBorderBuffer();
 
-				DrawBorder32(bufferPointer, stride);
+				DrawBorder32((byte*)buffer.DataPointer, buffer.Stride);
 
 				videoRenderer.UnlockBorderBuffer();
 			}
@@ -264,15 +260,12 @@ namespace CrystalBoy.Emulation
 
 		public unsafe void ClearBuffer()
 		{
-			byte* buffer;
-			int stride;
-
 			if (videoRenderer == null)
 				return;
 
-			buffer = (byte*)videoRenderer.LockScreenBuffer(out stride);
+			var buffer = videoRenderer.LockScreenBuffer();
 
-			ClearBuffer32(buffer, stride, 0xFF000000);
+			ClearBuffer32((byte*)buffer.DataPointer, buffer.Stride, 0xFF000000);
 
 			videoRenderer.UnlockScreenBuffer();
 

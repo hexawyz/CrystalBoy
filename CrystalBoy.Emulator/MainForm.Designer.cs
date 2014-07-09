@@ -473,7 +473,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.superGameBoyColorToolStripMenuItem.Name = "superGameBoyColorToolStripMenuItem";
 			resources.ApplyResources(this.superGameBoyColorToolStripMenuItem, "superGameBoyColorToolStripMenuItem");
-			this.superGameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoyAdvance;
+			this.superGameBoyColorToolStripMenuItem.Tag = CrystalBoy.Emulation.HardwareType.SuperGameBoyColor;
 			this.superGameBoyColorToolStripMenuItem.Click += new System.EventHandler(this.randomHardwareToolStripMenuItem_Click);
 			// 
 			// gameBoyAdvanceToolStripMenuItem
