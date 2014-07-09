@@ -91,7 +91,9 @@
     <Compile Include="DebuggerForm.Designer.cs">
       <DependentUpon>DebuggerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="EmulatedGameBoy.cs" />
+    <Compile Include="EmulatedGameBoy.cs">
+      <SubType>component</SubType>
+    </Compile>
     <Compile Include="EmulationStatus.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
