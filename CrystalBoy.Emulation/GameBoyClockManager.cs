@@ -23,10 +23,10 @@ using System.Threading;
 namespace CrystalBoy.Emulation
 {
 	/// <summary>Represent a basic clock manager for Game Boy emulation.</summary>
-	/// <remarks>This implementation of <see cref="IClockManager"/> will synchronize emualtion to 60 FPS.</remarks>
+	/// <remarks>This implementation of <see cref="IClockManager"/> will synchronize emulation to 60 FPS.</remarks>
 	public sealed class GameBoyClockManager : IClockManager
 	{
-		private const double FrameDuration = 1000d / 60d;
+		public static readonly long ApproximateFrameTickDuration = 166 * Stopwatch.Frequency / 10000; // The "exact" frame duration in ticks would be 166666, but we can't be that precise…
 
 		Stopwatch stopwatch = new Stopwatch();
 
@@ -34,27 +34,29 @@ namespace CrystalBoy.Emulation
 		/// <remarks>This method will be called every time the timing has to be restarted.</remarks>
 		public void Reset()
 		{
-			stopwatch.Reset();
-			stopwatch.Start();
+			stopwatch.Restart();
 		}
 
 		/// <summary>Wait before the next event.</summary>
-		/// <remarks>This method uses an hybrid wait, relying on <see cref="Thread.Sleep"/> as much as possible.</remarks>
+		/// <remarks>This method uses an hybrid wait, relying on <see cref="Thread.Sleep(int)"/> when possible.</remarks>
 		public void Wait()
 		{
-			long ellapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+			const long FrameTickDuration = TimeSpan.TicksPerSecond / 60;
 
-			if (ellapsedMilliseconds < 17) // Exact timing for one frame at 60fps is 16⅔ ms
+			long timer = stopwatch.Elapsed.Ticks;
+
+			if (timer < FrameTickDuration)	// Exact timing for one frame at 60fps is 16⅔ ms
 			{
-				if (ellapsedMilliseconds < 16)
+				if (timer < FrameTickDuration - TimeSpan.TicksPerMillisecond)
 				{
-					// Conversion from long to int is safe since the value is less than 17.
-					// Sleep is a really bad tool for precise timing, but it will play its role when needed.
-					Thread.Sleep(16 - (int)ellapsedMilliseconds);
+					Thread.Sleep((int)(FrameTickDuration / TimeSpan.TicksPerMillisecond) - 1);
 				}
 
 				// Do some active wait, even though this is bad…
-				while (stopwatch.Elapsed.TotalMilliseconds < FrameDuration) ;
+				while (stopwatch.ElapsedTicks < ApproximateFrameTickDuration)
+				{
+					Thread.SpinWait(1000);
+				}
 			}
 
 			Reset();

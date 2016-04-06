@@ -1,0 +1,13 @@
+TODO:
+Allocate (mostly) all the memory at once, and localize the memory blocks as much as possible.
+Try do do more buffer swapping, and less copying.
+Split the UI requirements from the emulation requirements (eg. bilinear interpolation)
+ - Plugin options shouldn't be exposed to the emualtion layer.
+Enhance the new video renderer infrastructure to make it less awkward, and re-implement previous features.
+
+ DONE:
+ Totally rework the VideoRenderer infrastructure
+ - Either let it do the rendering (by using the public API exposed by the lib)
+ - Or do not call it a renderer anymore… More like a "VideoPresenter" or something like that.
+ - Make it fully asynchronous if possible
+Fix the bugs of color palette setting for non-CGB games: the palette memory gets disabled 

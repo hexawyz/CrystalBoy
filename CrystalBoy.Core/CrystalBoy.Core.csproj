@@ -71,6 +71,9 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
+    <Compile Include="AsyncAutoResetEvent.cs" />
+    <Compile Include="ThreadSynchronizationContext.cs" />
+    <Compile Include="TripleBufferingSystem.cs" />
     <Compile Include="ColorPalette.cs" />
     <Compile Include="DisassembleFlags.cs" />
     <Compile Include="FixedColorPalette.cs" />
@@ -93,6 +96,7 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RomInformation.cs" />
+    <Compile Include="AsyncTripleBufferingSystem.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="Utility.Generated.cs">
       <DependentUpon>Utility.Generated.tt</DependentUpon>

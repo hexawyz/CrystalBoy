@@ -27,13 +27,13 @@ namespace CrystalBoy.Core
 	{
 		#region Static Members
 
-#if PINVOKE
+#if WIN32 && PINVOKE
 		private static IntPtr hHeap = NativeMethods.GetProcessHeap();
 #endif
 
 		#endregion
 
-#if GCHANDLE
+#if !(WIN32 && PINVOKE) && GCHANDLE
 		private byte[] buffer;
 		private GCHandle gcHandle;
 #endif
@@ -43,12 +43,15 @@ namespace CrystalBoy.Core
 
 		#region Constructors
 
+		/// <summary>Initializes a new instance of the <see cref="MemoryBlock"/> class.</summary>
+		/// <param name="length">The length of the memory block to allocate.</param>
 		public MemoryBlock(int length) { Alloc(length); }
 
 		#endregion
 
 		#region Destructors
 
+		/// <summary>Finalizes an instance of the <see cref="MemoryBlock"/> class.</summary>
 		~MemoryBlock() { Dispose(false); }
 
 		private void Dispose(bool disposing)
@@ -61,6 +64,7 @@ namespace CrystalBoy.Core
 			}
 		}
 
+		/// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
 		public void Dispose()
 		{
 			Dispose(true);
@@ -120,6 +124,11 @@ namespace CrystalBoy.Core
 
 		#endregion
 
+		/// <summary>Gets or sets the <see cref="byte"/> value at the specified offset.</summary>
+		/// <value>The <see cref="byte"/> value at the specified offset.</value>
+		/// <param name="offset">The offset of the value to access.</param>
+		/// <returns>The <see cref="byte"/> value at the specified offset.</returns>
+		/// <exception cref="System.IndexOutOfRangeException"><paramref name="offset"/> is outside of the allowed range.</exception>
 		public byte this[int offset]
 		{
 			get
@@ -136,11 +145,17 @@ namespace CrystalBoy.Core
 			}
 		}
 
+		/// <summary>Gets the pointer to the memory block.</summary>
+		/// <value>The pointer to the memory block.</value>
 		[CLSCompliant(false)]
 		public void* Pointer { get { return memoryPointer; } }
 
+		/// <summary>Gets the length of the memory block.</summary>
+		/// <value>The length of the memory block.</value>
 		public int Length { get { return length; } }
 
+		/// <summary>Gets a value indicating whether this instance is disposed.</summary>
+		/// <value><see langword="true" /> if this instance is disposed; otherwise, <see langword="false" />.</value>
 		public bool IsDisposed { get { return disposed; } }
 
 		#region Copy

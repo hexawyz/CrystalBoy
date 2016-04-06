@@ -105,9 +105,7 @@ namespace CrystalBoy.Emulation
 					throw new NotSupportedException("Unsupported Cartidge Type");
 			}
 
-#if WITH_THREADING
 			SuspendEmulation();
-#endif
 
 			this.romInformation = romInformation;
 			this.externalRomBlock = externalRom;
@@ -130,16 +128,12 @@ namespace CrystalBoy.Emulation
 		{
 			if (externalRomBlock != null)
 			{
-#if WITH_THREADING
 				SuspendEmulation();
-#endif
 				this.mapper = null;
 				this.externalRomBlock = null;
 				this.romInformation = null;
 				this.colorMode = ColorHardware;
-#if WITH_DEBUGGING
 				ClearBreakpoints();
-#endif
 				Reset(); // Will call “ResumeEmulation”…
 			}
 		}

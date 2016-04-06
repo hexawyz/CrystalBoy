@@ -30,30 +30,22 @@ namespace CrystalBoy.Emulation
 
 		private SynchronizationContext synchronizationContext;
 		private SendOrPostCallback handlePostedNotification;
-#if WITH_THREADING
 		private Thread processorThread;
 		private Thread audioFrameThread;
-		private SendOrPostCallback videoFrameCallback;
 		private volatile bool isRunning;
-		private volatile bool isRenderingVideo;
 		//private volatile bool isRenderingAudio; // Go on with locking for now since it is safer… Possibly need to rewrite this later once the audio emulation is ok.
 		private volatile IClockManager clockManager;
-
-		private bool threadingEnabled;
-#endif
 
 		#region Events
 
 		public event EventHandler FrameDone;
 		private NotificationHandler frameDoneHandler;
 
-#if WITH_THREADING
 		public event EventHandler EmulationStarted;
 		private NotificationHandler emulationStartedHandler;
 
 		public event EventHandler EmulationStopped;
 		private NotificationHandler emulationStoppedHandler;
-#endif
 
 		#endregion
 
@@ -62,24 +54,18 @@ namespace CrystalBoy.Emulation
 			synchronizationContext = SynchronizationContext.Current;
 			handlePostedNotification = HandlePostedNotification;
 			frameDoneHandler = OnFrameDone;
-			videoFrameCallback = RenderVideoFrameCallback;
-#if WITH_THREADING
 			clockManager = new GameBoyClockManager();
 			emulationStartedHandler = OnEmulationStarted;
 			emulationStoppedHandler = OnEmulationStopped;
-			threadingEnabled = true;
-			processorThread = new Thread(RunProcessor) { IsBackground = true };
+			processorThread = new Thread(RunProcessor) { IsBackground = true, Name = "GBZ80 Emulation" };
 			audioFrameThread = new Thread(RunAudioRenderer) { IsBackground = true };
 
 			processorThread.Start();
 			audioFrameThread.Start();
-#endif
 		}
 
-#if WITH_THREADING
 		partial void DisposeThreading()
 		{
-			threadingEnabled = false;
 			Stop();
 			DisposeThread(ref processorThread);
 			DisposeThread(ref audioFrameThread);
@@ -95,7 +81,6 @@ namespace CrystalBoy.Emulation
 				thread = null;
 			}
 		}
-#endif
 
 		/// <summary>Gets or sets the synchronization context used by this instance.</summary>
 		/// <value>The synchronization context.</value>
@@ -107,32 +92,21 @@ namespace CrystalBoy.Emulation
 
 		public void RunFrame()
 		{
-#if WITH_THREADING
 			// Prevent dumb deadlocks by checking the value of “isRunning”.
 			// However, it is still possible to induce a deadlock in complex threading configurations.
 			// In fact, method calls on GameBoyMemoryBus 
-			if (threadingEnabled) { if (!isRunning) lock (processorThread) Monitor.Pulse(processorThread); }
-			else
-#endif
-			{
-				if (processor.Emulate(true)) PostUINotification(frameDoneHandler);
-#if WITH_DEBUGGING
-				else if (processor.Status == ProcessorStatus.Running) PostUINotification(breakpointHandler);
-#endif
-			}
+			if (!isRunning) lock (processorThread) Monitor.Pulse(processorThread);
 		}
 
 		public void Step()
 		{
-#if WITH_THREADING
 			if (isRunning) throw new InvalidOperationException();
 
 			lock (processorThread)
-#endif
-			processor.Emulate(false);
+				processor.Emulate(false);
 		}
 
-		private void OnFrameDone(EventArgs e) { if (FrameDone != null) FrameDone(this, e); }
+		private void OnFrameDone(EventArgs e) { FrameDone?.Invoke(this, e); }
 
 		private void HandlePostedNotification(object state)
 		{
@@ -146,8 +120,6 @@ namespace CrystalBoy.Emulation
 			if (synchronizationContext != null) synchronizationContext.Post(handlePostedNotification, handler);
 			else handler(EventArgs.Empty);
 		}
-
-#if WITH_THREADING
 
 		public IClockManager ClockManager
 		{
@@ -190,33 +162,22 @@ namespace CrystalBoy.Emulation
 		}
 
 		private void ResumeEmulation() { if (isRunning) lock (processorThread) Monitor.Pulse(processorThread); }
-
-		private void UIThreadRender()
-		{
-			// This method will (should) never be called when a rendering operation is already active.
-			// The code below should thus never lock the thread for a long time.
-			if (synchronizationContext != null) synchronizationContext.Post(videoFrameCallback, null);
-			else videoFrameCallback(null);
-		}
-
+		
 		private void RunProcessor()
 		{
 			lock (processorThread)
 			{
-				while (true)
+				while (!isDisposed)
 				{
-					bool result;
-
 					Monitor.Wait(processorThread);
-
-					if (!threadingEnabled) return;
-
+					
 					var clockManager = this.clockManager ?? NullClockManager.Default;
 
 					PostUINotification(emulationStartedHandler);
 
 					clockManager.Reset();
 
+					bool shouldContinueRunning;
 					do
 					{
 						clockManager.Wait();
@@ -227,9 +188,9 @@ namespace CrystalBoy.Emulation
 						//	- Because Events may be triggered between the call to “processor.Emulate” and the loop condition evalutaion, altough that is unlikely:
 						//    The only value of “isRunning” that matters is the one directly after the call to “processor.Emulate”. (Either the read one or the written one)
 						//	- Changes to “isRunning” inside of “processor.Emulate” will be taken into account, for maximum reactivity.
-						if (result = processor.Emulate(true))
+						if (shouldContinueRunning = processor.Emulate(true))
 						{
-							result &= isRunning;
+							shouldContinueRunning &= isRunning;
 							PostUINotification(frameDoneHandler);
 						}
 						else
@@ -242,10 +203,10 @@ namespace CrystalBoy.Emulation
 								PostUINotification(breakpointHandler);
 							}
 #endif
-							else result = true;
+							else shouldContinueRunning = true;
 						}
 					}
-					while (result);
+					while (shouldContinueRunning);
 
 					PostUINotification(emulationStoppedHandler);
 				}
@@ -254,8 +215,6 @@ namespace CrystalBoy.Emulation
 
 		private void OnFrameReady()
 		{
-			OnBeforeRendering(frameEventArgs);
-
 			if (sgbPendingTransfer)
 			{
 				ProcessSuperGameBoyCommand(true);
@@ -264,86 +223,36 @@ namespace CrystalBoy.Emulation
 
 			// For now, keep the audio and video rendering paths separate…
 			// It is probably a good idea to merge them, thus avoiding to test threadingEnabled twice…
-
-#if WITH_THREADING
-			if (threadingEnabled)
+			
+			lock (audioFrameThread)
 			{
-				lock (audioFrameThread)
-				{
-					// Locking here WILL slow the emulation down… (This might not be a problem for running at 60 fps on modern 1.5GHz+ computers though…)
-					// We'll have to wait for the previous frame's audio rendering to be done…
-					// By using a real multithreaded sound engine, we could spread the emulation across 3 processors.
-					// A good multithreaded sound engine would of course have a slightly different design than the multithreaded video engine:
-					// Contrarily to video rendering, we cannot afford to miss a frame for only a few ms of delay…
-					// We should however be able to write data to the buffer faster than it can be consumed, as with video data…
-					Utility.Swap(ref audioStatusSnapshot, ref savedAudioStatusSnapshot);
-					Utility.Swap(ref audioPortAccessList, ref savedAudioPortAccessList);
-					Monitor.Pulse(audioFrameThread);
-				}
+				// Locking here WILL slow the emulation down… (This might not be a problem for running at 60 fps on modern 1.5GHz+ computers though…)
+				// We'll have to wait for the previous frame's audio rendering to be done…
+				// By using a real multithreaded sound engine, we could spread the emulation across 3 processors.
+				// A good multithreaded sound engine would of course have a slightly different design than the multithreaded video engine:
+				// Contrarily to video rendering, we cannot afford to miss a frame for only a few ms of delay…
+				// We should however be able to write data to the buffer faster than it can be consumed, as with video data…
+				Utility.Swap(ref audioStatusSnapshot, ref savedAudioStatusSnapshot);
+				Utility.Swap(ref audioPortAccessList, ref savedAudioPortAccessList);
+				Monitor.Pulse(audioFrameThread);
 			}
-			else
-			{
-#else
-				RenderAudioFrame();
-#endif
-#if WITH_THREADING
-			}
-#endif
 
-			if (!frameEventArgs.SkipFrame)
-			{
-#if WITH_THREADING
-				if (threadingEnabled)
-				{
-					if (!isRenderingVideo)
-					{
-						// Set the flag, effectively locking the saved state
-						isRenderingVideo = true;
-						// Swap the buffers
-						Utility.Swap(ref videoStatusSnapshot, ref savedVideoStatusSnapshot);
-						Utility.Swap(ref videoPortAccessList, ref savedVideoPortAccessList);
-						Utility.Swap(ref paletteAccessList, ref savedPaletteAccessList);
-						// Request rendering
-						UIThreadRender();
-					}
-				}
-				else
-				{
-#endif
-					RenderVideoFrame();
-					OnAfterRendering(EventArgs.Empty);
-#if WITH_THREADING
-				}
-#endif
-			}
-		}
-
-		private void RenderVideoFrameCallback(object state)
-		{
-			// The method will clear the isRendering field by itself
-			RenderVideoFrame();
-
-			OnAfterRendering(EventArgs.Empty);
+			// Request rendering
+			videoFrameData.IsRunningInColorMode = colorMode;
+			videoFrameData = videoTripleBufferingSystem.ProducerBufferProvider.SwapBuffers();
 		}
 
 		private void RunAudioRenderer()
 		{
 			lock (audioFrameThread)
 			{
-				while (true)
+				while (!isDisposed)
 				{
 					Monitor.Wait(audioFrameThread);
-
-					if (!threadingEnabled) return;
-
+					
 					RenderAudioFrame();
 				}
 			}
 		}
-
-		public bool ThreadingEnabled { get { return threadingEnabled; } }
-#else
-		public bool ThreadingEnabled { get { return false; } }
-#endif
 	}
 }

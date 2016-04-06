@@ -36,7 +36,7 @@ namespace CrystalBoy.Emulator
 		private MapViewerForm mapViewerForm;
 		private RomInformationForm romInformationForm;
 		private EmulatedGameBoy emulatedGameBoy;
-		private VideoRenderer videoRenderer;
+		private IVideoRenderer videoRenderer;
 		private AudioRenderer audioRenderer;
 		private Dictionary<Type, ToolStripMenuItem> videoRendererMenuItemDictionary;
 		private Dictionary<Type, ToolStripMenuItem> audioRendererMenuItemDictionary;
@@ -77,7 +77,7 @@ namespace CrystalBoy.Emulator
 				bool isAudioRenderer = plugin.Type.IsSubclassOf(typeof(AudioRenderer));
 
 				// Skip the plugins which are neither AudioRenderer nor VideoRenderer, for future-proofing the code a little bit.
-				if (!(isAudioRenderer || plugin.Type.IsSubclassOf(typeof(VideoRenderer)))) continue;
+				if (!(isAudioRenderer || typeof(IVideoRenderer).IsAssignableFrom(plugin.Type))) continue;
 
 				var rendererMenuItem = new ToolStripMenuItem(plugin.DisplayName);
 
@@ -158,23 +158,23 @@ namespace CrystalBoy.Emulator
 
 		#region Video Renderer Management
 
-		private VideoRenderer CreateVideoRenderer(Type rendererType)
+		private IVideoRenderer CreateVideoRenderer(Type rendererType)
 		{
-			Type[] constructorParameterTypes;
+			ConstructorInfo foundConstructor = null;
+			bool hasParameter = false;
 
-			// Assume the plugin filter has been passed at loading (it should have !)
-			if (rendererType.IsGenericType)
-				rendererType = rendererType.MakeGenericType(constructorParameterTypes = new[] { typeof(Control) });
-			else if (rendererType.IsSubclassOf(typeof(VideoRenderer<Control>)))
-				constructorParameterTypes = new[] { typeof(Control) };
-			else if (rendererType.IsSubclassOf(typeof(VideoRenderer<IWin32Window>)))
-				constructorParameterTypes = new[] { typeof(IWin32Window) };
-			else constructorParameterTypes = Type.EmptyTypes;
+			foreach (var constructor in rendererType.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
+			{
+				var parameters = constructor.GetParameters();
 
-			// Not using Activator.CreateInstance here because it doesn't allow to check the exact signature… (Does it really matters ? Somehow…)
-			ConstructorInfo constructor = rendererType.GetConstructor(constructorParameterTypes);
+				if (parameters.Length == 0 || parameters.Length == 1 && parameters[0].ParameterType.IsAssignableFrom(typeof(Control)))
+				{
+					foundConstructor = constructor;
+					hasParameter = parameters.Length == 1;
+				}
+			}
 
-			return (VideoRenderer)constructor.Invoke(constructorParameterTypes.Length > 0 ? new[] { toolStripContainer.ContentPanel } : new object[0]);
+			return (IVideoRenderer)foundConstructor.Invoke(hasParameter ? new[] { toolStripContainer.ContentPanel } : new object[0]);
 		}
 
 		private void SwitchVideoRenderer(Type rendererType)
@@ -187,8 +187,8 @@ namespace CrystalBoy.Emulator
 			}
 
 			videoRenderer = CreateVideoRenderer(rendererType);
-			videoRenderer.Interpolation = false;
-			videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
+			//videoRenderer.Interpolation = false;
+			//videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
 
 			ToolStripMenuItem selectedRendererMenuItem = videoRendererMenuItemDictionary[rendererType];
 
@@ -220,7 +220,7 @@ namespace CrystalBoy.Emulator
 				foreach (var plugin in Program.PluginCollection)
 				{
 					bool isAudioRenderer = plugin.Type.IsSubclassOf(typeof(AudioRenderer));
-					bool isVideoRenderer = !isAudioRenderer && plugin.Type.IsSubclassOf(typeof(VideoRenderer));
+					bool isVideoRenderer = !isAudioRenderer && plugin.Type.IsSubclassOf(typeof(IVideoRenderer));
 
 					if (audioRendererType == null && isAudioRenderer) audioRendererType = plugin.Type;
 					else if (firstVideoRendererType == null && isVideoRenderer) firstVideoRendererType = plugin.Type;
@@ -407,31 +407,31 @@ namespace CrystalBoy.Emulator
 
 		private void ShowBorder()
 		{
-			if (videoRenderer != null && !videoRenderer.BorderVisible)
-			{
-				var panelSize = toolStripContainer.ContentPanel.ClientSize;
+			//if (videoRenderer != null && !videoRenderer.BorderVisible)
+			//{
+			//	var panelSize = toolStripContainer.ContentPanel.ClientSize;
 
-				videoRenderer.BorderVisible = true;
-				AdjustSize(panelSize.Width * 256 / 160, panelSize.Height * 224 / 144);
-			}
+			//	videoRenderer.BorderVisible = true;
+			//	AdjustSize(panelSize.Width * 256 / 160, panelSize.Height * 224 / 144);
+			//}
 		}
 
 		private void HideBorder()
 		{
-			if (videoRenderer != null && videoRenderer.BorderVisible)
-			{
-				var panelSize = toolStripContainer.ContentPanel.ClientSize;
+			//if (videoRenderer != null && videoRenderer.BorderVisible)
+			//{
+			//	var panelSize = toolStripContainer.ContentPanel.ClientSize;
 
-				videoRenderer.BorderVisible = false;
-				AdjustSize(panelSize.Width * 160 / 256, panelSize.Height * 144 / 224);
-			}
+			//	videoRenderer.BorderVisible = false;
+			//	AdjustSize(panelSize.Width * 160 / 256, panelSize.Height * 144 / 224);
+			//}
 		}
 
 		#endregion
 
 		private void SetZoomFactor(int factor)
 		{
-			var referenceSize = videoRenderer.BorderVisible ? new Size(256, 224) : new Size(160, 144);
+			var referenceSize = /*videoRenderer.BorderVisible ? new Size(256, 224) : */new Size(160, 144);
 
 			if (factor <= 0) throw new ArgumentOutOfRangeException("factor");
 			Settings.Default.ZoomFactor = factor;
@@ -520,7 +520,7 @@ namespace CrystalBoy.Emulator
 		{
 			Size renderSize = toolStripContainer.ContentPanel.ClientSize;
 
-			Settings.Default.ContentSize = Settings.Default.BorderVisibility != BorderVisibility.On && videoRenderer.BorderVisible ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
+			Settings.Default.ContentSize = /*Settings.Default.BorderVisibility != BorderVisibility.On && videoRenderer.BorderVisible ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : */renderSize;
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
@@ -529,9 +529,9 @@ namespace CrystalBoy.Emulator
 
 		private void OnEmulationStatusChanged(object sender, EventArgs e) { UpdateEmulationStatus(); }
 
-		private unsafe void OnNewFrame(object sender, EventArgs e) { UpdateFrameRate(); }
+		private void OnNewFrame(object sender, EventArgs e) { UpdateFrameRate(); }
 
-		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e) { videoRenderer.Render(); }
+		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e) { /*videoRenderer.Render();*/ }
 
 		#region Menus
 
@@ -598,8 +598,8 @@ namespace CrystalBoy.Emulator
 
 		private void videoToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
-			interpolationToolStripMenuItem.Enabled = videoRenderer.SupportsInterpolation;
-			interpolationToolStripMenuItem.Checked = videoRenderer.Interpolation;
+			//interpolationToolStripMenuItem.Enabled = videoRenderer.SupportsInterpolation;
+			//interpolationToolStripMenuItem.Checked = videoRenderer.Interpolation;
 		}
 
 		private void audioRendererMenuItem_Click(object sender, EventArgs e)
@@ -624,7 +624,7 @@ namespace CrystalBoy.Emulator
 			borderOnToolStripMenuItem.Checked = borderVisibility == BorderVisibility.On;
 			borderOffToolStripMenuItem.Checked = borderVisibility == BorderVisibility.Off;
 		}
-		
+
 		private void borderAutoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Settings.Default.BorderVisibility = BorderVisibility.Auto;
@@ -675,7 +675,7 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
-		private void interpolationToolStripMenuItem_Click(object sender, EventArgs e) { videoRenderer.Interpolation = !videoRenderer.Interpolation; }
+		private void interpolationToolStripMenuItem_Click(object sender, EventArgs e) { /*videoRenderer.Interpolation = !videoRenderer.Interpolation;*/ }
 
 		#endregion
 

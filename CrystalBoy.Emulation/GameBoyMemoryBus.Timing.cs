@@ -155,10 +155,11 @@ namespace CrystalBoy.Emulation
 					OnFrameReady();
 					// Prepare for the new frame…
 					// Clear the video access lists
-					videoPortAccessList.Clear();
-					paletteAccessList.Clear();
+					videoFrameData.VideoPortAccessList.Clear();
+					videoFrameData.PaletteAccessList.Clear();
+					videoFrameData.GreyPaletteUpdated = false;
 					// Create a new snapshot of the video ports
-					videoStatusSnapshot.Capture();
+					videoFrameData.VideoMemorySnapshot.Capture(false);
 				}
 				else
 				{

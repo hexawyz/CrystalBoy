@@ -76,7 +76,7 @@
     <Compile Include="BorderVisibility.cs" />
     <Compile Include="GameBoyClockManager.cs" />
     <Compile Include="IClockManager.cs" />
-    <Compile Include="VideoBufferReference.cs" />
+    <Compile Include="IVideoRenderer.cs" />
     <Compile Include="Mappers\RomController.cs" />
     <Compile Include="Mappers\MemoryBankController.cs" />
     <Compile Include="Mappers\MemoryBankController1.cs" />
@@ -102,9 +102,9 @@
     <Compile Include="ReadKeysEventArgs.cs" />
     <Compile Include="RealTimeClockState.cs" />
     <Compile Include="SuperGameBoyCommand.cs" />
-    <Compile Include="VideoRenderer.cs" />
+    <Compile Include="VideoFrameData.cs" />
     <Compile Include="RumbleEventArgs.cs" />
-    <Compile Include="VideoStatusSnapshot.cs" />
+    <Compile Include="VideoMemorySnapshot.cs" />
     <Compile Include="GameBoyMemoryBus.cs" />
     <Compile Include="GameBoyMemoryBus.Threading.cs">
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
@@ -113,9 +113,8 @@
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
     <Compile Include="LookupTables.cs" />
-    <Compile Include="GameBoyMemoryBus.Rendering.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
+    <Compile Include="VideoFrameRenderer.cs" />
+    <Compile Include="VideoRenderingEngine.cs" />
     <Compile Include="GameBoyMemoryBus.Processor.cs">
       <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>

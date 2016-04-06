@@ -27,29 +27,28 @@ namespace CrystalBoy.Emulation
 		#region Variables
 
 		// Snapshot of the audio ports, used for frame rendering
-		AudioStatusSnapshot audioStatusSnapshot;
-		AudioStatusSnapshot savedAudioStatusSnapshot;
-		// Snapshot of the video ports, used for frame rendering
-		VideoStatusSnapshot videoStatusSnapshot;
-		VideoStatusSnapshot savedVideoStatusSnapshot;
-		// Recorded video port accesses, used for video frame rendering
-		List<PortAccess> videoPortAccessList;
-		List<PortAccess> savedVideoPortAccessList;
-		// Recorded color palette accesses for CGB mode only. (No need to simulate BGPI/BGPD and OPBI/OBPD during rendering)
-		List<PaletteAccess> paletteAccessList;
-		List<PaletteAccess> savedPaletteAccessList;
+		private AudioStatusSnapshot audioStatusSnapshot;
+		private AudioStatusSnapshot savedAudioStatusSnapshot;
+		/// <summary>Current data holder class for video rendering.</summary>
+		private VideoFrameData videoFrameData;
+		//// Current snapshot of the video ports, used for frame rendering
+		//private VideoMemorySnapshot videoStatusSnapshot;
+		//// Current list of recorded video port accesses, used for video frame rendering
+		//private List<PortAccess> videoPortAccessList;
+		//// Current list of recorded color palette accesses for CGB mode only. (No need to simulate BGPI/BGPD and OPBI/OBPD during rendering)
+		//private List<PaletteAccess> paletteAccessList;
 		// Recorded audio port accesses, used for audio frame rendering
-		List<PortAccess> audioPortAccessList;
-		List<PortAccess> savedAudioPortAccessList;
+		private List<PortAccess> audioPortAccessList;
+		private List<PortAccess> savedAudioPortAccessList;
 
-		int bgpIndex, obpIndex;
-		bool bgpInc, obpInc;
-		bool usePaletteMapping;
+		private int bgpIndex, obpIndex;
+		private bool bgpInc, obpInc;
+		private bool usePaletteMapping;
 
-		byte hdmaSourceHigh, hdmaSourceLow, hdmaDestinationHigh, hdmaDestinationLow;
+		private byte hdmaSourceHigh, hdmaSourceLow, hdmaDestinationHigh, hdmaDestinationLow;
 		// For Horizontal Blank DMA
-		bool hdmaActive;
-		byte hdmaCurrentSourceHigh, hdmaCurrentSourceLow, hdmaCurrentDestinationHigh, hdmaCurrentDestinationLow, hdmaCurrentLength;
+		private bool hdmaActive;
+		private byte hdmaCurrentSourceHigh, hdmaCurrentSourceLow, hdmaCurrentDestinationHigh, hdmaCurrentDestinationLow, hdmaCurrentLength;
 
 		#endregion
 
@@ -57,20 +56,8 @@ namespace CrystalBoy.Emulation
 
 		partial void InitializePorts()
 		{
-			this.videoStatusSnapshot = new VideoStatusSnapshot(this);
-			this.videoPortAccessList = new List<PortAccess>(1000);
-			this.paletteAccessList = new List<PaletteAccess>(1000);
 			this.audioPortAccessList = new List<PortAccess>(1000);
-#if WITH_THREADING
-			this.savedVideoStatusSnapshot = new VideoStatusSnapshot(this);
-			this.savedVideoPortAccessList = new List<PortAccess>(1000);
-			this.savedPaletteAccessList = new List<PaletteAccess>(1000);
 			this.savedAudioPortAccessList = new List<PortAccess>(1000);
-#else
-			this.savedVideoStatusSnapshot = videoStatusSnapshot;
-			this.savedVideoPortAccessList = videoPortAccessList;
-			this.savedPaletteAccessList = paletteAccessList;
-#endif
 		}
 
 		#endregion
@@ -122,20 +109,26 @@ namespace CrystalBoy.Emulation
 			WritePort(Port.WY, 0x00);
 			WritePort(Port.WX, 0x00);
 			WritePort(Port.IE, 0x00);
-
-			if (colorHardware && !useBootRom) ApplyAutomaticPalette();
-
+			
 			if (colorHardware) WritePort(Port.PMAP, colorMode ? (byte)0xFE : (byte)0xFF);
 			WritePort(Port.U72, 0x00);
 			WritePort(Port.U73, 0x00);
 			WritePort(Port.U74, 0x00);
 			WritePort(Port.U75, 0x8F);
 
-			videoPortAccessList.Clear();
-			paletteAccessList.Clear();
+			ResetFrameData();
+
+			if (usePaletteMapping) ApplyAutomaticPalette();
+		}
+
+		private void ResetFrameData()
+		{
+			videoFrameData.VideoPortAccessList.Clear();
+			videoFrameData.PaletteAccessList.Clear();
+			videoFrameData.GreyPaletteUpdated = false;
 			audioPortAccessList.Clear();
 
-			videoStatusSnapshot.Capture();
+			videoFrameData.VideoMemorySnapshot.Capture(false);
 		}
 
 		private void ApplyAutomaticPalette()
@@ -336,7 +329,7 @@ namespace CrystalBoy.Emulation
 				case 0x49: // OBP1
 					portMemory[port] = value; // Store the value in memory
 					if (!colorMode)
-						videoPortAccessList.Add(new PortAccess(frameCycles, port, value)); // Keep track of the write
+						videoFrameData.VideoPortAccessList.Add(new PortAccess(frameCycles, port, value)); // Keep track of the write
 					break;
 				// Only in cgb mode
 				case 0x68: // BCPS / BGPI
@@ -350,8 +343,8 @@ namespace CrystalBoy.Emulation
 					if (colorHardware)
 					{
 						paletteMemory[bgpIndex] = value;
-						if (usePaletteMapping) greyPaletteUpdated = true;
-						paletteAccessList.Add(new PaletteAccess(frameCycles, (byte)bgpIndex, value));
+						if (usePaletteMapping) videoFrameData.GreyPaletteUpdated = true;
+						videoFrameData.PaletteAccessList.Add(new PaletteAccess(frameCycles, (byte)bgpIndex, value));
 						if (bgpInc)
 							bgpIndex = (bgpIndex + 1) & 0x3F;
 					}
@@ -367,8 +360,8 @@ namespace CrystalBoy.Emulation
 					if (colorHardware)
 					{
 						paletteMemory[0x40 | obpIndex] = value;
-						if (usePaletteMapping) greyPaletteUpdated = true;
-						paletteAccessList.Add(new PaletteAccess(frameCycles, (byte)(0x40 | obpIndex), value));
+						if (usePaletteMapping) videoFrameData.GreyPaletteUpdated = true;
+						videoFrameData.PaletteAccessList.Add(new PaletteAccess(frameCycles, (byte)(0x40 | obpIndex), value));
 						if (obpInc)
 							obpIndex = (obpIndex + 1) & 0x3F;
 					}
@@ -387,7 +380,7 @@ namespace CrystalBoy.Emulation
 				case 0x43: // SCX
 				case 0x4A: // WY
 				case 0x4B: // WX
-					videoPortAccessList.Add(new PortAccess(frameCycles, port, value)); // Keep track of the write
+					videoFrameData.VideoPortAccessList.Add(new PortAccess(frameCycles, port, value)); // Keep track of the write
 					goto default;
 				default:
 					portMemory[port] = value; // Store the value in memory
@@ -412,7 +405,7 @@ namespace CrystalBoy.Emulation
 				case 0x41: // STAT
 					if (!lcdEnabled) return (byte)(portMemory[0x41] & 0x78);
 					// The check for line 143 fixes X - Xekkusu (which, oddly enough, was working with the previous emulation method…)
-					// The game checks for VBLANK in an *active* loop (?!) but the VBLANK interrupt gets triggered before the virtual CPU even got a chance of readign the mode 0…
+					// The game checks for VBLANK in an *active* loop (?!) but the VBLANK interrupt gets triggered before the virtual CPU even got a chance of reading the mode 0…
 					// There may be something else i'm emulating wrong, which could cause this bug, but in the mean time, this fixes it well enough…
 					// (The better fix being, if there are no other bugs, to emulate the read/write cycles correctly…)
 					else if (lcdRealLine >= 144 || lcdRealLine == 143 && rasterCycles >= HorizontalLineDuration - 8)
@@ -467,7 +460,7 @@ namespace CrystalBoy.Emulation
 					return 0;
 				case 0x72: // Undocumented port 0x72
 				case 0x73: // Undocumented port 0x73
-					return portMemory[port];
+					goto default;
 				case 0x74: // Undocumented port 0x74
 					return colorMode ? portMemory[0x74] : (byte)0xFF;
 				default:

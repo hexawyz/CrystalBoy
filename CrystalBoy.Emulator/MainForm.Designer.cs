@@ -149,6 +149,7 @@ namespace CrystalBoy.Emulator
 			// statusStrip
 			// 
 			resources.ApplyResources(this.statusStrip, "statusStrip");
+			this.statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
 			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel,
             this.frameRateToolStripStatusLabel,
@@ -175,6 +176,7 @@ namespace CrystalBoy.Emulator
 			// mainMenuStrip
 			// 
 			resources.ApplyResources(this.mainMenuStrip, "mainMenuStrip");
+			this.mainMenuStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
 			this.mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.emulationToolStripMenuItem,

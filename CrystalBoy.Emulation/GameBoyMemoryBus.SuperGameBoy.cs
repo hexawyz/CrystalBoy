@@ -225,15 +225,15 @@ namespace CrystalBoy.Emulation
 		private unsafe void SgbCharacterTransfer(bool high)
 		{
 			fixed (byte* sgbCharacterDataPointer = sgbCharacterData)
-				SgbVideoTransfer(high ? (void*)(sgbCharacterDataPointer + 0x1000) : (void*)sgbCharacterDataPointer, videoStatusSnapshot.VideoMemory);
+				SgbVideoTransfer(high ? (void*)(sgbCharacterDataPointer + 0x1000) : (void*)sgbCharacterDataPointer, videoFrameData.VideoMemorySnapshot.VideoMemory);
 		}
 
 		private unsafe void SgbPictureTransfer()
 		{
 			fixed (ushort* sgbBorderMapDataPointer = sgbBorderMapData)
-				SgbVideoTransfer((void*)sgbBorderMapDataPointer, videoStatusSnapshot.VideoMemory);
+				SgbVideoTransfer((void*)sgbBorderMapDataPointer, videoFrameData.VideoMemorySnapshot.VideoMemory);
 
-			RenderBorder();
+			//RenderBorder();
 
 			PostUINotification(borderChangedHandler);
 		}

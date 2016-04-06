@@ -24,8 +24,6 @@ namespace CrystalBoy.Emulation
 {
 	partial class GameBoyMemoryBus
 	{
-		#region Constants
-
 		public const int FrameDuration = 70224;
 		public const int VerticalBlankDuration = 4560;
 		public const int HorizontalBlankDuration = 204;
@@ -34,11 +32,7 @@ namespace CrystalBoy.Emulation
 		public const int Mode2Duration = 80;
 		public const int Mode3Duration = 172;
 		public const int HorizontalLineDuration = Mode2Duration + Mode3Duration + Mode0Duration;
-
-		#endregion
-
-		#region Variables
-
+		
 		// LCD “live” status
 		private int frameCycles;
 		private int rasterCycles; // Current clock cycle count, relative to the current LCD line
@@ -53,10 +47,14 @@ namespace CrystalBoy.Emulation
 		private bool notifyMode0;
 		private bool hdmaDone;
 
-		#endregion
-
-		#region Reset
-
+		private readonly AsyncTripleBufferingSystem<VideoFrameData> videoTripleBufferingSystem;
+		private readonly VideoRenderingEngine videoRenderingEngine;
+		
+		partial void DisposeVideo()
+		{
+			videoRenderingEngine.Dispose();
+		}
+		
 		partial void ResetVideo()
 		{
 			lcdRealLine = 0;
@@ -69,6 +67,7 @@ namespace CrystalBoy.Emulation
 
 			// The boostrap ROM uses the video RAM before executing the game, so we need to emulate this behavior when not using the bootstrap ROM
 			if (!useBootRom)
+			{
 				unsafe
 				{
 					// The video RAM will first be cleared by the bootstrap ROM
@@ -80,12 +79,11 @@ namespace CrystalBoy.Emulation
 					// Only write the logo map if not running a color game
 					if (!colorMode) WriteLogoMap();
 				}
+			}
+
+			videoRenderingEngine.ResetRendering(colorHardware, useBootRom);
 		}
-
-		#endregion
-
-		#region LCD Controller Status
-
+		
 		public bool VideoEnabled { get { return lcdEnabled; } }
 
 		private void DisableVideo()
@@ -109,16 +107,13 @@ namespace CrystalBoy.Emulation
 			lyRegister = 0;
 			videoNotifications = 0;
 			// Clear the video access lists
-			videoPortAccessList.Clear();
-			paletteAccessList.Clear();
+			videoFrameData.VideoPortAccessList.Clear();
+			videoFrameData.PaletteAccessList.Clear();
+			//videoFrameData.GreyPaletteUpdated = false;
 			// Create a new snapshot of the video ports
-			videoStatusSnapshot.Capture();
+			videoFrameData.VideoMemorySnapshot.Capture(true);
 		}
-
-		#endregion
-
-		#region Various Methods
-
+		
 		private unsafe void WriteLogoTiles()
 		{
 			byte* destination = videoMemory + 16;
@@ -184,7 +179,11 @@ namespace CrystalBoy.Emulation
 			}
 			while (tileIndex != 0);
 		}
-
-		#endregion
+		
+		public IVideoRenderer VideoRenderer
+		{
+			get { return videoRenderingEngine.VideoRenderer; }
+			set { videoRenderingEngine.VideoRenderer = value; }
+		}
 	}
 }

@@ -32,7 +32,7 @@ namespace CrystalBoy.Emulation
 		private bool colorHardware;
 		private bool colorMode;
 		private bool superFunctions;
-		private bool disposed;
+		private volatile bool isDisposed;
 
 		#endregion
 
@@ -41,6 +41,9 @@ namespace CrystalBoy.Emulation
 		/// <summary>Initializes a new instance of the <see cref="GameBoyMemoryBus"/> class.</summary>
 		public GameBoyMemoryBus()
 		{
+			videoTripleBufferingSystem = new AsyncTripleBufferingSystem<VideoFrameData>(() => new VideoFrameData(this));
+			videoRenderingEngine = new VideoRenderingEngine(videoTripleBufferingSystem.ConsumerBufferProvider);
+			videoFrameData = videoTripleBufferingSystem.ProducerBufferProvider.SwapBuffers();
 			Initialize();
 		}
 
@@ -93,9 +96,9 @@ namespace CrystalBoy.Emulation
 		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
 		private void Dispose(bool disposing)
 		{
-			if (disposing && !disposed)
+			if (disposing && !isDisposed)
 			{
-				disposed = true;
+				isDisposed = true;
 				DisposeThreading();
 				DisposeBootRom();
 				DisposeProcessor();
@@ -202,9 +205,7 @@ namespace CrystalBoy.Emulation
 			// From now on, the hardware type can only be changed after a "hard" reset of the emulated machine
 			HardwareType = hardwareType;
 
-#if WITH_THREADING
 			SuspendEmulation();
-#endif
 
 			ResetThreading();
 			ResetBootRom();
@@ -223,9 +224,9 @@ namespace CrystalBoy.Emulation
 			ResetDebug();
 			ResetSnapshot();
 
-#if WITH_THREADING
+			videoFrameData = videoTripleBufferingSystem.ProducerBufferProvider.SwapBuffers();
+
 			ResumeEmulation();
-#endif
 		}
 
 		#endregion

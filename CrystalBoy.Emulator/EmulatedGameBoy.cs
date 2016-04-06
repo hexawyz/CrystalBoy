@@ -61,13 +61,9 @@ namespace CrystalBoy.Emulator
 			bus = new GameBoyMemoryBus();
 			frameStopwatch = new Stopwatch();
 			frameRateStopwatch = new Stopwatch();
-#if WITH_THREADING
 			bus.EmulationStarted += OnEmulationStarted;	
 			bus.EmulationStopped += OnEmulationStopped;
 			bus.ClockManager = this;
-#else
-			Application.Idle += OnApplicationIdle;
-#endif
 			bus.ReadKeys += new EventHandler<ReadKeysEventArgs>(OnReadKeys);
 			emulationStatus = bus.UseBootRom ? EmulationStatus.Paused : EmulationStatus.Stopped;
 			if (container != null) container.Add(this);
@@ -98,19 +94,26 @@ namespace CrystalBoy.Emulator
 		{
 			if (enableFramerateLimiter)
 			{
-				long timer = frameStopwatch.ElapsedMilliseconds;
+				long timer = frameStopwatch.ElapsedTicks;
 
-				if (timer < 17) // Exact timing for one frame at 60fps is 16⅔ ms
+				if (timer < GameBoyClockManager.ApproximateFrameTickDuration)  // Exact timing for one frame at 60fps is 16⅔ ms
 				{
-					if (timer < 16)
+					// Windows System Timer runs at 15.6ms by default, so we only use Sleep() when there are more than 15ms remaining
+					if (timer < TimeSpan.TicksPerMillisecond)
 					{
-						// Conversion from long to int is safe since the value is less than 17.
-						// Sleep is a really bad tool for precise timing, but it will play its role when needed.
-						System.Threading.Thread.Sleep(16 - (int)timer);
+						// Request to sleep for 1ms, thus waking at the next timer interval (max 15.6ms of wait)
+						// Note that this will suck if another application did increase the timer precision…
+						Thread.Sleep(1);
 					}
 
 					// Do some active wait, even though this is bad…
-					while (frameStopwatch.Elapsed.TotalMilliseconds < (1000d / 60d)) ;
+					while (frameStopwatch.ElapsedTicks < GameBoyClockManager.ApproximateFrameTickDuration)
+					{
+						Thread.SpinWait(1000);
+					}
+
+					frameStopwatch.Stop();
+					frameStopwatch.Start();
 				}
 			}
 
@@ -125,10 +128,8 @@ namespace CrystalBoy.Emulator
 
 		private void OnReadKeys(object sender, ReadKeysEventArgs e) { if (e.JoypadIndex == 0) bus.PressedKeys = ReadKeys(); }
 
-#if WITH_THREADING
 		private void OnEmulationStarted(object sender, EventArgs e) { EmulationStatus = EmulationStatus.Running; }
 		private void OnEmulationStopped(object sender, EventArgs e) { Pause(!IsDisposed && Processor.Status == ProcessorStatus.Running); }
-#endif
 
 		public void Dispose()
 		{
@@ -248,22 +249,10 @@ namespace CrystalBoy.Emulator
 
 		public void Run()
 		{
-#if WITH_THREADING
 			bus.Run();
-#else
-			if (EmulationStatus == EmulationStatus.Paused)
-			{
-				(this as IClockManager).Reset();
-				EmulationStatus = EmulationStatus.Running;
-			}
-#endif
 		}
 
-#if WITH_THREADING
 		public void Pause() { if (!IsDisposed) bus.Stop(); }
-#else
-		public void Pause() { if (emulationStatus == EmulationStatus.Running) Pause(false); }
-#endif
 
 		private void Pause(bool breakpoint)
 		{
@@ -314,24 +303,6 @@ namespace CrystalBoy.Emulator
 			return keys;
 #endif
 		}
-
-#if !WITH_THREADING
-		private void OnApplicationIdle(object sender, EventArgs e)
-		{
-#if PINVOKE
-			NativeMethods.Message msg;
-
-			while (emulationStatus == EmulationStatus.Running &&
-				!NativeMethods.PeekMessage(out msg, IntPtr.Zero, 0, 0, 0))
-			{
-				(this as IClockManager).Wait();
-				RunFrameInternal();
-			}
-#else
-#error Render loop cannot work without P/Invoke
-#endif
-		}
-#endif
 
 		private void OnRomChanged(EventArgs e)
 		{
