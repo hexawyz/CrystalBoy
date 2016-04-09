@@ -16,13 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 		Documentation\GBZ80Opcodes.pdf = Documentation\GBZ80Opcodes.pdf
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9B40019A-36E3-432A-AF56-3E58AA16BE06}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Decompiler", "CrystalBoy.Decompiler\CrystalBoy.Decompiler.csproj", "{B5E59861-198D-4494-9301-B0B4135667DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core.OpcodeTableGenerator", "CrystalBoy.Core.OpcodeTableGenerator\CrystalBoy.Core.OpcodeTableGenerator.csproj", "{64472336-07E7-4879-9A07-A8DD98B763A1}"
