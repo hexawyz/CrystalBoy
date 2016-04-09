@@ -61,12 +61,9 @@ namespace CrystalBoy.Emulator.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>Rendering.Direct3D.dll</string>
-  <string>Rendering.SlimDX.dll</string>
-  <string>Rendering.SharpDX.dll</string>
-</ArrayOfString>")]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>Rendering.SharpDX.dll</string>\r\n</ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection PluginAssemblies {
             get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["PluginAssemblies"]));

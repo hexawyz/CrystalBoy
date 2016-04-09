@@ -1,5 +1,4 @@
-﻿#if false
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
 using SharpDX;
@@ -9,15 +8,18 @@ using Control = System.Windows.Forms.Control;
 using System.Runtime.InteropServices;
 using CrystalBoy.Emulation;
 using System.Threading.Tasks;
+using System.Threading;
+using SharpDX.Mathematics.Interop;
+using CrystalBoy.Emulation.Windows.Forms;
 
 namespace CrystalBoy.Emulator.Rendering.SharpDX
 {
 	[DisplayName("Direct2D")]
 	[Description("Renders video using Direct2D / SharpDX.")]
-	public sealed class Direct2DRenderer : VideoRenderer<Control>
+	public sealed class Direct2DRenderer : ControlVideoRenderer
 	{
 		private static readonly Task CompletedTask = Task.FromResult(true);
-
+		
 		private Factory factory;
 		private WindowRenderTarget windowRenderTarget;
 		private BitmapRenderTarget compositeRenderTarget;
@@ -25,27 +27,25 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		private Bitmap borderBitmap;
 		private Bitmap bitmap1;
 		private Bitmap bitmap2;
-		private Color4 clearColor;
-		private RectangleF drawRectangle;
-		private volatile byte[] borderBuffer;
-		private volatile byte[] screenBuffer;
-		private GCHandle borderBufferHandle;
-		private GCHandle screenBufferHandle;
-		private volatile bool borderBufferLocked;
-		private volatile bool screenBufferLocked;
+		private RawColor4 clearColor;
+		private RawRectangleF drawRectangle;
+		private readonly byte[] borderBuffer;
+		private readonly byte[] screenBuffer;
+		private volatile bool borderVisible;
 
-		public Direct2DRenderer(Control renderObject)
-			: base(renderObject)
+		public Direct2DRenderer(Control renderControl)
+			: base(renderControl)
 		{
 			borderBuffer = new byte[256 * 224 * 4];
 			screenBuffer = new byte[160 * 144 * 4];
-			clearColor = new Color4(unchecked((int)LookupTables.StandardColorLookupTable32[ClearColor]));
+			//clearColor = new RawColor4(unchecked((int)LookupTables.StandardColorLookupTable32[ClearColor]));
+			clearColor = new RawColor4(1, 1, 1, 1);
 			factory = new Factory(FactoryType.SingleThreaded, DebugLevel.None);
 			ResetRendering();
-			renderObject.FindForm().SizeChanged += OnSizeChanged;
+			RenderControl.FindForm().SizeChanged += OnSizeChanged;
 		}
 
-		public override void Dispose()
+		public void Dispose()
 		{
 			DisposeBitmaps();
 			DisposeRenderTargets();
@@ -53,7 +53,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			if (factory != null) factory.Dispose();
 			factory = null;
 
-			RenderObject.FindForm().SizeChanged -= OnSizeChanged;
+			RenderControl.FindForm().SizeChanged -= OnSizeChanged;
 		}
 
 		private void ResetRendering()
@@ -67,27 +67,27 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 		private void OnSizeChanged(object sender, EventArgs e)
 		{
-			if (windowRenderTarget != null) windowRenderTarget.Resize(new Size2(RenderObject.ClientSize.Width, RenderObject.ClientSize.Height));
+			if (windowRenderTarget != null) windowRenderTarget.Resize(new Size2(RenderControl.ClientSize.Width, RenderControl.ClientSize.Height));
 			RecalculateDrawRectangle();
 		}
 
 		private void RecalculateDrawRectangle()
 		{
-			int w = RenderObject.ClientSize.Width;
-			int h = RenderObject.ClientSize.Height;
+			int w = RenderControl.ClientSize.Width;
+			int h = RenderControl.ClientSize.Height;
 			float s;
 
-			if (BorderVisible)
+			if (borderVisible)
 			{
-				if ((s = (float)h * 256 / 224) <= w) drawRectangle = new RectangleF(0.5f * (w - s), 0, s, h);
-				else if ((s = (float)w * 224 / 256) <= h) drawRectangle = new RectangleF(0, 0.5f * (h - s), w, s);
-				else drawRectangle = new RectangleF(0, 0, w, h);
+				if ((s = (float)h * 256 / 224) <= w) drawRectangle = new RawRectangleF(0.5f * (w - s), 0, s, h);
+				else if ((s = (float)w * 224 / 256) <= h) drawRectangle = new RawRectangleF(0, 0.5f * (h - s), w, s);
+				else drawRectangle = new RawRectangleF(0, 0, w, h);
 			}
 			else
 			{
-				if ((s = (float)h * 160 / 144) <= w) drawRectangle = new RectangleF(0.5f * (w - s), 0, s, h);
-				else if ((s = (float)w * 144 / 160) <= h) drawRectangle = new RectangleF(0, 0.5f * (h - s), w, s);
-				else drawRectangle = new RectangleF(0, 0, w, h);
+				if ((s = (float)h * 160 / 144) <= w) drawRectangle = new RawRectangleF(0.5f * (w - s), 0, s, h);
+				else if ((s = (float)w * 144 / 160) <= h) drawRectangle = new RawRectangleF(0, 0.5f * (h - s), w, s);
+				else drawRectangle = new RawRectangleF(0, 0, w, h);
 			}
 		}
 
@@ -96,11 +96,21 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			windowRenderTarget = new WindowRenderTarget
 			(
 				factory,
-				new RenderTargetProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore), Type = RenderTargetType.Default, MinLevel = FeatureLevel.Level_DEFAULT },
-				new HwndRenderTargetProperties() { Hwnd = RenderObject.Handle, PixelSize = new Size2(RenderObject.ClientSize.Width, RenderObject.ClientSize.Height), PresentOptions = PresentOptions.Immediately }
+				new RenderTargetProperties()
+				{
+					PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore),
+					Type = RenderTargetType.Default,
+					MinLevel = FeatureLevel.Level_DEFAULT
+				},
+				new HwndRenderTargetProperties()
+				{
+					Hwnd = RenderControl.Handle,
+					PixelSize = new Size2(RenderControl.ClientSize.Width, RenderControl.ClientSize.Height),
+					PresentOptions = PresentOptions.Immediately
+				}
 			);
 			windowRenderTarget.DotsPerInch = new Size2F(96.0f, 96.0f);
-			if (BorderVisible) CreateCompositeRenderTarget();
+			if (borderVisible) CreateCompositeRenderTarget();
 			screenRenderTarget = new BitmapRenderTarget(windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(160, 144), new Size2(160, 144), null);
 			windowRenderTarget.AntialiasMode = AntialiasMode.Aliased;
 			RecalculateDrawRectangle();
@@ -140,106 +150,26 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			bitmap2 = null;
 		}
 
-		public override unsafe VideoBufferReference LockBorderBuffer()
-		{
-			if (!borderBufferLocked)
-			{
-				borderBufferHandle = GCHandle.Alloc(borderBuffer, GCHandleType.Pinned);
-				borderBufferLocked = true;
-			}
-
-			return new VideoBufferReference(borderBufferHandle.AddrOfPinnedObject(), 256 * 4);
-		}
-
-		public override unsafe Task<VideoBufferReference> LockBorderBufferAsync() { return Task.FromResult(LockBorderBuffer()); }
-
-		public override void UnlockBorderBuffer()
-		{
-			if (!borderBufferLocked) throw new InvalidOperationException();
-
-			borderBufferHandle.Free();
-			borderBufferLocked = false;
-
-			borderBitmap.CopyFromMemory(borderBuffer, 256 * 4);
-		}
-
-		public override Task UnlockBorderBufferAsync()
-		{
-			UnlockBorderBuffer();
-			return CompletedTask;
-		}
-
-		public unsafe override VideoBufferReference LockScreenBuffer()
-		{
-			if (!screenBufferLocked)
-			{
-				screenBufferHandle = GCHandle.Alloc(screenBuffer, GCHandleType.Pinned);
-				screenBufferLocked = true;
-			}
-
-			return new VideoBufferReference(screenBufferHandle.AddrOfPinnedObject(), 160 * 4);
-		}
-
-		public override unsafe Task<VideoBufferReference> LockScreenBufferAsync() { return Task.FromResult(LockScreenBuffer()); }
-
-		public override void UnlockScreenBuffer()
-		{
-			if (!screenBufferLocked) throw new InvalidOperationException();
-
-			screenBufferHandle.Free();
-			screenBufferLocked = false;
-
-			SwapBitmaps();
-
-			bitmap1.CopyFromMemory(screenBuffer, 160 * 4);
-
-			screenRenderTarget.BeginDraw();
-			screenRenderTarget.DrawBitmap(bitmap2, new RectangleF(0, 0, 160, 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
-			screenRenderTarget.DrawBitmap(bitmap1, new RectangleF(0, 0, 160, 144), 0.5f, BitmapInterpolationMode.NearestNeighbor);
-			screenRenderTarget.EndDraw();
-		}
-
-		public override Task UnlockScreenBufferAsync()
-		{
-			UnlockScreenBuffer();
-			return CompletedTask;
-		}
-
 		private void SwapBitmaps()
 		{
 			var temp = bitmap1;
 			bitmap1 = bitmap2;
 			bitmap2 = temp;
 		}
-
-		public override bool SupportsInterpolation { get { return true; } }
-
-		protected override void OnClearColorChanged(EventArgs e)
-		{
-			clearColor = new Color4(unchecked((int)LookupTables.StandardColorLookupTable32[ClearColor]));
-			base.OnClearColorChanged(e);
-		}
-
-		protected override void OnBorderVisibleChanged(EventArgs e)
-		{
-			if (BorderVisible) CreateCompositeRenderTarget();
-			RecalculateDrawRectangle();
-			base.OnBorderVisibleChanged(e);
-		}
-
-		public override void Render() { Render(true); }
+		
+		private void Render() { Render(true); }
 
 		private void Render(bool retry)
 		{
-			var interpolationMode = Interpolation ? BitmapInterpolationMode.Linear : BitmapInterpolationMode.NearestNeighbor;
+			var interpolationMode = false ? BitmapInterpolationMode.Linear : BitmapInterpolationMode.NearestNeighbor;
 
 			windowRenderTarget.BeginDraw();
 
-			if (BorderVisible)
+			if (borderVisible)
 			{
 				compositeRenderTarget.BeginDraw();
 				compositeRenderTarget.Clear(clearColor);
-				compositeRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, new RectangleF(48, 40, 160, 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
+				compositeRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, new RawRectangleF(48, 40, 160, 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
 				compositeRenderTarget.DrawBitmap(borderBitmap, 1.0f, BitmapInterpolationMode.NearestNeighbor);
 				compositeRenderTarget.EndDraw();
 				windowRenderTarget.DrawBitmap(compositeRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
@@ -256,11 +186,55 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			}
 		}
 
-		public override Task RenderAsync()
+		private void UpdateScreenAndPresent(object state)
 		{
+			SwapBitmaps();
+
+			bitmap1.CopyFromMemory(screenBuffer, 160 * 4);
+
+			screenRenderTarget.BeginDraw();
+			screenRenderTarget.DrawBitmap(bitmap2, new RawRectangleF(0, 0, 160, 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
+			screenRenderTarget.DrawBitmap(bitmap1, new RawRectangleF(0, 0, 160, 144), 0.5f, BitmapInterpolationMode.NearestNeighbor);
+			screenRenderTarget.EndDraw();
+
 			Render();
+
+			var tcs = state as TaskCompletionSource<bool>;
+
+			if (tcs != null)
+			{
+				if (RenderControl.IsDisposed) tcs.TrySetCanceled();
+				else tcs.TrySetResult(true);
+			}
+		}
+
+		public override unsafe Task RenderFrameAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			fixed (void* p = screenBuffer)
+			{
+				renderer.RenderVideoFrame32(frame, (IntPtr)p, 160 * 4);
+			}
+			cancellationToken.ThrowIfCancellationRequested();
+
+			// Setting up a task completion source may not be needed here, but I don't know if there's something to gain by not doing so.
+			if (SynchronizationContext != null)
+			{
+				var tcs = new TaskCompletionSource<bool>();
+				SynchronizationContext.Post(UpdateScreenAndPresent, tcs);
+				return tcs.Task;
+			}
+			else
+			{
+				UpdateScreenAndPresent(null);
+				return CompletedTask;
+			}
+		}
+
+		public override Task RenderBorderAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
+		{
 			return CompletedTask;
 		}
 	}
 }
-#endif

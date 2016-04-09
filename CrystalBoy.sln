@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.VisualAssembler"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator.Rendering.SharpDX", "CrystalBoy.Emulator.Rendering.SharpDX\CrystalBoy.Emulator.Rendering.SharpDX.csproj", "{7FD501EC-302B-4D7B-BCA3-F96F187E5A4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulation.Windows.Forms", "CrystalBoy.Emulation.Windows.Forms\CrystalBoy.Emulation.Windows.Forms.csproj", "{8D6C649A-4058-47FF-849A-66ACD22FE5AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{7FD501EC-302B-4D7B-BCA3-F96F187E5A4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FD501EC-302B-4D7B-BCA3-F96F187E5A4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FD501EC-302B-4D7B-BCA3-F96F187E5A4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D6C649A-4058-47FF-849A-66ACD22FE5AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D6C649A-4058-47FF-849A-66ACD22FE5AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D6C649A-4058-47FF-849A-66ACD22FE5AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D6C649A-4058-47FF-849A-66ACD22FE5AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

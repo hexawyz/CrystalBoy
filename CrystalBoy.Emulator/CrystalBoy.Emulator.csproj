@@ -204,6 +204,10 @@
       <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
       <Name>CrystalBoy.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CrystalBoy.Emulation.Windows.Forms\CrystalBoy.Emulation.Windows.Forms.csproj">
+      <Project>{8d6c649a-4058-47ff-849a-66acd22fe5ad}</Project>
+      <Name>CrystalBoy.Emulation.Windows.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CrystalBoy.Emulation\CrystalBoy.Emulation.csproj">
       <Project>{48489DFD-05FC-4AF5-B238-15912EC77719}</Project>
       <Name>CrystalBoy.Emulation</Name>

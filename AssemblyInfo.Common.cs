@@ -1,6 +1,6 @@
-#region Copyright Notice
+ï»¿#region Copyright Notice
 // This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
+// Copyright Â© 2008-2011 Fabien Barbier
 // 
 // CrystalBoy is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("GoldenCrystal")]
 [assembly: AssemblyProduct("CrystalBoy")]
-[assembly: AssemblyCopyright("Copyright © GoldenCrystal 2008-2011")]
+[assembly: AssemblyCopyright("Copyright Â© GoldenCrystal 2008-2016")]
 [assembly: NeutralResourcesLanguage("en-US")]
 
 [assembly: SuppressIldasm]
