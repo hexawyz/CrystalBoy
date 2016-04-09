@@ -76,7 +76,7 @@ namespace CrystalBoy.Emulator.Renderers
 
 		public override Task RenderFrameAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
+			if (cancellationToken.IsCancellationRequested) return TaskHelper.CanceledTask;
 
 			var bitmap = _screenBitmapTripleBufferingSystem.GetCurrentProducerBuffer();
 
@@ -89,7 +89,7 @@ namespace CrystalBoy.Emulator.Renderers
 
 			_screenBitmapTripleBufferingSystem.GetNextProducerBuffer();
 
-			cancellationToken.ThrowIfCancellationRequested();
+			if (cancellationToken.IsCancellationRequested) return TaskHelper.CanceledTask;
 
 			// Setting up a task completion source may not be needed here, but I don't know if there's something to gain by not doing so.
 			if (SynchronizationContext != null)

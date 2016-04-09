@@ -6,6 +6,7 @@ Split the UI requirements from the emulation requirements (eg. bilinear interpol
 Enhance the new video renderer infrastructure to make it less awkward, and re-implement previous features.
 Reimplement SGB border rendering.
 Audio !
+Switch to .NET 4.6 and use Buffer.MemoryCopy.
 
 DONE:
 Totally rework the VideoRenderer infrastructure

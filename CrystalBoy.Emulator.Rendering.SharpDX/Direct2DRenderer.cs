@@ -11,15 +11,14 @@ using System.Threading.Tasks;
 using System.Threading;
 using SharpDX.Mathematics.Interop;
 using CrystalBoy.Emulation.Windows.Forms;
+using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulator.Rendering.SharpDX
 {
 	[DisplayName("Direct2D")]
-	[Description("Renders video using Direct2D / SharpDX.")]
+	[Description("Renders video using Direct2D.")]
 	public sealed class Direct2DRenderer : ControlVideoRenderer
 	{
-		private static readonly Task CompletedTask = Task.FromResult(true);
-		
 		private Factory factory;
 		private WindowRenderTarget windowRenderTarget;
 		private BitmapRenderTarget compositeRenderTarget;
@@ -199,6 +198,20 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 			Render();
 
+			HandleCompletion(state);
+		}
+
+		private void UpdateBorderAndPresent(object state)
+		{
+			borderBitmap.CopyFromMemory(borderBuffer, 256 * 4);
+
+			Render();
+
+			HandleCompletion(state);
+		}
+
+		private void HandleCompletion(object state)
+		{
 			var tcs = state as TaskCompletionSource<bool>;
 
 			if (tcs != null)
@@ -210,12 +223,37 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 		public override unsafe Task RenderFrameAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
-
+			if (cancellationToken.IsCancellationRequested) return TaskHelper.CanceledTask;
+			
 			fixed (void* p = screenBuffer)
 			{
 				renderer.RenderVideoFrame32(frame, (IntPtr)p, 160 * 4);
 			}
+
+			if (cancellationToken.IsCancellationRequested) return TaskHelper.CanceledTask;
+
+			// Setting up a task completion source may not be needed here, but I don't know if there's something to gain by not doing so.
+			if (SynchronizationContext != null)
+			{
+				var tcs = new TaskCompletionSource<bool>();
+				SynchronizationContext.Post(UpdateScreenAndPresent, tcs);
+				return tcs.Task;
+			}
+			else
+			{
+				UpdateScreenAndPresent(null);
+				return TaskHelper.TrueTask;
+			}
+		}
+
+		public override unsafe Task RenderBorderAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			//fixed (void* p = borderBitmap)
+			//{
+			//	renderer.RenderVideoFrame32(frame, (IntPtr)p, 160 * 4);
+			//}
 			cancellationToken.ThrowIfCancellationRequested();
 
 			// Setting up a task completion source may not be needed here, but I don't know if there's something to gain by not doing so.
@@ -228,13 +266,8 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			else
 			{
 				UpdateScreenAndPresent(null);
-				return CompletedTask;
+				return TaskHelper.TrueTask;
 			}
-		}
-
-		public override Task RenderBorderAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
-		{
-			return CompletedTask;
 		}
 	}
 }

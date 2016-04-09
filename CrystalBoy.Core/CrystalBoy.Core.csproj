@@ -64,21 +64,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
     <Compile Include="AsyncAutoResetEvent.cs" />
+    <Compile Include="MakerDictionary.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MakerDictionary.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TaskHelper.cs" />
     <Compile Include="ThreadSynchronizationContext.cs" />
     <Compile Include="TripleBufferingSystem.cs" />
     <Compile Include="ColorPalette.cs" />
     <Compile Include="DisassembleFlags.cs" />
     <Compile Include="FixedColorPalette.cs" />
     <Compile Include="Flags.cs" />
-    <Compile Include="MakerDictionary.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="NintendoLogo.cs" />
     <Compile Include="OpcodeInfo.cs" />
@@ -111,7 +114,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="makers.xml" />
+    <None Include="makers.xml" />
+    <Content Include="MakerDictionary.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MakerDictionary.cs</LastGenOutput>
+    </Content>
     <Content Include="Notes.txt" />
     <Content Include="Removed.txt" />
   </ItemGroup>

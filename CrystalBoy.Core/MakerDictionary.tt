@@ -1,0 +1,81 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Xml" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System;
+using System.Collections.Generic;
+
+namespace CrystalBoy.Core
+{
+	public static class MakerDictionary
+	{
+		public static string GetMakerName(string makerCode)
+		{
+			string result;
+
+			if (_makerDictionary.TryGetValue(makerCode, out result))
+				return result;
+			else
+				return "?";
+		}
+
+		private static readonly Dictionary<string, string> _makerDictionary = new Dictionary<string, string>
+		{
+<#
+using (var file = File.OpenText(Host.ResolvePath("makers.xml")))
+using
+(
+	var xmlReader = XmlReader.Create
+	(
+		file,
+		new XmlReaderSettings()
+		{
+			IgnoreWhitespace = true,
+			IgnoreComments = true,
+			CloseInput = true,
+			ConformanceLevel = ConformanceLevel.Document
+		}
+	)
+)
+{
+	xmlReader.Read();
+	xmlReader.ReadStartElement("Makers");
+
+	if (!xmlReader.IsEmptyElement)
+	{
+		xmlReader.MoveToContent();
+
+		while (xmlReader.NodeType == XmlNodeType.Element)
+		{
+			string code, name;
+
+			if (xmlReader.Name != "Maker")
+				if (!xmlReader.ReadToNextSibling("Maker"))
+					continue;
+
+			xmlReader.MoveToAttribute("Code");
+			xmlReader.ReadAttributeValue();
+			code = xmlReader.Value;
+			xmlReader.MoveToElement();
+			xmlReader.ReadStartElement("Maker");
+			xmlReader.MoveToContent();
+			name = xmlReader.ReadContentAsString();
+			xmlReader.ReadEndElement();
+
+#>
+			{ "<#=code#>", "<#=name#>" },
+<#
+		}
+	}
+
+	xmlReader.ReadEndElement();
+}
+#>
+		};
+	}
+}
