@@ -1,3 +1,0 @@
-﻿CIL/MSIL allows memory copies / initializations directly via two opcodes: cpblk and initblk.
-Since these are not directly accessible in C#, two DynamicMethod using these opcodes are built at runtime.
-All the core functions can be built without interop if needed, they'll just rely on CLR functionality instead. (useful for non Win32 environments)

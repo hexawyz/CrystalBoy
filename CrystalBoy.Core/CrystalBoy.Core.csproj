@@ -119,8 +119,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MakerDictionary.cs</LastGenOutput>
     </Content>
-    <Content Include="Notes.txt" />
-    <Content Include="Removed.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
