@@ -468,7 +468,7 @@ namespace CrystalBoy.Emulation
 			byte* bufferLine = buffer;
 			uint* bufferPixel;
 			int scx, scy, wx, wy;
-			int pi, data1, data2;
+			int clk, pi, data1, data2;
 			bool bgDraw, winDraw, winDraw2, objDraw, signedIndex;
 			byte objDrawn;
 			uint** bgPalettes, objPalettes;
@@ -488,6 +488,7 @@ namespace CrystalBoy.Emulation
 			fixed (ObjectData* objectData = this.objectData)
 			fixed (ushort* paletteIndexTable = LookupTables.PaletteLookupTable,
 				flippedPaletteIndexTable = LookupTables.FlippedPaletteLookupTable)
+			fixed (uint* backgroundPalette = this.backgroundPalette, objectPalette1 = this.objectPalette1, objectPalette2 = this.objectPalette2)
 			{
 				tilePalette = bgPalettes[0];
 
@@ -505,79 +506,51 @@ namespace CrystalBoy.Emulation
 				scy = frame.VideoMemorySnapshot.SCY;
 				wx = frame.VideoMemorySnapshot.WX - 7;
 				wy = frame.VideoMemorySnapshot.WY;
-				data1 = frame.VideoMemorySnapshot.BGP;
-				for (i = 0; i < 4; i++)
-				{
-					tilePalette[i] = backgroundPalette[data1 & 3];
-					data1 >>= 2;
-				}
-				data1 = frame.VideoMemorySnapshot.OBP0;
-				for (j = 0; j < 4; j++)
-				{
-					objPalettes[0][j] = objectPalette1[data1 & 3];
-					data1 >>= 2;
-				}
-				data1 = frame.VideoMemorySnapshot.OBP1;
-				for (j = 0; j < 4; j++)
-				{
-					objPalettes[1][j] = objectPalette2[data1 & 3];
-					data1 >>= 2;
-				}
 
+				UpdatePalette(frame.VideoMemorySnapshot.BGP, tilePalette, backgroundPalette);
+				UpdatePalette(frame.VideoMemorySnapshot.OBP0, objPalettes[0], objectPalette1);
+				UpdatePalette(frame.VideoMemorySnapshot.OBP1, objPalettes[1], objectPalette2);
+
+				// Initialize the clock, and the port access index.
+				clk = 0;
 				pi = 0;
 
 				for (i = 0; i < 144; i++) // Loop on frame lines
 				{
-					data2 = i * 456; // Line clock
-
 					// Update ports before drawing the line
-					while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock <= data2)
+					while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock <= clk)
 					{
+						data2 = frame.VideoPortAccessList[pi].Value;
+
 						switch (frame.VideoPortAccessList[pi].Port)
 						{
 							case Port.LCDC:
-								data1 = frame.VideoPortAccessList[pi].Value;
-								bgDraw = (data1 & 0x01) != 0;
-								bgMap = frame.VideoMemorySnapshot.VideoMemory + ((data1 & 0x08) != 0 ? 0x1C00 : 0x1800);
-								winDraw = (data1 & 0x20) != 0;
-								winMap = frame.VideoMemorySnapshot.VideoMemory + ((data1 & 0x40) != 0 ? 0x1C00 : 0x1800);
-								objDraw = (data1 & 0x02) != 0;
-								objHeight = (data1 & 0x04) != 0 ? 16 : 8;
-								signedIndex = (data1 & 0x10) == 0;
+								bgDraw = (data2 & 0x01) != 0;
+								bgMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x08) != 0 ? 0x1C00 : 0x1800);
+								winDraw = (data2 & 0x20) != 0;
+								winMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x40) != 0 ? 0x1C00 : 0x1800);
+								objDraw = (data2 & 0x02) != 0;
+								objHeight = (data2 & 0x04) != 0 ? 16 : 8;
+								signedIndex = (data2 & 0x10) == 0;
 								bgTiles = (ushort*)(signedIndex ? frame.VideoMemorySnapshot.VideoMemory + 0x1000 : frame.VideoMemorySnapshot.VideoMemory);
 								break;
-							case Port.SCX: scx = frame.VideoPortAccessList[pi].Value; break;
-							case Port.SCY: scy = frame.VideoPortAccessList[pi].Value; break;
-							case Port.WX: wx = frame.VideoPortAccessList[pi].Value - 7; break;
+							case Port.SCX: scx = data2; break;
+							case Port.SCY: scy = data2; break;
+							case Port.WX: wx = data2 - 7; break;
 							case Port.BGP:
-								data1 = frame.VideoPortAccessList[pi].Value;
-								for (j = 0; j < 4; j++)
-								{
-									tilePalette[j] = backgroundPalette[data1 & 3];
-									data1 >>= 2;
-								}
+								UpdatePalette(data2, tilePalette, backgroundPalette);
 								break;
 							case Port.OBP0:
-								data1 = frame.VideoPortAccessList[pi].Value;
-								for (j = 0; j < 4; j++)
-								{
-									objPalettes[0][j] = objectPalette1[data1 & 3];
-									data1 >>= 2;
-								}
+								UpdatePalette(data2, objPalettes[0], objectPalette1);
 								break;
 							case Port.OBP1:
-								data1 = frame.VideoPortAccessList[pi].Value;
-								for (j = 0; j < 4; j++)
-								{
-									objPalettes[1][j] = objectPalette2[data1 & 3];
-									data1 >>= 2;
-								}
+								UpdatePalette(data2, objPalettes[1], objectPalette2);
 								break;
 						}
 
 						pi++;
 					}
-					
+
 					// Find valid sprites for the line, limited to 10 like on real GB
 					for (j = 0, objCount = 0; j < 40 && objCount < 10; j++) // Loop on OAM data
 					{
@@ -594,7 +567,7 @@ namespace CrystalBoy.Emulation
 							data2 = bgTile[3]; // Fourth byte contain flags that we'll examine
 							objectData[objCount].Palette = (data2 & 0x10) != 0 ? 1 : 0; // Set the palette index according to the flags
 							objectData[objCount].Priority = (data2 & 0x80) == 0; // Store the priority information
-							// Now we check the Y flip flag, as we'll use it to calculate the tile line offset
+																				 // Now we check the Y flip flag, as we'll use it to calculate the tile line offset
 							if ((data2 & 0x40) != 0)
 								data1 = (objHeight + data1 - i - 1) << 1;
 							else
@@ -604,9 +577,9 @@ namespace CrystalBoy.Emulation
 								data1 += (bgTile[2] & 0xFE) << 4; // Third byte is the tile index
 							else
 								data1 += bgTile[2] << 4; // A tile is 16 bytes wide
-							// No all that is left is to fetch the tile data :)
+														 // No all that is left is to fetch the tile data :)
 							bgTile = frame.VideoMemorySnapshot.VideoMemory + data1; // Calculate the full tile line address for VRAM Bank 0
-							// Depending on the X flip flag, we will load the flipped pixel data or the regular one
+																					// Depending on the X flip flag, we will load the flipped pixel data or the regular one
 							if ((data2 & 0x20) != 0)
 								objectData[objCount].PixelData = flippedPaletteIndexTable[*(ushort*)bgTile];
 							else
@@ -614,7 +587,7 @@ namespace CrystalBoy.Emulation
 							objCount++; // Increment the object counter
 						}
 					}
-					
+
 					// Initialize the background and window with new parameters
 					bgTileIndex = scx >> 3;
 					pixelIndex = scx & 7;
@@ -627,13 +600,55 @@ namespace CrystalBoy.Emulation
 					winLineOffset = (i - wy) & 7;
 
 					winDraw2 = winDraw && i >= wy;
-					
+
 					// Adjust the current pixel to the current line
 					bufferPixel = (uint*)bufferLine;
+
+					clk += GameBoyMemoryBus.Mode2Duration; // Increment the clock by the duration of mode 2. (This is an approximation…)
 
 					// Do the actual drawing
 					for (j = 0; j < 160; j++) // Loop on line pixels
 					{
+						clk++; // The clock will be incremented by 1 for every pixel, 160 in total. Together with the hardcoded mode 2, this will put the clock to 240 in the end.
+
+						// Update values that can be updated dynamically
+						if ((j & 0x8) == 0x0)
+						{
+							// Update ports before drawing the line
+							while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock <= clk)
+							{
+								data2 = frame.VideoPortAccessList[pi].Value;
+
+								switch (frame.VideoPortAccessList[pi].Port)
+								{
+									case Port.LCDC:
+										bgDraw = (data2 & 0x01) != 0;
+										bgMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x08) != 0 ? 0x1C00 : 0x1800);
+										winDraw = (data2 & 0x20) != 0;
+										winMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x40) != 0 ? 0x1C00 : 0x1800);
+										objDraw = (data2 & 0x02) != 0;
+										objHeight = (data2 & 0x04) != 0 ? 16 : 8;
+										signedIndex = (data2 & 0x10) == 0;
+										bgTiles = (ushort*)(signedIndex ? frame.VideoMemorySnapshot.VideoMemory + 0x1000 : frame.VideoMemorySnapshot.VideoMemory);
+										break;
+									case Port.SCX: scx = data2; break;
+									case Port.SCY: scy = data2; break;
+									case Port.WX: wx = data2 - 7; break;
+									case Port.BGP:
+										UpdatePalette(data2, tilePalette, backgroundPalette);
+										break;
+									case Port.OBP0:
+										UpdatePalette(data2, objPalettes[0], objectPalette1);
+										break;
+									case Port.OBP1:
+										UpdatePalette(data2, objPalettes[1], objectPalette2);
+										break;
+								}
+
+								pi++;
+							}
+						}
+
 						objDrawn = 0; // Draw no object by default
 
 						if (objDraw && objCount > 0)
@@ -697,9 +712,19 @@ namespace CrystalBoy.Emulation
 						else *bufferPixel++ = objDrawn != 0 ? objColor : LookupTables.GrayPalette[0];
 					}
 
+					clk += 216;
+
 					bufferLine += stride;
 				}
 			}
+		}
+
+		private static unsafe void UpdatePalette(int registerData, uint* destinationPalette, uint* sourceColorPalette)
+		{
+			*destinationPalette = sourceColorPalette[registerData & 3];
+			*++destinationPalette = sourceColorPalette[(registerData >>= 2) & 3];
+			*++destinationPalette = sourceColorPalette[(registerData >>= 2) & 3];
+			*++destinationPalette = sourceColorPalette[(registerData >> 2) & 3];
 		}
 	}
 }
