@@ -512,13 +512,13 @@ namespace CrystalBoy.Emulation
 				UpdatePalette(frame.VideoMemorySnapshot.OBP1, objPalettes[1], objectPalette2);
 
 				// Initialize the clock, and the port access index.
-				clk = 0;
+				clk = 4; // Be off by 4 clock cycles (the minimum time required by a DMG CPU instruction) to compensate write cycle imprecision.
 				pi = 0;
 
 				for (i = 0; i < 144; i++) // Loop on frame lines
 				{
 					// Update ports before drawing the line
-					while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock <= clk)
+					while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock < clk)
 					{
 						data2 = frame.VideoPortAccessList[pi].Value;
 
@@ -612,10 +612,10 @@ namespace CrystalBoy.Emulation
 						clk++; // The clock will be incremented by 1 for every pixel, 160 in total. Together with the hardcoded mode 2, this will put the clock to 240 in the end.
 
 						// Update values that can be updated dynamically
-						if ((j & 0x8) == 0x0)
+						if (true /*(j & 0x8) == 0x0*/)
 						{
 							// Update ports before drawing the line
-							while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock <= clk)
+							while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock < clk)
 							{
 								data2 = frame.VideoPortAccessList[pi].Value;
 
