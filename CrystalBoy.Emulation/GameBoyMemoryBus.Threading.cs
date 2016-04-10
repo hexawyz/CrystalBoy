@@ -112,7 +112,7 @@ namespace CrystalBoy.Emulation
 		{
 			var handler = state as NotificationHandler;
 
-			handler(EventArgs.Empty);
+			handler?.Invoke(EventArgs.Empty);
 		}
 
 		private void PostUINotification(NotificationHandler handler)

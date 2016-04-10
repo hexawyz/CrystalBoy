@@ -7,6 +7,7 @@ Enhance the new video renderer infrastructure to make it less awkward, and re-im
 Reimplement SGB border rendering.
 Audio !
 Switch to .NET 4.6 and use Buffer.MemoryCopy.
+Have a better video emulation (Allow more dynamic changes during video rendering)
 
 DONE:
 Totally rework the VideoRenderer infrastructure

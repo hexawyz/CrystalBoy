@@ -1,22 +1,4 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CrystalBoy.Core;
 
@@ -24,8 +6,6 @@ namespace CrystalBoy.Emulation
 {
 	partial class GameBoyMemoryBus
 	{
-		#region Variables
-
 		// Cycle counter
 		// We count cycles on a frame basis
 		// A frame always lasts 70224 cycles, excepted when the frame starts with lcd disabled, and lcd is enabled before frame end
@@ -37,27 +17,15 @@ namespace CrystalBoy.Emulation
 		bool doubleSpeed, prepareSpeedSwitch;
 		bool frameDone;
 
-		#endregion
-
-		#region Properties
-
 		public bool DoubleSpeed { get { return doubleSpeed; } }
 
 		public bool PrepareSpeedSwitch { get { return prepareSpeedSwitch; } }
-
-		#endregion
-
-		#region Reset
 
 		partial void ResetTiming()
 		{
 			doubleSpeed = false;
 			prepareSpeedSwitch = false;
 		}
-
-		#endregion
-
-		#region Timing
 
 		public int LcdCycleCount { get { return rasterCycles; } }
 
@@ -108,7 +76,7 @@ namespace CrystalBoy.Emulation
 						else videoNotifications &= 0x0E;
 					}
 				}
-				// Update LY 4 cycles before next line
+				// Update LY 4 cycles before next line (NB: This may be kind of a hack)
 				else if (rasterCycles >= HorizontalLineDuration - 4)
 				{
 					if ((lyRegister = lcdRealLine + 1) == portMemory[0x45] && notifyCoincidence && (videoNotifications & 0x01) == 0)
@@ -119,8 +87,8 @@ namespace CrystalBoy.Emulation
 					else videoNotifications &= 0x0E;
 				}
 
-				// Mode 2, 3 and 0 can only happen outside of VBLANK
-				if (lcdRealLine < 144)
+				// Mode 2 can happen *once* during V-Blank, on line 144, if no VBI interrupt did get triggered.
+				if (lcdRealLine < 144 || lcdRealLine == 144 && !vblankExecutedAtLine144)
 				{
 					// Check for OAM Fetch
 					if (notifyMode2 && rasterCycles < Mode2Duration && (videoNotifications & 0x02) == 0)
@@ -128,6 +96,11 @@ namespace CrystalBoy.Emulation
 						videoNotifications |= 0x02;
 						InterruptRequest(0x02);
 					}
+				}
+
+				// Mode 2, 3 and 0 can only happen outside of VBLANK
+				if (lcdRealLine < 144)
+				{
 					// Check for HBLANK
 					if (rasterCycles >= Mode2Duration + Mode3Duration)
 					{
@@ -141,85 +114,94 @@ namespace CrystalBoy.Emulation
 					}
 				}
 			}
-			else do // This may probably be sped up a little bit for big updates (> 20 cycles) but those should not happen very often
+			else
 			{
-				rasterCycles -= HorizontalLineDuration;
-				hdmaDone = false;
-
-				if (lcdRealLine == 153)
+				// This may probably be sped up a little bit for big updates (> 20 cycles) but those should not happen very often.
+				do
 				{
-					lcdRealLine = 0;
-					// Resume LCD drawing (after VBlank)
-					videoNotifications &= 0x01; // Keep the coincidence bit
-					// Raise the FrameReady event
-					OnFrameReady();
-					// Prepare for the new frame…
-					// Clear the video access lists
-					videoFrameData.VideoPortAccessList.Clear();
-					videoFrameData.PaletteAccessList.Clear();
-					videoFrameData.GreyPaletteUpdated = false;
-					// Create a new snapshot of the video ports
-					videoFrameData.VideoMemorySnapshot.Capture(false);
-				}
-				else
-				{
-					lcdRealLine++;
-					videoNotifications &= 0x09; // Keep the coincidence and vblank bits
-				}
+					rasterCycles -= HorizontalLineDuration;
+					hdmaDone = false;
 
-				// Compute the new LY value
-				int lyNewValue = lcdRealLine < 153 ?
-					rasterCycles >= HorizontalLineDuration - 4 ?
-						lcdRealLine + 1 :
-						lcdRealLine :
-					rasterCycles < 8 ?
-						153 :
-						0;
-
-				// TODO handle LY "jumping" from 152 to 0
-
-				// Check for LY=LYC coincidence
-				if (notifyCoincidence && lyNewValue == portMemory[0x45])
-				{
-					if ((videoNotifications & 0x01) == 0 || lyNewValue != lyRegister)
+					if (lcdRealLine == 153)
 					{
-						videoNotifications |= 0x01;
-						InterruptRequest(0x02);
+						lcdRealLine = 0;
+						vblankExecutedAtLine144 = false;
+						// Resume LCD drawing (after VBlank)
+						videoNotifications &= 0x01; // Keep the coincidence bit
+													// Raise the FrameReady event
+						OnFrameReady();
+						// Prepare for the new frame…
+						// Clear the video access lists
+						videoFrameData.VideoPortAccessList.Clear();
+						videoFrameData.PaletteAccessList.Clear();
+						videoFrameData.GreyPaletteUpdated = false;
+						// Create a new snapshot of the video ports
+						videoFrameData.VideoMemorySnapshot.Capture(false);
 					}
-				}
-				else videoNotifications &= 0x0E;
-				lyRegister = lyNewValue;
-
-				// Check for VBLANK Interrupt
-				if (lcdRealLine >= 144)
-				{
-					if ((videoNotifications & 0x08) == 0)
+					else
 					{
-						videoNotifications |= 0x08;
-						InterruptRequest(notifyMode1 ? (byte)0x03 : (byte)0x01);
+						lcdRealLine++;
+						videoNotifications &= 0x09; // Keep the coincidence and vblank bits
 					}
-				}
-				// Check for Mode 2 or Mode 0
-				else
-				{
-					if (notifyMode2)
+
+					// Compute the new LY value
+					int lyNewValue = lcdRealLine < 153 ?
+						rasterCycles >= HorizontalLineDuration - 4 ?
+							lcdRealLine + 1 :
+							lcdRealLine :
+						rasterCycles < 8 ?
+							153 :
+							0;
+
+					// TODO handle LY "jumping" from 152 to 0
+
+					// Check for LY=LYC coincidence
+					if (notifyCoincidence && lyNewValue == portMemory[0x45])
+					{
+						if ((videoNotifications & 0x01) == 0 || lyNewValue != lyRegister)
+						{
+							videoNotifications |= 0x01;
+							InterruptRequest(0x02);
+						}
+					}
+					else videoNotifications &= 0x0E;
+					lyRegister = lyNewValue;
+
+					// Check for VBLANK Interrupt
+					if (lcdRealLine >= 144)
+					{
+						if ((videoNotifications & 0x08) == 0)
+						{
+							videoNotifications |= 0x08;
+							InterruptRequest(notifyMode1 ? (byte)0x03 : (byte)0x01);
+							vblankExecutedAtLine144 = (EnabledInterrupts & 0x1) != 0;
+						}
+					}
+
+					// Check for mode 2 (OAM)
+					if (notifyMode2 && (lcdRealLine < 144 || lcdRealLine == 144 && !vblankExecutedAtLine144))
 					{
 						videoNotifications |= 0x02;
 						InterruptRequest(0x02);
 					}
-					if (rasterCycles >= Mode2Duration + Mode3Duration)
+
+					// Check for Mode 0
+					if (lcdRealLine < 144)
 					{
-						if (notifyMode0)
+						if (rasterCycles >= Mode2Duration + Mode3Duration)
 						{
-							videoNotifications |= 0x04;
-							InterruptRequest(0x02);
+							if (notifyMode0)
+							{
+								videoNotifications |= 0x04;
+								InterruptRequest(0x02);
+							}
+							// Handle HDMA, but add cycles only if the processing here is done…
+							// (If we still have another line waiting, the cycles are already included in the computation…)
+							if (hdmaActive && !hdmaDone) HandleHdma(rasterCycles < HorizontalLineDuration);
 						}
-						// Handle HDMA, but add cycles only if the processing here is done…
-						// (If we still have another line waiting, the cycles are already included in the computation…)
-						if (hdmaActive && !hdmaDone) HandleHdma(rasterCycles < HorizontalLineDuration);
 					}
-				}
-			} while (rasterCycles >= HorizontalLineDuration);
+				} while (rasterCycles >= HorizontalLineDuration);
+			}
 		}
 
 		internal int HandleProcessorStop()
@@ -231,7 +213,5 @@ namespace CrystalBoy.Emulation
 			}
 			else return WaitForInterrupts();
 		}
-
-		#endregion
 	}
 }

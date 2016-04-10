@@ -66,8 +66,25 @@ namespace CrystalBoy.Emulation
 								stat = Math.Min(stat, FrameDuration - rasterCycles - 4);
 						}
 					}
-					if (notifyMode0) stat = Math.Min(stat, (rasterCycles > Mode2Duration + Mode3Duration ? HorizontalLineDuration : lcdRealLine < 143 ? 0 : (154 - lcdRealLine) * HorizontalLineDuration) + Mode2Duration + Mode3Duration - rasterCycles);
-					if (notifyMode2) stat = Math.Min(stat, lcdRealLine < 143 ? HorizontalLineDuration - rasterCycles : (154 - lcdRealLine) * HorizontalLineDuration - rasterCycles);
+					if (notifyMode0)
+					{
+						stat = Math.Min(stat, (rasterCycles > Mode2Duration + Mode3Duration ? HorizontalLineDuration : lcdRealLine < 143 ? 0 : (154 - lcdRealLine) * HorizontalLineDuration) + Mode2Duration + Mode3Duration - rasterCycles);
+					}
+
+					if (notifyMode2)
+					{
+						// OAM interrupt is quite peculiar, as it will fire either 144 or 145 times depending on the conditions.
+						int mode2 = lcdRealLine <= 144 ?
+							HorizontalLineDuration - rasterCycles :
+							(154 - lcdRealLine) * HorizontalLineDuration - rasterCycles;
+
+						// The STAT interrupt won't fire for mode 2 if a V-Blank interrupt happens at the same time.
+						// If there is no V-Blank interrupt scheduled, we will thus observe *145* STAT OAM interrupts for one frame.
+						if (mode2 < stat && (lcdRealLine < 144 || mode2 < vbi))
+						{
+							stat = mode2;
+						}
+					}
 				}
 			}
 

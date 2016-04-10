@@ -38,6 +38,7 @@ namespace CrystalBoy.Emulation
 		private int rasterCycles; // Current clock cycle count, relative to the current LCD line
 		private int lcdRealLine; // LY should be equal to this *most of the time*.
 		private int lyRegister; // Maintain LY status in parallel 
+		private bool vblankExecutedAtLine144; // We need to know if the V-Blank interrupt was executed for line 144, as this will condition the execution of STAT Mode 2 (OAM) for this line. (GB hardware quirk)
 		private bool lcdEnabled; // Self-explanatory…
 		// LCD Status Interrupt
 		private byte videoNotifications; // Bitmask indicating the requested video interrupts (1 = LY=LYC, 2 = OAM Fetch, 4 = HBLANK, 8 = VBLANK)
@@ -64,6 +65,7 @@ namespace CrystalBoy.Emulation
 			lcdEnabled = true;
 			hdmaActive = false;
 			hdmaDone = false;
+			vblankExecutedAtLine144 = false;
 
 			// The boostrap ROM uses the video RAM before executing the game, so we need to emulate this behavior when not using the bootstrap ROM
 			if (!useBootRom)
@@ -91,10 +93,11 @@ namespace CrystalBoy.Emulation
 			// Disabling the LCD is fairly easy.
 			// Enabling it should be a bit more tricky...
 			lcdEnabled = false;
-			videoNotifications = 0;
+			rasterCycles = 0;
 			lcdRealLine = 0;
 			lyRegister = 0;
-			rasterCycles = 0;
+			videoNotifications = 0;
+			vblankExecutedAtLine144 = false;
 		}
 
 		private void EnableVideo()
@@ -106,6 +109,7 @@ namespace CrystalBoy.Emulation
 			lcdRealLine = 0;
 			lyRegister = 0;
 			videoNotifications = 0;
+			vblankExecutedAtLine144 = false;
 			// Clear the video access lists
 			videoFrameData.VideoPortAccessList.Clear();
 			videoFrameData.PaletteAccessList.Clear();

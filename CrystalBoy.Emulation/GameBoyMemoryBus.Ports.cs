@@ -233,6 +233,7 @@ namespace CrystalBoy.Emulation
 					// -4 allows the interrupt to happen 4 cycles beforce the new line
 					//lyOffset = lcdCycles / -HorizontalLineDuration - 4;
 					// For now leave it as read only… Need to find a game tring to reset LY.
+					// NB: Shantae and Prehistorik Man seem to write to this register. Need to find out what they expect from this.
 					break;
 				case 0x45: // LYC
 					portMemory[0x45] = value;
