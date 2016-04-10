@@ -237,7 +237,7 @@ namespace CrystalBoy.Emulation
 			byte* bufferLine = buffer;
 			uint* bufferPixel;
 			int scx, scy, wx, wy;
-			int pi, ppi, data1, data2;
+			int clk, pi, ppi, data1, data2;
 			bool bgPriority, tilePriority, winDraw, winDraw2, objDraw, signedIndex;
 			byte objDrawn; 
 			uint** bgPalettes, objPalettes;
@@ -277,15 +277,14 @@ namespace CrystalBoy.Emulation
 
 				tilePriority = false;
 
+				clk = 4; // LCD clock
 				pi = 0; // Port access list index
 				ppi = 0; // Palette access list index
 
 				for (i = 0; i < 144; i++) // Loop on frame lines
 				{
-					data2 = i * 456; // Line clock
-
 					// Update ports before drawing the line
-					while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock <= data2)
+					while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock < clk)
 					{
 						switch (frame.VideoPortAccessList[pi].Port)
 						{
@@ -307,8 +306,11 @@ namespace CrystalBoy.Emulation
 
 						pi++;
 					}
+
+					clk += GameBoyMemoryBus.Mode2Duration;
+
 					// Update palettes before drawing the line (This is necessary for a lot of demos with dynamic palettes)
-					while (ppi < frame.PaletteAccessList.Count && frame.PaletteAccessList[ppi].Clock < data2)
+					while (ppi < frame.PaletteAccessList.Count && frame.PaletteAccessList[ppi].Clock < clk)
 					{
 						// By doing this, we trash the palette memory snapshot… But at least it works. (Might be necessary to allocate another temporary palette buffer in the future)
 						frame.VideoMemorySnapshot.PaletteMemory[frame.PaletteAccessList[ppi].Offset] = frame.PaletteAccessList[ppi].Value;
@@ -376,6 +378,18 @@ namespace CrystalBoy.Emulation
 					// Do the actual drawing
 					for (j = 0; j < 160; j++) // Loop on line pixels
 					{
+						clk++;
+
+						// Update palettes before drawing the line (This is necessary for a lot of demos with dynamic palettes)
+						while (ppi < frame.PaletteAccessList.Count && frame.PaletteAccessList[ppi].Clock < clk)
+						{
+							// By doing this, we trash the palette memory snapshot… But at least it works. (Might be necessary to allocate another temporary palette buffer in the future)
+							frame.VideoMemorySnapshot.PaletteMemory[frame.PaletteAccessList[ppi].Offset] = frame.PaletteAccessList[ppi].Value;
+							bgPalettes[0][frame.PaletteAccessList[ppi].Offset / 2] = LookupTables.StandardColorLookupTable32[((ushort*)frame.VideoMemorySnapshot.PaletteMemory)[frame.PaletteAccessList[ppi].Offset / 2]];
+
+							ppi++;
+						}
+
 						objDrawn = 0; // Draw no object by default
 
 						if (objDraw && objCount > 0)
@@ -445,6 +459,8 @@ namespace CrystalBoy.Emulation
 							pixelIndex++;
 						}
 					}
+
+					clk += 216;
 
 					bufferLine += stride;
 				}
