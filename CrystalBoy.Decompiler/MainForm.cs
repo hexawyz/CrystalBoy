@@ -42,10 +42,10 @@ namespace CrystalBoy.Decompiler
 			// Open only existing rom files
 			if (!fileInfo.Exists)
 				throw new FileNotFoundException();
-			// Limit the rom size to 4 Mb
-			if (fileInfo.Length > 4 * 1024 * 1024)
+			// Limit the rom size to 8 Mb
+			if (fileInfo.Length > 8 * 1024 * 1024)
 				throw new FileTooLongException();
-			rom = MemoryUtility.ReadFile(fileInfo);
+			rom = MemoryUtility.ReadFile(fileInfo, true);
 			memory = new FlexibleGameBoyMemory(rom);
 			disassemblyView.Memory = memory;
 			codeMap = new CodeMap(rom);

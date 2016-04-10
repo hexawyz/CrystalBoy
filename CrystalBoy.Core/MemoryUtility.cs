@@ -39,13 +39,72 @@ namespace CrystalBoy.Core
 
 		#region Reading
 
-		public static MemoryBlock ReadFile(FileInfo fileInfo)
+		public static MemoryBlock ReadFile(FileInfo fileInfo, bool roundToPowerOfTwo)
 		{
 			FileStream fileStream;
 
 			// Open the file in exclusive mode
 			using (fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
-				return ReadStream(fileStream, checked((int)fileStream.Length));
+			{
+				return ReadStream
+				(
+					fileStream,
+					checked
+					(
+						roundToPowerOfTwo ?
+							(int)fileStream.Length :
+							(int)RoundToPowerOfTwo((ulong)fileStream.Length)
+					)
+				);
+			}
+		}
+
+		private static ulong RoundToPowerOfTwo(ulong value)
+		{
+			// We can't do our job if the value is too big. 
+			if (value > 0x8000000000000000UL) throw new ArgumentOutOfRangeException(nameof(value));
+			
+			// Only do the "complex" bit arithmetic if the number is not already a power of two.
+			// We can consider 0 to be a power of two here… Anyway, loading an empty file is not very interresting.
+			if ((value & (value - 1)) == 0)
+			{
+				// We'll find the enclosing power of two in a maximum of 14 compares & 15 shifts for 63 bit values, and a maximum of 11 compares & 10 shifts for 31 bit values.
+				// This may not be the best algorithm out there, but it should at least be readable.
+				// The loops have been unrolled, to avoid unnecessary operations.
+
+				ulong enclosing = 0x80;
+
+				// Find the appropriate byte (minimum 1 compare & 0 shift, maximum 7 compares & 8 shifts)
+				if
+				(
+					enclosing < value &&
+					(enclosing <<= 8) < value &&
+					(enclosing <<= 8) < value &&
+					(enclosing <<= 8) < value &&
+					(enclosing <<= 8) < value &&
+					(enclosing <<= 8) < value &&
+					(enclosing <<= 8) < value
+				)
+				{
+					enclosing <<= 8;
+				}
+
+				// Find the exactly greater value (minimum 1 compare & 1 shift, maximum 7 compares & 7 shifts)
+				ulong nextEnclosing;
+
+				if ((nextEnclosing = enclosing >> 1) <= value) return enclosing;
+				if ((nextEnclosing = (enclosing = nextEnclosing) >> 1) <= value) return enclosing;
+				if ((nextEnclosing = (enclosing = nextEnclosing) >> 1) <= value) return enclosing;
+				if ((nextEnclosing = (enclosing = nextEnclosing) >> 1) <= value) return enclosing;
+				if ((nextEnclosing = (enclosing = nextEnclosing) >> 1) <= value) return enclosing;
+				if ((nextEnclosing = (enclosing = nextEnclosing) >> 1) <= value) return enclosing;
+
+				return (nextEnclosing = (enclosing = nextEnclosing) >> 1) <= value ?
+					enclosing :
+					nextEnclosing;
+			}
+
+			return value;
 		}
 
 		public static MemoryBlock ReadStream(Stream stream, int length)
@@ -58,16 +117,15 @@ namespace CrystalBoy.Core
 			try
 			{
 				// Create the memory block once the file has been successfully opened
-				memoryBlock = new MemoryBlock((int)length);
+				memoryBlock = new MemoryBlock(length);
 
 				// Read the file using the extension method defined below
 				stream.Read(memoryBlock, 0, memoryBlock.Length);
 			}
-			catch
+			catch when (memoryBlock != null)
 			{
 				// Dispose the memory if needed
-				if (memoryBlock != null)
-					memoryBlock.Dispose();
+				memoryBlock.Dispose();
 
 				throw;
 			}

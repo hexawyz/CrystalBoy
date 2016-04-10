@@ -311,11 +311,12 @@ namespace CrystalBoy.Emulator
 			// Open only existing rom files
 			if (!romFileInfo.Exists)
 				throw new FileNotFoundException();
-			// Limit the rom size to 4 Mb
-			if (romFileInfo.Length > 4 * 1024 * 1024)
-				throw new InvalidOperationException();
+			if (romFileInfo.Length < 512)
+				throw new InvalidOperationException("ROM files must be at least 512 bytes.");
+			if (romFileInfo.Length > 8 * 1024 * 1024)
+				throw new InvalidOperationException("ROM files cannot exceed 8MB.");
 
-			emulatedGameBoy.LoadRom(MemoryUtility.ReadFile(romFileInfo));
+			emulatedGameBoy.LoadRom(MemoryUtility.ReadFile(romFileInfo, true));
 
 			if (emulatedGameBoy.RomInformation.HasRam && emulatedGameBoy.RomInformation.HasBattery)
 			{

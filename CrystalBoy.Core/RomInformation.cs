@@ -1,41 +1,79 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
+﻿using System;
+using System.Text;
 
 namespace CrystalBoy.Core
 {
 	public sealed class RomInformation
 	{
-		private string name, makerCode, makerName;
-		private int romSize, ramSize, romBankCount, ramBankCount;
-		private bool regularSupport, cgbSupport, sgbSupport, japanese;
-		private bool partialLogoCheck, fullLogoCheck;
-		private bool hasRam, hasBattery, hasTimer, hasRumble;
-		private byte automaticColorPaletteIndex;
-		private RomType romType;
+		/// <summary>Gets the name of the ROM.</summary>
+		public string Name { get; }
+
+		/// <summary>Gets the maker code indicated in the ROM.</summary>
+		public string MakerCode { get; }
+
+		/// <summary>Gets the maker name, as determined from the internal database.</summary>
+		public string MakerName { get; }
+
+		/// <summary>Gets the automatic color palette index used for displaying a non-CGB game on a CGB.</summary>
+		public byte? AutomaticColorPaletteIndex => _automaticColorPaletteIndex < 192 ?
+			_automaticColorPaletteIndex :
+			null as byte?;
+
+		/// <summary>Gets the automatic color palette used for displaying a non-CGB game on a CGB.</summary>
+		public FixedColorPalette? AutomaticColorPalette => _automaticColorPaletteIndex < 192 ?
+			PaletteData.GetPalette(_automaticColorPaletteIndex) :
+			null as FixedColorPalette?;
+
+		/// <summary>Gets a value indicating whether this ROM has support for the regular GameBoy hardware.</summary>
+		public bool SupportsRegularGameBoy { get; }
+
+		/// <summary>Gets a value indicating whether this ROM has support for the GameBoy Color hardware.</summary>
+		public bool SupportsColorGameBoy { get; }
+
+		/// <summary>Gets a value indicating whether this ROM has support for the Super GameBoy hardware.</summary>
+		public bool SupportsSuperGameBoy { get; }
+
+		/// <summary>Gets a value indicating whether the Nintendo logo is valid from a GameBoy Color bootstrap ROM's point of view.</summary>
+		public bool IsLogoPartiallyValid { get; }
+
+		/// <summary>Gets a value indicating whether the Nintendo logo is valid from a regular GameBoy ROM's point of view.</summary>
+		public bool IsLogoFullyValid { get; }
+
+		/// <summary>Gets a value indicating the type of ROM embedded in the cartidge.</summary>
+		public RomType RomType { get; }
+
+		/// <summary>Gets a value indicating the size of the ROM embedded in the cartidge.</summary>
+		public int RomSize { get; }
+
+		/// <summary>Gets a value indicating the size of the RAM embedded in the cartidge.</summary>
+		public int RamSize { get; }
+
+		/// <summary>Gets a value indicating whether the cartidge is Japanese.</summary>
+		public bool IsJapanese { get; }
+
+		/// <summary>Gets a value indicating the number of ROM banks embedded in the cartidge.</summary>
+		public int RomBankCount { get; }
+
+		/// <summary>Gets a value indicating the number of RAM banks embedded in the cartidge.</summary>
+		public int RamBankCount { get; }
+
+		/// <summary>Gets a value indicating whether the cartidge has any kind of RAM embedded.</summary>
+		public bool HasRam { get; }
+
+		/// <summary>Gets a value indicating whether the cartidge has a battery.</summary>
+		public bool HasBattery { get; }
+
+		/// <summary>Gets a value indicating whether the cartidge has a RTC timer.</summary>
+		public bool HasTimer { get; }
+
+		/// <summary>Gets a value indicating whether the cartidge has rumble features.</summary>
+		public bool HasRumble { get; }
+
+		private readonly byte _automaticColorPaletteIndex;
 
 		public unsafe RomInformation(MemoryBlock memoryBlock)
 		{
 			byte* memory;
-			int maxNameLength;
-			int makerCode;
-			byte cgbFlag, sgbFlag;
 
 			if (memoryBlock == null)
 				throw new ArgumentNullException("memoryBlock");
@@ -43,83 +81,84 @@ namespace CrystalBoy.Core
 			memory = (byte*)memoryBlock.Pointer;
 
 			// Defaults to black&white compatible
-			regularSupport = true;
+			SupportsRegularGameBoy = true;
 
 			// Logo check
- 			// Defaults to logo ok
-			partialLogoCheck = fullLogoCheck = true;
+			// Defaults to logo ok
+			bool partialLogoCheck = true;
+			bool fullLogoCheck = true;
 			for (int i = 0; i < NintendoLogo.Data.Length; i++)
+			{
 				if (memory[0x104 + i] != NintendoLogo.Data[i])
 				{
 					fullLogoCheck = false;
 					if (i < 0x18) // GBC parses only first 24 bytes of logo data, according to PanDocs
 						partialLogoCheck = false;
 				}
+			}
+
+			IsLogoPartiallyValid = partialLogoCheck;
+			IsLogoFullyValid = fullLogoCheck;
 
 			// Read the licensee code
-			makerCode = memory[0x14B];
-			this.makerCode = string.Intern
-			(
-				makerCode == 0x33 ?
-					((char)memory[0x144]).ToString() + ((char)memory[0x145]).ToString() :
-					makerCode.ToString("X2", System.Globalization.CultureInfo.InvariantCulture)
-			);
-			makerName = MakerDictionary.GetMakerName(this.makerCode);
+			byte internalMakerCode = memory[0x14B];
+			MakerCode = internalMakerCode == 0x33 ?
+				((char)memory[0x144]).ToString() + ((char)memory[0x145]).ToString() :
+				internalMakerCode.ToString("X2", System.Globalization.CultureInfo.InvariantCulture);
+			MakerName = MakerDictionary.GetMakerName(MakerCode);
 
 			// Detect CGB support
-			cgbFlag = memory[0x143];
-			cgbSupport = (cgbFlag & 0x80) != 0;
-			if (cgbSupport && ((cgbFlag & 0x40) != 0))
-				regularSupport = false;
+			byte cgbFlag = memory[0x143];
+			SupportsColorGameBoy = (cgbFlag & 0x80) != 0;
+			if (SupportsColorGameBoy && ((cgbFlag & 0x40) != 0))
+				SupportsRegularGameBoy = false;
 
 			// Detect SGB support
-			sgbFlag = memory[0x146];
-			if (sgbFlag == 0x3 && makerCode == 0x33)
-				sgbSupport = true;
+			byte sgbFlag = memory[0x146];
+			if (sgbFlag == 0x3 && internalMakerCode == 0x33)
+				SupportsSuperGameBoy = true;
+			
 
-			// Read the name
-			if (cgbSupport) maxNameLength = 15;
-			else maxNameLength = 16;
-
-			name = "";
-
-			for (int i = 0; i < maxNameLength; i++)
+			// Parse the game name (NB: part of it may contain some kind of manufacturer code)
+			var sb = new StringBuilder(SupportsColorGameBoy ? 15 : 16);
+			for (int i = 0; i < sb.Capacity; i++)
 			{
 				byte c = memory[0x134 + i];
 
 				if (c == 0) break;
-				else name += (char)c;
+				else sb.Append((char)c);
 			}
+			Name = sb.ToString();
 
 			// Automatic palette detection
-			if (!cgbSupport)
+			if (!SupportsColorGameBoy)
 			{
 				byte titleChecksum = 0;
 
 				for (int i = 0; i < 16; i++) titleChecksum += memory[0x134 + i];
 
-				automaticColorPaletteIndex = PaletteData.FindPaletteIndex(this.makerCode, titleChecksum, memory[0x137]);
+				_automaticColorPaletteIndex = PaletteData.FindPaletteIndex(MakerCode, titleChecksum, memory[0x137]);
 			}
-			else automaticColorPaletteIndex = 192;
+			else _automaticColorPaletteIndex = 192;
 
 			// Read the cartridge type
-			switch (romType = (RomType)memory[0x147])
+			switch (RomType = (RomType)memory[0x147])
 			{
 				case RomType.RomMbc3TimerRamBattery:
-					hasRam = true;
+					HasRam = true;
 					goto case RomType.RomMbc3TimerBattery;
 				case RomType.RomMbc3TimerBattery:
-					hasTimer = true;
-					hasBattery = true;
+					HasTimer = true;
+					HasBattery = true;
 					break;
 				case RomType.RomMbc5RumbleRamBattery:
-					hasBattery = true;
+					HasBattery = true;
 					goto case RomType.RomMbc5RumbleRam;
 				case RomType.RomMbc5RumbleRam:
-					hasRam = true;
+					HasRam = true;
 					goto case RomType.RomMbc5Rumble;
 				case RomType.RomMbc5Rumble:
-					hasRumble = true;
+					HasRumble = true;
 					break;
 				case RomType.RomRamBattery:
 				case RomType.RomMbc1RamBattery:
@@ -130,7 +169,7 @@ namespace CrystalBoy.Core
 				case RomType.RomMbc7RamBattery:
 				case RomType.RomMmm01RamBattery:
 				case RomType.RomHuC1RamBattery:
-					hasBattery = true;
+					HasBattery = true;
 					goto case RomType.RomRam;
 				case RomType.RomRam:
 				case RomType.RomMbc1Ram:
@@ -140,28 +179,28 @@ namespace CrystalBoy.Core
 				case RomType.RomMbc5Ram:
 				case RomType.RomMbc6Ram:
 				case RomType.RomMmm01Ram:
-					hasRam = true;
+					HasRam = true;
 					break;
 			}
 
 			// Read the ROM size
-			romBankCount = GetRomBankCount(memory[0x148]);
-			romSize = GetRomSize(memory[0x148]);
+			RomBankCount = GetRomBankCount(memory[0x148]);
+			RomSize = GetRomSize(memory[0x148]);
 			// Read the RAM size
-			if (romType == RomType.RomMbc2 || romType == RomType.RomMbc2Battery)
+			if (RomType == RomType.RomMbc2 || RomType == RomType.RomMbc2Battery)
 			{
 				// MBC2 has an internal RAM of 512 half-bytes, which doesn't count as external RAM, even though it has the same effect.
-				ramBankCount = 1;
-				ramSize = 512;
+				RamBankCount = 1;
+				RamSize = 512;
 			}
 			else
 			{
-				ramBankCount = GetRamBankCount(memory[0x149]);
-				ramSize = GetRamSize(memory[0x149]);
+				RamBankCount = GetRamBankCount(memory[0x149]);
+				RamSize = GetRamSize(memory[0x149]);
 			}
 
 			// Read the region flag
-			japanese = (memory[0x150] == 0); // Should be 0x01 for non-japanese
+			IsJapanese = (memory[0x150] == 0); // Should be 0x01 for non-japanese
 		}
 
 		private static int GetRomBankCount(int sizeFlag)
@@ -229,45 +268,5 @@ namespace CrystalBoy.Core
 					return -1;
 			}
 		}
-
-		public string Name { get { return name; } }
-
-		public string MakerCode { get { return makerCode; } }
-
-		public string MakerName { get { return makerName; } }
-
-		public byte? AutomaticColorPaletteIndex { get { return automaticColorPaletteIndex < 192 ? automaticColorPaletteIndex : (byte?)null; } }
-
-		public FixedColorPalette? AutomaticColorPalette { get { return automaticColorPaletteIndex < 192 ? PaletteData.GetPalette(automaticColorPaletteIndex) : (FixedColorPalette?)null; } }
-
-		public bool RegularGameBoySupport { get { return regularSupport; } }
-
-		public bool ColorGameBoySupport { get { return cgbSupport; } }
-
-		public bool SuperGameBoySupport { get { return sgbSupport; } }
-
-		public bool PartialLogoCheck { get { return partialLogoCheck; } }
-
-		public bool FullLogoCheck { get { return fullLogoCheck; } }
-
-		public RomType RomType { get { return romType; } }
-
-		public int RomSize { get { return romSize; } }
-
-		public int RamSize { get { return ramSize; } }
-
-		public bool IsJapanese { get { return japanese; } }
-
-		public int RomBankCount { get { return romBankCount; } }
-
-		public int RamBankCount { get { return ramBankCount; } }
-
-		public bool HasRam { get { return hasRam; } }
-
-		public bool HasBattery { get { return hasBattery; } }
-
-		public bool HasTimer { get { return hasTimer; } }
-
-		public bool HasRumble { get { return hasRumble; } }
 	}
 }

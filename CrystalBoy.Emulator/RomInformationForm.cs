@@ -73,8 +73,8 @@ namespace CrystalBoy.Emulator
 				romTypeValueLabel.Text = GetDescription(EmulatedGameBoy.RomInformation.RomType);
 				romSizeValueLabel.Text = Common.FormatSize(EmulatedGameBoy.RomInformation.RomSize);
 				ramSizeValueLabel.Text = Common.FormatSize(EmulatedGameBoy.RomInformation.RamSize);
-				sgbCheckBox.Checked = EmulatedGameBoy.RomInformation.SuperGameBoySupport;
-				cgbCheckBox.Checked = EmulatedGameBoy.RomInformation.ColorGameBoySupport;
+				sgbCheckBox.Checked = EmulatedGameBoy.RomInformation.SupportsSuperGameBoy;
+				cgbCheckBox.Checked = EmulatedGameBoy.RomInformation.SupportsColorGameBoy;
 			}
 			else
 			{

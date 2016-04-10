@@ -110,7 +110,7 @@ namespace CrystalBoy.Emulation
 			this.romInformation = romInformation;
 			this.externalRomBlock = externalRom;
 			this.mapper = mapper;
-			this.colorMode = ColorHardware & romInformation.ColorGameBoySupport;
+			this.colorMode = ColorHardware & romInformation.SupportsColorGameBoy;
 
 #if WITH_DEBUGGING
 			ClearBreakpoints();
