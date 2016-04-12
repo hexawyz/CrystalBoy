@@ -283,6 +283,8 @@ namespace CrystalBoy.Emulation
 
 				for (i = 0; i < 144; i++) // Loop on frame lines
 				{
+					clk += GameBoyMemoryBus.Mode2Duration;
+
 					// Update ports before drawing the line
 					while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock < clk)
 					{
@@ -306,8 +308,6 @@ namespace CrystalBoy.Emulation
 
 						pi++;
 					}
-
-					clk += GameBoyMemoryBus.Mode2Duration;
 
 					// Update palettes before drawing the line (This is necessary for a lot of demos with dynamic palettes)
 					while (ppi < frame.PaletteAccessList.Count && frame.PaletteAccessList[ppi].Clock < clk)
@@ -626,43 +626,39 @@ namespace CrystalBoy.Emulation
 					for (j = 0; j < 160; j++) // Loop on line pixels
 					{
 						clk++; // The clock will be incremented by 1 for every pixel, 160 in total. Together with the hardcoded mode 2, this will put the clock to 240 in the end.
-
-						// Update values that can be updated dynamically
-						if (true /*(j & 0x8) == 0x0*/)
+						
+						// Update ports before drawing the line
+						while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock < clk)
 						{
-							// Update ports before drawing the line
-							while (pi < frame.VideoPortAccessList.Count && frame.VideoPortAccessList[pi].Clock < clk)
+							data2 = frame.VideoPortAccessList[pi].Value;
+
+							switch (frame.VideoPortAccessList[pi].Port)
 							{
-								data2 = frame.VideoPortAccessList[pi].Value;
-
-								switch (frame.VideoPortAccessList[pi].Port)
-								{
-									case Port.LCDC:
-										bgDraw = (data2 & 0x01) != 0;
-										bgMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x08) != 0 ? 0x1C00 : 0x1800);
-										winDraw = (data2 & 0x20) != 0;
-										winMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x40) != 0 ? 0x1C00 : 0x1800);
-										objDraw = (data2 & 0x02) != 0;
-										objHeight = (data2 & 0x04) != 0 ? 16 : 8;
-										signedIndex = (data2 & 0x10) == 0;
-										bgTiles = (ushort*)(signedIndex ? frame.VideoMemorySnapshot.VideoMemory + 0x1000 : frame.VideoMemorySnapshot.VideoMemory);
-										break;
-									case Port.SCX: scx = data2; break;
-									case Port.SCY: scy = data2; break;
-									case Port.WX: wx = data2 - 7; break;
-									case Port.BGP:
-										UpdatePalette(data2, tilePalette, backgroundPalette);
-										break;
-									case Port.OBP0:
-										UpdatePalette(data2, objPalettes[0], objectPalette1);
-										break;
-									case Port.OBP1:
-										UpdatePalette(data2, objPalettes[1], objectPalette2);
-										break;
-								}
-
-								pi++;
+								case Port.LCDC:
+									bgDraw = (data2 & 0x01) != 0;
+									bgMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x08) != 0 ? 0x1C00 : 0x1800);
+									winDraw = (data2 & 0x20) != 0;
+									winMap = frame.VideoMemorySnapshot.VideoMemory + ((data2 & 0x40) != 0 ? 0x1C00 : 0x1800);
+									objDraw = (data2 & 0x02) != 0;
+									objHeight = (data2 & 0x04) != 0 ? 16 : 8;
+									signedIndex = (data2 & 0x10) == 0;
+									bgTiles = (ushort*)(signedIndex ? frame.VideoMemorySnapshot.VideoMemory + 0x1000 : frame.VideoMemorySnapshot.VideoMemory);
+									break;
+								case Port.SCX: scx = data2; break;
+								case Port.SCY: scy = data2; break;
+								case Port.WX: wx = data2 - 7; break;
+								case Port.BGP:
+									UpdatePalette(data2, tilePalette, backgroundPalette);
+									break;
+								case Port.OBP0:
+									UpdatePalette(data2, objPalettes[0], objectPalette1);
+									break;
+								case Port.OBP1:
+									UpdatePalette(data2, objPalettes[1], objectPalette2);
+									break;
 							}
+
+							pi++;
 						}
 
 						objDrawn = 0; // Draw no object by default
