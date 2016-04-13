@@ -116,6 +116,7 @@ namespace CrystalBoy.Emulation
 			//videoFrameData.GreyPaletteUpdated = false;
 			// Create a new snapshot of the video ports
 			videoFrameData.VideoMemorySnapshot.Capture(true);
+			videoFrameData.SgbBorderChanged = false;
 		}
 		
 		private unsafe void WriteLogoTiles()

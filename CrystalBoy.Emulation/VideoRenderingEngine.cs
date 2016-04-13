@@ -65,13 +65,28 @@ namespace CrystalBoy.Emulation
 
 				if (videoRenderer != null)
 				{
+					// Redraw the border if necessary.
+					if (frame.SgbBorderChanged)
+					{
+						try
+						{
+							await videoRenderer.RenderBorderAsync(videoFrameRenderer, frame, cancellationTokenSource.Token);
+						}
+						catch (Exception ex)
+						{
+							// TODO: Log that somewhere. (UI Notification ?)
+							Console.Error.WriteLine(ex);
+						}
+					}
+
 					try
 					{
 						await videoRenderer.RenderFrameAsync(videoFrameRenderer, frame, cancellationTokenSource.Token);
 					}
 					catch (Exception ex)
 					{
-						Console.WriteLine(ex);
+						// TODO: Log that somewhere. (UI Notification ?)
+						Console.Error.WriteLine(ex);
 					}
 				}
 			}

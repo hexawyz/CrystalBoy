@@ -28,6 +28,8 @@ namespace CrystalBoy.Emulation.Windows.Forms
 		{
 		}
 
+		public abstract void Refresh();
+
 		public abstract Task RenderBorderAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken);
 
 		public abstract Task RenderFrameAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken);

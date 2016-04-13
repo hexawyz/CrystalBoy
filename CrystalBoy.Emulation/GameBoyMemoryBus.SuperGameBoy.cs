@@ -25,8 +25,8 @@ namespace CrystalBoy.Emulation
 	{
 		#region Variables
 
-		private byte[] sgbCharacterData;
-		private ushort[] sgbBorderMapData;
+		internal byte[] sgbCharacterData;
+		internal ushort[] sgbBorderMapData;
 		private byte[] sgbCommandBuffer;
 		private GameBoyKeys[] additionalKeys;
 		private ushort sgbCommandBufferStatus;
@@ -76,13 +76,14 @@ namespace CrystalBoy.Emulation
 			sgbCustomBorder = false;
 			sgbScreenStatus = 0;
 			sgbStatus = useBootRom ? (byte)6 : (byte)0;
+			videoFrameData.SgbBorderChanged = false;
 		}
 
 		#endregion
 
 		public bool HasCustomBorder { get { return sgbCustomBorder; } }
 
-		private void OnBorderChanged(EventArgs e) { if (BorderChanged != null) BorderChanged(this, e); }
+		private void OnBorderChanged(EventArgs e) { BorderChanged?.Invoke(this, e); }
 
 		private void SuperGameBoyKeyRegisterWrite()
 		{
@@ -233,7 +234,7 @@ namespace CrystalBoy.Emulation
 			fixed (ushort* sgbBorderMapDataPointer = sgbBorderMapData)
 				SgbVideoTransfer((void*)sgbBorderMapDataPointer, videoFrameData.VideoMemorySnapshot.VideoMemory);
 
-			//RenderBorder();
+			videoFrameData.SgbBorderChanged = true;
 
 			PostUINotification(borderChangedHandler);
 		}

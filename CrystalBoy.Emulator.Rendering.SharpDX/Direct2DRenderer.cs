@@ -30,7 +30,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		private RawRectangleF drawRectangle;
 		private readonly byte[] borderBuffer;
 		private readonly byte[] screenBuffer;
-		private volatile bool borderVisible;
+		private volatile bool borderVisible = true;
 
 		public Direct2DRenderer(Control renderControl)
 			: base(renderControl)
@@ -75,17 +75,18 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			int w = RenderControl.ClientSize.Width;
 			int h = RenderControl.ClientSize.Height;
 			float s;
+			float t;
 
 			if (borderVisible)
 			{
-				if ((s = (float)h * 256 / 224) <= w) drawRectangle = new RawRectangleF(0.5f * (w - s), 0, s, h);
-				else if ((s = (float)w * 224 / 256) <= h) drawRectangle = new RawRectangleF(0, 0.5f * (h - s), w, s);
+				if ((s = (float)h * 256 / 224) <= w) drawRectangle = new RawRectangleF(t = 0.5f * (w - s), 0, t + s, h);
+				else if ((s = (float)w * 224 / 256) <= h) drawRectangle = new RawRectangleF(0, t = 0.5f * (h - s), w, t + s);
 				else drawRectangle = new RawRectangleF(0, 0, w, h);
 			}
 			else
 			{
-				if ((s = (float)h * 160 / 144) <= w) drawRectangle = new RawRectangleF(0.5f * (w - s), 0, s, h);
-				else if ((s = (float)w * 144 / 160) <= h) drawRectangle = new RawRectangleF(0, 0.5f * (h - s), w, s);
+				if ((s = (float)h * 160 / 144) <= w) drawRectangle = new RawRectangleF(t = 0.5f * (w - s), 0, t + s, h);
+				else if ((s = (float)w * 144 / 160) <= h) drawRectangle = new RawRectangleF(0, t = 0.5f * (h - s), w, t + s);
 				else drawRectangle = new RawRectangleF(0, 0, w, h);
 			}
 		}
@@ -107,18 +108,26 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 					PixelSize = new Size2(RenderControl.ClientSize.Width, RenderControl.ClientSize.Height),
 					PresentOptions = PresentOptions.Immediately
 				}
-			);
-			windowRenderTarget.DotsPerInch = new Size2F(96.0f, 96.0f);
+			)
+			{
+				DotsPerInch = new Size2F(96.0f, 96.0f),
+				AntialiasMode = AntialiasMode.Aliased,
+			};
 			if (borderVisible) CreateCompositeRenderTarget();
 			screenRenderTarget = new BitmapRenderTarget(windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(160, 144), new Size2(160, 144), null);
-			windowRenderTarget.AntialiasMode = AntialiasMode.Aliased;
 			RecalculateDrawRectangle();
 		}
 
 		private void CreateCompositeRenderTarget()
 		{
 			if (compositeRenderTarget == null)
-				compositeRenderTarget = new BitmapRenderTarget(windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(256, 224), new Size2(256, 224), null);
+			{
+				compositeRenderTarget = new BitmapRenderTarget(windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(256, 224), new Size2(256, 224), new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore))
+				{
+					DotsPerInch = new Size2F(96.0f, 96.0f),
+					AntialiasMode = AntialiasMode.Aliased,
+				};
+			}
 		}
 
 		private void DisposeRenderTargets()
@@ -156,9 +165,9 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			bitmap2 = temp;
 		}
 		
-		private void Render() { Render(true); }
+		private void Render(bool shouldRecompose) { Render(shouldRecompose, true); }
 
-		private void Render(bool retry)
+		private void Render(bool shouldRecompose, bool shouldRetry)
 		{
 			var interpolationMode = false ? BitmapInterpolationMode.Linear : BitmapInterpolationMode.NearestNeighbor;
 
@@ -168,7 +177,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			{
 				compositeRenderTarget.BeginDraw();
 				compositeRenderTarget.Clear(clearColor);
-				compositeRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, new RawRectangleF(48, 40, 160, 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
+				compositeRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, new RawRectangleF(48, 40, 48 + 160, 40 + 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
 				compositeRenderTarget.DrawBitmap(borderBitmap, 1.0f, BitmapInterpolationMode.NearestNeighbor);
 				compositeRenderTarget.EndDraw();
 				windowRenderTarget.DrawBitmap(compositeRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
@@ -181,7 +190,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 				// If needed, try to recreate the target.
 				ResetRendering();
 				// Try to render again, but only once. (We don't want to enter an infinite recursion… AKA Stack Overflow)
-				if (retry) Render(false);
+				if (shouldRetry) Render(true, false);
 			}
 		}
 
@@ -196,7 +205,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			screenRenderTarget.DrawBitmap(bitmap1, new RawRectangleF(0, 0, 160, 144), 0.5f, BitmapInterpolationMode.NearestNeighbor);
 			screenRenderTarget.EndDraw();
 
-			Render();
+			Render(true);
 
 			HandleCompletion(state);
 		}
@@ -205,7 +214,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		{
 			borderBitmap.CopyFromMemory(borderBuffer, 256 * 4);
 
-			Render();
+			Render(true);
 
 			HandleCompletion(state);
 		}
@@ -219,6 +228,11 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 				if (RenderControl.IsDisposed) tcs.TrySetCanceled();
 				else tcs.TrySetResult(true);
 			}
+		}
+
+		public override void Refresh()
+		{
+			Render(false);
 		}
 
 		public override unsafe Task RenderFrameAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
@@ -250,22 +264,22 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			//fixed (void* p = borderBitmap)
-			//{
-			//	renderer.RenderVideoFrame32(frame, (IntPtr)p, 160 * 4);
-			//}
+			fixed (void* p = borderBuffer)
+			{
+				renderer.RenderVideoBorder32(frame, (IntPtr)p, 256 * 4);
+			}
 			cancellationToken.ThrowIfCancellationRequested();
 
 			// Setting up a task completion source may not be needed here, but I don't know if there's something to gain by not doing so.
 			if (SynchronizationContext != null)
 			{
 				var tcs = new TaskCompletionSource<bool>();
-				SynchronizationContext.Post(UpdateScreenAndPresent, tcs);
+				SynchronizationContext.Post(UpdateBorderAndPresent, tcs);
 				return tcs.Task;
 			}
 			else
 			{
-				UpdateScreenAndPresent(null);
+				UpdateBorderAndPresent(null);
 				return TaskHelper.TrueTask;
 			}
 		}

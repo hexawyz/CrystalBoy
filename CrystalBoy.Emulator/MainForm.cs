@@ -26,6 +26,7 @@ using CrystalBoy.Emulator.Properties;
 using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
+using CrystalBoy.Emulation.Windows.Forms;
 
 namespace CrystalBoy.Emulator
 {
@@ -532,7 +533,10 @@ namespace CrystalBoy.Emulator
 
 		private void OnNewFrame(object sender, EventArgs e) { UpdateFrameRate(); }
 
-		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e) { /*videoRenderer.Render();*/ }
+		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e)
+		{
+			(videoRenderer as ControlVideoRenderer)?.Refresh();
+		}
 
 		#region Menus
 

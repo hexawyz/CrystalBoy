@@ -137,6 +137,7 @@ namespace CrystalBoy.Emulation
 						videoFrameData.GreyPaletteUpdated = false;
 						// Create a new snapshot of the video ports
 						videoFrameData.VideoMemorySnapshot.Capture(false);
+						videoFrameData.SgbBorderChanged = false;
 					}
 					else
 					{

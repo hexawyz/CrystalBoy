@@ -57,6 +57,11 @@ namespace CrystalBoy.Emulation
 			renderPaletteMemoryBlock.Dispose();
 		}
 
+		public unsafe void RenderVideoBorder32(VideoFrameData frame, IntPtr buffer, int stride)
+		{
+			DrawBorder32(frame, (byte*)buffer, stride);
+		}
+
 		public unsafe void RenderVideoFrame32(VideoFrameData frame, IntPtr buffer, int stride)
 		{
 			if (frame.VideoMemorySnapshot.SuperGameBoyScreenStatus != 1)
@@ -166,18 +171,19 @@ namespace CrystalBoy.Emulation
 		}
 
 		ObjectData[] objectData = new ObjectData[10];
-		
-		/*
+
+
 		/// <summary>Draws the SGB border into a 32 BPP buffer.</summary>
+		/// <param name="frame">The frame for which to draw the border.</param>
 		/// <param name="buffer">Destination pixel buffer.</param>
 		/// <param name="stride">Buffer line stride.</param>
-		public unsafe void DrawBorder32(byte* buffer, int stride)
+		private unsafe void DrawBorder32(VideoFrameData frame, byte* buffer, int stride)
 		{
 			uint[] paletteData = new uint[8 << 4];
 			int mapRowOffset = -32;
 
 			// Fill only the 4 border palettes… Just ignore the others
-			for (int i = 0x40; i < paletteData.Length; i++) paletteData[i] = LookupTables.StandardColorLookupTable32[sgbBorderMapData[0x400 - 0x40 + i]];
+			for (int i = 0x40; i < paletteData.Length; i++) paletteData[i] = LookupTables.StandardColorLookupTable32[frame.SgbBorderMapData[0x400 - 0x40 + i]];
 
 			for (int i = 0; i < 224; i++)
 			{
@@ -187,14 +193,14 @@ namespace CrystalBoy.Emulation
 
 				for (int j = 32; j-- != 0; mapTileOffset++)
 				{
-					ushort tileInformation = sgbBorderMapData[mapTileOffset];
+					ushort tileInformation = frame.SgbBorderMapData[mapTileOffset];
 					int tileRowOffset = ((tileInformation & 0xFF) << 5) + ((tileInformation & 0x8000) != 0 ? 0xE - tileBaseRowOffset : tileBaseRowOffset);
 					int paletteOffset = ((tileInformation >> 10) & 0x7) << 4;
 
-					byte tileValue0 = sgbCharacterData[tileRowOffset];
-					byte tileValue1 = sgbCharacterData[tileRowOffset + 1];
-					byte tileValue2 = sgbCharacterData[tileRowOffset + 16];
-					byte tileValue3 = sgbCharacterData[tileRowOffset + 17];
+					byte tileValue0 = frame.SgbCharacterData[tileRowOffset];
+					byte tileValue1 = frame.SgbCharacterData[tileRowOffset + 1];
+					byte tileValue2 = frame.SgbCharacterData[tileRowOffset + 16];
+					byte tileValue3 = frame.SgbCharacterData[tileRowOffset + 17];
 
 					if ((tileInformation & 0x4000) != 0)
 						for (byte k = 0x01; k != 0; k <<= 1)
@@ -219,7 +225,6 @@ namespace CrystalBoy.Emulation
 				buffer += stride;
 			}
 		}
-		*/
 
 		/// <summary>Draws the current frame into a 32 BPP buffer.</summary>
 		/// <param name="frame">The frame to draw.</param>

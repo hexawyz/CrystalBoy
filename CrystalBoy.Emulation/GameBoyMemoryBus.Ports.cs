@@ -128,7 +128,9 @@ namespace CrystalBoy.Emulation
 			videoFrameData.GreyPaletteUpdated = false;
 			audioPortAccessList.Clear();
 
+			// Hopefully this comes after SGB emulation.
 			videoFrameData.VideoMemorySnapshot.Capture(false);
+			videoFrameData.SgbBorderChanged = false;
 		}
 
 		private void ApplyAutomaticPalette()

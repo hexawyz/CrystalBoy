@@ -23,57 +23,57 @@ namespace CrystalBoy.Emulation
 {
 	internal sealed class VideoMemorySnapshot : IDisposable
 	{
-		private readonly GameBoyMemoryBus bus;
-		private readonly MemoryBlock videoMemoryBlock;
-		private readonly MemoryBlock objectAttributeMemoryBlock;
-		private readonly MemoryBlock paletteMemoryBlock;
+		private readonly GameBoyMemoryBus _bus;
+		private readonly MemoryBlock _videoMemoryBlock;
+		private readonly MemoryBlock _objectAttributeMemoryBlock;
+		private readonly MemoryBlock _paletteMemoryBlock;
 
 		public unsafe VideoMemorySnapshot(GameBoyMemoryBus bus)
 		{
-			this.bus = bus;
-			this.videoMemoryBlock = new MemoryBlock(16384);
-			this.VideoMemory = (byte*)this.videoMemoryBlock.Pointer;
-			this.objectAttributeMemoryBlock = new MemoryBlock(0xA0); // Do not allocate more bytes than needed… GameBoyMemoryBus allocates 0x100 because of the segmented memory.
-			this.ObjectAttributeMemory = (byte*)this.objectAttributeMemoryBlock.Pointer;
-			this.paletteMemoryBlock = new MemoryBlock(16 * 4 * sizeof(ushort));
-			this.PaletteMemory = (byte*)this.paletteMemoryBlock.Pointer;
+			_bus = bus;
+			_videoMemoryBlock = new MemoryBlock(16384);
+			VideoMemory = (byte*)this._videoMemoryBlock.Pointer;
+			_objectAttributeMemoryBlock = new MemoryBlock(0xA0); // Do not allocate more bytes than needed… GameBoyMemoryBus allocates 0x100 because of the segmented memory.
+			ObjectAttributeMemory = (byte*)_objectAttributeMemoryBlock.Pointer;
+			_paletteMemoryBlock = new MemoryBlock(16 * 4 * sizeof(ushort));
+			PaletteMemory = (byte*)this._paletteMemoryBlock.Pointer;
 		}
 
 		public void Dispose()
 		{
-			videoMemoryBlock.Dispose();
-			objectAttributeMemoryBlock.Dispose();
-			paletteMemoryBlock.Dispose();
+			_videoMemoryBlock.Dispose();
+			_objectAttributeMemoryBlock.Dispose();
+			_paletteMemoryBlock.Dispose();
 		}
 
 		public void Capture(bool afterVideoEnable)
 		{
-			LCDC = bus.ReadPort(Port.LCDC);
-			SCX = bus.ReadPort(Port.SCX);
-			SCY = bus.ReadPort(Port.SCY);
-			WX = bus.ReadPort(Port.WX);
-			WY = bus.ReadPort(Port.WY);
+			LCDC = _bus.ReadPort(Port.LCDC);
+			SCX = _bus.ReadPort(Port.SCX);
+			SCY = _bus.ReadPort(Port.SCY);
+			WX = _bus.ReadPort(Port.WX);
+			WY = _bus.ReadPort(Port.WY);
 			unsafe
 			{
-				if (!bus.ColorMode)
+				if (!_bus.ColorMode)
 				{
-					BGP = bus.ReadPort(Port.BGP);
-					OBP0 = bus.ReadPort(Port.OBP0);
-					OBP1 = bus.ReadPort(Port.OBP1);
-					MemoryBlock.Copy((void*)VideoMemory, bus.VideoRam.Pointer, bus.VideoRam.Length >> 1);
+					BGP = _bus.ReadPort(Port.BGP);
+					OBP0 = _bus.ReadPort(Port.OBP0);
+					OBP1 = _bus.ReadPort(Port.OBP1);
+					MemoryBlock.Copy((void*)VideoMemory, _bus.VideoRam.Pointer, _bus.VideoRam.Length >> 1);
 					if (afterVideoEnable)
 					{
-						MemoryBlock.Copy((void*)PaletteMemory, bus.PaletteMemory.Pointer, bus.PaletteMemory.Length);
+						MemoryBlock.Copy((void*)PaletteMemory, _bus.PaletteMemory.Pointer, _bus.PaletteMemory.Length);
 					}
 				}
 				else
 				{
-					MemoryBlock.Copy((void*)VideoMemory, bus.VideoRam.Pointer, bus.VideoRam.Length);
-					MemoryBlock.Copy((void*)PaletteMemory, bus.PaletteMemory.Pointer, bus.PaletteMemory.Length);
+					MemoryBlock.Copy((void*)VideoMemory, _bus.VideoRam.Pointer, _bus.VideoRam.Length);
+					MemoryBlock.Copy((void*)PaletteMemory, _bus.PaletteMemory.Pointer, _bus.PaletteMemory.Length);
 				}
-				MemoryBlock.Copy((void*)ObjectAttributeMemory, bus.ObjectAttributeMemory.Pointer, objectAttributeMemoryBlock.Length);
+				MemoryBlock.Copy((void*)ObjectAttributeMemory, _bus.ObjectAttributeMemory.Pointer, _objectAttributeMemoryBlock.Length);
 			}
-			SuperGameBoyScreenStatus = bus.SuperGameBoyScreenStatus;
+			SuperGameBoyScreenStatus = _bus.SuperGameBoyScreenStatus;
 		}
 
 		public byte LCDC;

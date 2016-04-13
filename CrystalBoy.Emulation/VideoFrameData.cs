@@ -26,12 +26,19 @@ namespace CrystalBoy.Emulation
 		/// <summary>Gets or sets a value indicating whether the grey palette for B&amp;W games running in CGB mode has been updated.</summary>
 		/// <value><see langword="true" /> if the grey palette for B&amp;W games running in CGB mode has been updated; otherwise, <see langword="false" />.</value>
 		internal bool GreyPaletteUpdated { get; set; }
+		
+		internal bool SgbBorderChanged { get; set; }
+
+		internal byte[] SgbCharacterData { get; }
+		internal ushort[] SgbBorderMapData { get; }
 
 		internal VideoFrameData(GameBoyMemoryBus bus)
 		{
 			VideoMemorySnapshot = new VideoMemorySnapshot(bus);
 			VideoPortAccessList = new List<PortAccess>(1000);
 			PaletteAccessList = new List<PaletteAccess>(1000);
+			SgbCharacterData = new byte[0x2000];
+			SgbBorderMapData = new ushort[0x800];
 		}
 	}
 }

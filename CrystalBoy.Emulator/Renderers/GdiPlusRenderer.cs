@@ -74,6 +74,11 @@ namespace CrystalBoy.Emulator.Renderers
 			}
 		}
 
+		public override void Refresh()
+		{
+			Render(null);
+		}
+
 		public override Task RenderFrameAsync(VideoFrameRenderer renderer, VideoFrameData frame, CancellationToken cancellationToken)
 		{
 			if (cancellationToken.IsCancellationRequested) return TaskHelper.CanceledTask;

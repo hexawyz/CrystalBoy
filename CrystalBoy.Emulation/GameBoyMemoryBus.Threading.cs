@@ -218,6 +218,11 @@ namespace CrystalBoy.Emulation
 			if (sgbPendingTransfer)
 			{
 				ProcessSuperGameBoyCommand(true);
+				if (videoFrameData.SgbBorderChanged)
+				{
+					sgbCharacterData.CopyTo(videoFrameData.SgbCharacterData, 0);
+					sgbBorderMapData.CopyTo(videoFrameData.SgbBorderMapData, 0);
+				}
 				sgbPendingTransfer = false;
 			}
 
