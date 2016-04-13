@@ -130,7 +130,7 @@ namespace CrystalBoy.Emulation
 
 			// Hopefully this comes after SGB emulation.
 			videoFrameData.VideoMemorySnapshot.Capture(false);
-			videoFrameData.SgbBorderChanged = false;
+			videoFrameData.SgbBorderChanged = true;
 		}
 
 		private void ApplyAutomaticPalette()
