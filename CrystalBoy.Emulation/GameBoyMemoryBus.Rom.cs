@@ -61,7 +61,7 @@ namespace CrystalBoy.Emulation
 			if (externalRom == null) throw new ArgumentNullException("externalRom");
 
 			if ((externalRom.Length & 0x3FFF) != 0
-				|| (externalRom.Length >> 14) > 256)
+				|| (externalRom.Length >> 14) > 512)
 				throw new InvalidOperationException();
 
 			romInformation = new RomInformation(externalRom);

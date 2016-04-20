@@ -1,41 +1,16 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
+﻿using System;
 using System.IO;
 
 namespace CrystalBoy.Core
 {
 	public static class MemoryUtility
 	{
-		const int bufferLength = 16384;
+		private const int BufferLength = 16384;
 
 		[ThreadStatic]
-		static byte[] buffer;
+		private static byte[] _buffer;
 
-		private static byte[] Buffer
-		{
-			get
-			{
-				if (buffer != null) return buffer;
-				else return buffer = new byte[bufferLength];
-			}
-		}
+		private static byte[] Buffer => _buffer ?? (_buffer = new byte[BufferLength]);
 
 		#region Reading
 
@@ -52,8 +27,8 @@ namespace CrystalBoy.Core
 					checked
 					(
 						roundToPowerOfTwo ?
-							(int)fileStream.Length :
-							(int)RoundToPowerOfTwo((ulong)fileStream.Length)
+							(int)RoundToPowerOfTwo((ulong)fileStream.Length) :
+							(int)fileStream.Length
 					)
 				);
 			}
@@ -63,10 +38,10 @@ namespace CrystalBoy.Core
 		{
 			// We can't do our job if the value is too big. 
 			if (value > 0x8000000000000000UL) throw new ArgumentOutOfRangeException(nameof(value));
-			
+
 			// Only do the "complex" bit arithmetic if the number is not already a power of two.
 			// We can consider 0 to be a power of two here… Anyway, loading an empty file is not very interresting.
-			if ((value & (value - 1)) == 0)
+			if ((value & (value - 1)) != 0)
 			{
 				// We'll find the enclosing power of two in a maximum of 14 compares & 15 shifts for 63 bit values, and a maximum of 11 compares & 10 shifts for 31 bit values.
 				// This may not be the best algorithm out there, but it should at least be readable.
@@ -158,7 +133,7 @@ namespace CrystalBoy.Core
 			buffer = Buffer;
 
 			totalBytesRead = 0;
-			bytesToRead = Math.Min(bufferLength, length);
+			bytesToRead = Math.Min(BufferLength, length);
 
 			// Read the file in chunks
 			fixed (byte* pBuffer = buffer)
@@ -197,7 +172,7 @@ namespace CrystalBoy.Core
 			buffer = Buffer;
 
 			totalBytesRead = 0;
-			bytesToRead = Math.Min(bufferLength, length);
+			bytesToRead = Math.Min(BufferLength, length);
 
 			// Read the file in chunks
 			fixed (byte* pBuffer = buffer)
@@ -250,7 +225,7 @@ namespace CrystalBoy.Core
 
 			// Initialize variables
 			bytesLeft = length;
-			bytesToWrite = bufferLength;
+			bytesToWrite = BufferLength;
 
 			// Get a pointer to the memory block
 			pMemory = (byte*)memoryBlock.Pointer + offset;
@@ -289,7 +264,7 @@ namespace CrystalBoy.Core
 
 			// Initialize variables
 			bytesLeft = length;
-			bytesToWrite = bufferLength;
+			bytesToWrite = BufferLength;
 
 			// Get a pointer to the memory block
 			pMemory = (byte*)memoryBlock.Pointer + offset;

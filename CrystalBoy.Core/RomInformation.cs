@@ -42,6 +42,9 @@ namespace CrystalBoy.Core
 		/// <summary>Gets a value indicating the type of ROM embedded in the cartidge.</summary>
 		public RomType RomType { get; }
 
+		/// <summary>Gets a value indicating the size of the ROM embedded in the cartidge, as declared by the ROM.</summary>
+		public int DeclaredRomSize { get; }
+
 		/// <summary>Gets a value indicating the size of the ROM embedded in the cartidge.</summary>
 		public int RomSize { get; }
 
@@ -50,6 +53,9 @@ namespace CrystalBoy.Core
 
 		/// <summary>Gets a value indicating whether the cartidge is Japanese.</summary>
 		public bool IsJapanese { get; }
+
+		/// <summary>Gets a value indicating the number of ROM banks embedded in the cartidge, as declared by the ROM.</summary>
+		public int DeclaredRomBankCount { get; }
 
 		/// <summary>Gets a value indicating the number of ROM banks embedded in the cartidge.</summary>
 		public int RomBankCount { get; }
@@ -68,6 +74,9 @@ namespace CrystalBoy.Core
 
 		/// <summary>Gets a value indicating whether the cartidge has rumble features.</summary>
 		public bool HasRumble { get; }
+
+		/// <summary>Gets a value indicating whether the declared size of the ROM matches the actual ROM.</summary>
+		public bool IsDeclaredRomSizeCorrect => DeclaredRomBankCount == RomBankCount;
 
 		private readonly byte _automaticColorPaletteIndex;
 
@@ -184,8 +193,12 @@ namespace CrystalBoy.Core
 			}
 
 			// Read the ROM size
-			RomBankCount = GetRomBankCount(memory[0x148]);
-			RomSize = GetRomSize(memory[0x148]);
+			DeclaredRomBankCount = GetRomBankCount(memory[0x148]);
+			DeclaredRomSize = GetRomSize(DeclaredRomBankCount);
+
+			RomSize = memoryBlock.Length;
+			RomBankCount = RomSize >> 14;
+
 			// Read the RAM size
 			if (RomType == RomType.RomMbc2 || RomType == RomType.RomMbc2Battery)
 			{
@@ -205,9 +218,12 @@ namespace CrystalBoy.Core
 
 		private static int GetRomBankCount(int sizeFlag)
 		{
-			if (sizeFlag <= 0x7)
+			if (sizeFlag <= 0x8)
+			{
 				return 2 << sizeFlag;
+			}
 			else
+			{
 				switch (sizeFlag)
 				{
 					case 0x52:
@@ -219,14 +235,13 @@ namespace CrystalBoy.Core
 					default:
 						return -1;
 				}
+			}
 		}
 
-		private static int GetRomSize(int sizeFlag)
+		private static int GetRomSize(int bankCount)
 		{
-			int bankCount = GetRomBankCount(sizeFlag);
-
 			if (bankCount > 0)
-				return bankCount * 16384;
+				return bankCount << 14;
 			else
 				return -1;
 		}
