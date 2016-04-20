@@ -11,6 +11,20 @@ namespace CrystalBoy.Emulation.Windows.Forms
 {
 	public abstract class ControlVideoRenderer : IVideoRenderer
 	{
+		private volatile bool _borderVisible;
+
+		public bool BorderVisible
+		{
+			get { return _borderVisible; }
+			set
+			{
+				if (_borderVisible != (_borderVisible = value))
+				{
+					OnBorderVisibilityChanged();
+				}
+			}
+		}
+
 		protected Control RenderControl { get; }
 		protected SynchronizationContext SynchronizationContext { get; }
 
@@ -27,6 +41,8 @@ namespace CrystalBoy.Emulation.Windows.Forms
 		public virtual void Dispose()
 		{
 		}
+		
+		protected virtual void OnBorderVisibilityChanged() { }
 
 		public abstract void Refresh();
 

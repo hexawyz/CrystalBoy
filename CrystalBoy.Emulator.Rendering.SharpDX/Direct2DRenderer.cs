@@ -30,7 +30,6 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		private RawRectangleF drawRectangle;
 		private readonly byte[] borderBuffer;
 		private readonly byte[] screenBuffer;
-		private volatile bool borderVisible = true;
 
 		public Direct2DRenderer(Control renderControl)
 			: base(renderControl)
@@ -77,7 +76,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			float s;
 			float t;
 
-			if (borderVisible)
+			if (BorderVisible)
 			{
 				if ((s = (float)h * 256 / 224) <= w) drawRectangle = new RawRectangleF(t = 0.5f * (w - s), 0, t + s, h);
 				else if ((s = (float)w * 224 / 256) <= h) drawRectangle = new RawRectangleF(0, t = 0.5f * (h - s), w, t + s);
@@ -113,7 +112,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 				DotsPerInch = new Size2F(96.0f, 96.0f),
 				AntialiasMode = AntialiasMode.Aliased,
 			};
-			if (borderVisible) CreateCompositeRenderTarget();
+			if (BorderVisible) CreateCompositeRenderTarget();
 			screenRenderTarget = new BitmapRenderTarget(windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(160, 144), new Size2(160, 144), null);
 			RecalculateDrawRectangle();
 		}
@@ -173,8 +172,10 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 			windowRenderTarget.BeginDraw();
 
-			if (borderVisible)
+			if (BorderVisible)
 			{
+				CreateCompositeRenderTarget();
+
 				compositeRenderTarget.BeginDraw();
 				compositeRenderTarget.Clear(clearColor);
 				compositeRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, new RawRectangleF(48, 40, 48 + 160, 40 + 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
@@ -182,7 +183,10 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 				compositeRenderTarget.EndDraw();
 				windowRenderTarget.DrawBitmap(compositeRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
 			}
-			else windowRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
+			else
+			{
+				windowRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
+			}
 
 			try { windowRenderTarget.EndDraw();}
 			catch (COMException)

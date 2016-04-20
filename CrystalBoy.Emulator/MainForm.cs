@@ -409,31 +409,37 @@ namespace CrystalBoy.Emulator
 
 		private void ShowBorder()
 		{
-			//if (videoRenderer != null && !videoRenderer.BorderVisible)
-			//{
-			//	var panelSize = toolStripContainer.ContentPanel.ClientSize;
+			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
 
-			//	videoRenderer.BorderVisible = true;
-			//	AdjustSize(panelSize.Width * 256 / 160, panelSize.Height * 224 / 144);
-			//}
+			if (videoRenderer != null && !videoRenderer.BorderVisible)
+			{
+				var panelSize = toolStripContainer.ContentPanel.ClientSize;
+
+				videoRenderer.BorderVisible = true;
+				AdjustSize(panelSize.Width * 256 / 160, panelSize.Height * 224 / 144);
+			}
 		}
 
 		private void HideBorder()
 		{
-			//if (videoRenderer != null && videoRenderer.BorderVisible)
-			//{
-			//	var panelSize = toolStripContainer.ContentPanel.ClientSize;
+			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
 
-			//	videoRenderer.BorderVisible = false;
-			//	AdjustSize(panelSize.Width * 160 / 256, panelSize.Height * 144 / 224);
-			//}
+			if (videoRenderer != null && videoRenderer.BorderVisible)
+			{
+				var panelSize = toolStripContainer.ContentPanel.ClientSize;
+
+				videoRenderer.BorderVisible = false;
+				AdjustSize(panelSize.Width * 160 / 256, panelSize.Height * 144 / 224);
+			}
 		}
 
 		#endregion
 
 		private void SetZoomFactor(int factor)
 		{
-			var referenceSize = /*videoRenderer.BorderVisible ? new Size(256, 224) : */new Size(160, 144);
+			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
+
+			var referenceSize = videoRenderer?.BorderVisible ?? false ? new Size(256, 224) : new Size(160, 144);
 
 			if (factor <= 0) throw new ArgumentOutOfRangeException("factor");
 			Settings.Default.ZoomFactor = factor;
@@ -520,9 +526,11 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnClosed(EventArgs e)
 		{
+			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
+
 			Size renderSize = toolStripContainer.ContentPanel.ClientSize;
 
-			Settings.Default.ContentSize = /*Settings.Default.BorderVisibility != BorderVisibility.On && videoRenderer.BorderVisible ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : */renderSize;
+			Settings.Default.ContentSize = Settings.Default.BorderVisibility != BorderVisibility.On && (videoRenderer?.BorderVisible ?? false) ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
