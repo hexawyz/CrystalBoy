@@ -26,6 +26,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using CrystalBoy.Emulation;
 using CrystalBoy.Emulator.Properties;
+using CrystalBoy.Emulation.Windows.Forms;
 
 namespace CrystalBoy.Emulator
 {
@@ -197,7 +198,7 @@ namespace CrystalBoy.Emulator
 						if (type.IsAbstract) continue;
 
 						// Simplify things for now…
-						if (typeof(IVideoRenderer).IsAssignableFrom(type) && !type.IsGenericTypeDefinition)
+						if (typeof(ControlVideoRenderer).IsAssignableFrom(type) && !type.IsGenericTypeDefinition)
 						{
 							pluginList.Add(new PluginInformation(type));
 						}

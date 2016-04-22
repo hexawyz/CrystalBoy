@@ -37,7 +37,7 @@ namespace CrystalBoy.Emulator
 		private MapViewerForm mapViewerForm;
 		private RomInformationForm romInformationForm;
 		private EmulatedGameBoy emulatedGameBoy;
-		private IVideoRenderer videoRenderer;
+		private ControlVideoRenderer videoRenderer;
 		private AudioRenderer audioRenderer;
 		private Dictionary<Type, ToolStripMenuItem> videoRendererMenuItemDictionary;
 		private Dictionary<Type, ToolStripMenuItem> audioRendererMenuItemDictionary;
@@ -78,7 +78,7 @@ namespace CrystalBoy.Emulator
 				bool isAudioRenderer = plugin.Type.IsSubclassOf(typeof(AudioRenderer));
 
 				// Skip the plugins which are neither AudioRenderer nor VideoRenderer, for future-proofing the code a little bit.
-				if (!(isAudioRenderer || typeof(IVideoRenderer).IsAssignableFrom(plugin.Type))) continue;
+				if (!(isAudioRenderer || typeof(ControlVideoRenderer).IsAssignableFrom(plugin.Type))) continue;
 
 				var rendererMenuItem = new ToolStripMenuItem(plugin.DisplayName);
 
@@ -159,24 +159,7 @@ namespace CrystalBoy.Emulator
 
 		#region Video Renderer Management
 
-		private IVideoRenderer CreateVideoRenderer(Type rendererType)
-		{
-			ConstructorInfo foundConstructor = null;
-			bool hasParameter = false;
-
-			foreach (var constructor in rendererType.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
-			{
-				var parameters = constructor.GetParameters();
-
-				if (parameters.Length == 0 || parameters.Length == 1 && parameters[0].ParameterType.IsAssignableFrom(typeof(Control)))
-				{
-					foundConstructor = constructor;
-					hasParameter = parameters.Length == 1;
-				}
-			}
-
-			return (IVideoRenderer)foundConstructor.Invoke(hasParameter ? new[] { toolStripContainer.ContentPanel } : new object[0]);
-		}
+		private ControlVideoRenderer CreateVideoRenderer(Type rendererType) => (ControlVideoRenderer)Activator.CreateInstance(rendererType, new[] { toolStripContainer.ContentPanel });
 
 		private void SwitchVideoRenderer(Type rendererType)
 		{
@@ -189,7 +172,7 @@ namespace CrystalBoy.Emulator
 
 			videoRenderer = CreateVideoRenderer(rendererType);
 			//videoRenderer.Interpolation = false;
-			//videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
+			videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
 
 			ToolStripMenuItem selectedRendererMenuItem = videoRendererMenuItemDictionary[rendererType];
 
@@ -409,8 +392,6 @@ namespace CrystalBoy.Emulator
 
 		private void ShowBorder()
 		{
-			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
-
 			if (videoRenderer != null && !videoRenderer.BorderVisible)
 			{
 				var panelSize = toolStripContainer.ContentPanel.ClientSize;
@@ -422,8 +403,6 @@ namespace CrystalBoy.Emulator
 
 		private void HideBorder()
 		{
-			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
-
 			if (videoRenderer != null && videoRenderer.BorderVisible)
 			{
 				var panelSize = toolStripContainer.ContentPanel.ClientSize;
@@ -437,8 +416,6 @@ namespace CrystalBoy.Emulator
 
 		private void SetZoomFactor(int factor)
 		{
-			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
-
 			var referenceSize = videoRenderer?.BorderVisible ?? false ? new Size(256, 224) : new Size(160, 144);
 
 			if (factor <= 0) throw new ArgumentOutOfRangeException("factor");
@@ -526,8 +503,6 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnClosed(EventArgs e)
 		{
-			var videoRenderer = this.videoRenderer as ControlVideoRenderer;
-
 			Size renderSize = toolStripContainer.ContentPanel.ClientSize;
 
 			Settings.Default.ContentSize = Settings.Default.BorderVisibility != BorderVisibility.On && (videoRenderer?.BorderVisible ?? false) ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
@@ -543,7 +518,7 @@ namespace CrystalBoy.Emulator
 
 		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e)
 		{
-			(videoRenderer as ControlVideoRenderer)?.Refresh();
+			videoRenderer?.Refresh();
 		}
 
 		#region Menus
