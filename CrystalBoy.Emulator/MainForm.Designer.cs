@@ -1,22 +1,4 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-namespace CrystalBoy.Emulator
+﻿namespace CrystalBoy.Emulator
 {
 	partial class MainForm
 	{
@@ -57,7 +39,7 @@ namespace CrystalBoy.Emulator
 			this.toolStripContainer = new System.Windows.Forms.ToolStripContainer();
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-			this.frameRateToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.speedToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.emulationStatusToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -86,6 +68,8 @@ namespace CrystalBoy.Emulator
 			this.zoom200toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom300toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.zoom400toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.zoom600toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.zoom800toolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.videoRendererToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.interpolationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.hardwareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -152,7 +136,7 @@ namespace CrystalBoy.Emulator
 			this.statusStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
 			this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel,
-            this.frameRateToolStripStatusLabel,
+            this.speedToolStripStatusLabel,
             this.emulationStatusToolStripStatusLabel});
 			this.statusStrip.Name = "statusStrip";
 			this.statusStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.ManagerRenderMode;
@@ -163,10 +147,10 @@ namespace CrystalBoy.Emulator
 			resources.ApplyResources(this.toolStripStatusLabel, "toolStripStatusLabel");
 			this.toolStripStatusLabel.Spring = true;
 			// 
-			// frameRateToolStripStatusLabel
+			// speedToolStripStatusLabel
 			// 
-			resources.ApplyResources(this.frameRateToolStripStatusLabel, "frameRateToolStripStatusLabel");
-			this.frameRateToolStripStatusLabel.Name = "frameRateToolStripStatusLabel";
+			resources.ApplyResources(this.speedToolStripStatusLabel, "speedToolStripStatusLabel");
+			this.speedToolStripStatusLabel.Name = "speedToolStripStatusLabel";
 			// 
 			// emulationStatusToolStripStatusLabel
 			// 
@@ -363,7 +347,9 @@ namespace CrystalBoy.Emulator
             this.zoom100toolStripMenuItem,
             this.zoom200toolStripMenuItem,
             this.zoom300toolStripMenuItem,
-            this.zoom400toolStripMenuItem});
+            this.zoom400toolStripMenuItem,
+            this.zoom600toolStripMenuItem,
+            this.zoom800toolStripMenuItem});
 			this.zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
 			resources.ApplyResources(this.zoomToolStripMenuItem, "zoomToolStripMenuItem");
 			this.zoomToolStripMenuItem.DropDownOpening += new System.EventHandler(this.zoomToolStripMenuItem_DropDownOpening);
@@ -391,6 +377,18 @@ namespace CrystalBoy.Emulator
 			this.zoom400toolStripMenuItem.Name = "zoom400toolStripMenuItem";
 			resources.ApplyResources(this.zoom400toolStripMenuItem, "zoom400toolStripMenuItem");
 			this.zoom400toolStripMenuItem.Click += new System.EventHandler(this.zoom400toolStripMenuItem_Click);
+			// 
+			// zoom600toolStripMenuItem
+			// 
+			this.zoom600toolStripMenuItem.Name = "zoom600toolStripMenuItem";
+			resources.ApplyResources(this.zoom600toolStripMenuItem, "zoom600toolStripMenuItem");
+			this.zoom600toolStripMenuItem.Click += new System.EventHandler(this.zoom600toolStripMenuItem_Click);
+			// 
+			// zoom800toolStripMenuItem
+			// 
+			this.zoom800toolStripMenuItem.Name = "zoom800toolStripMenuItem";
+			resources.ApplyResources(this.zoom800toolStripMenuItem, "zoom800toolStripMenuItem");
+			this.zoom800toolStripMenuItem.Click += new System.EventHandler(this.zoom800toolStripMenuItem_Click);
 			// 
 			// videoRendererToolStripMenuItem
 			// 
@@ -600,7 +598,7 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripMenuItem oamViewerToolStripMenuItem;
 		private System.Windows.Forms.ToolStripContainer toolStripContainer;
 		private System.Windows.Forms.StatusStrip statusStrip;
-		private System.Windows.Forms.ToolStripStatusLabel frameRateToolStripStatusLabel;
+		private System.Windows.Forms.ToolStripStatusLabel speedToolStripStatusLabel;
 		private System.Windows.Forms.ToolStripMenuItem emulationToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem pauseToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
@@ -620,6 +618,8 @@ namespace CrystalBoy.Emulator
 		private System.Windows.Forms.ToolStripMenuItem zoom200toolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom300toolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem zoom400toolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem zoom600toolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem zoom800toolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem gameBoyAdvanceToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;

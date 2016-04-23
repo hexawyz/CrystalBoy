@@ -1,22 +1,4 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
+﻿using System;
 using System.Threading;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -29,6 +11,10 @@ namespace CrystalBoy.Emulator
 	[DesignerCategory("Component")]
 	sealed class EmulatedGameBoy : IComponent, IClockManager, IDisposable
 	{
+		public const double ReferenceFrameRate = 60;
+
+		private readonly SynchronizationContext synchronizationContext;
+		
 		private GameBoyMemoryBus bus;
 		private EmulationStatus emulationStatus;
 		private Stopwatch frameStopwatch;
@@ -43,30 +29,57 @@ namespace CrystalBoy.Emulator
 		public event EventHandler Break;
 		public event EventHandler EmulationStatusChanged;
 
+		/// <summary>Notify the execution of a frame.</summary>
+		/// <remarks>
+		/// This event is raised on the processor emulation thread.
+		/// This event should be handled in a thread-safe manner, and as lightly as possible, to not stall the emulation.
+		/// </remarks>
 		public event EventHandler NewFrame
 		{
 			add { bus.FrameDone += value; }
 			remove { bus.FrameDone -= value; }
 		}
 
-		public event EventHandler BorderChanged
-		{
-			add { bus.BorderChanged += value; }
-			remove { bus.BorderChanged -= value; }
-		}
+		/// <summary>Notify the change of the SGB border.</summary>
+		public event EventHandler BorderChanged;
 
 		public EmulatedGameBoy() : this(null) { }
+
 		public EmulatedGameBoy(IContainer container)
 		{
+			synchronizationContext = SynchronizationContext.Current;
 			bus = new GameBoyMemoryBus();
 			frameStopwatch = new Stopwatch();
 			frameRateStopwatch = new Stopwatch();
 			bus.EmulationStarted += OnEmulationStarted;	
 			bus.EmulationStopped += OnEmulationStopped;
+			bus.BorderChanged += OnBorderChanged;
 			bus.ClockManager = this;
-			bus.ReadKeys += new EventHandler<ReadKeysEventArgs>(OnReadKeys);
+			bus.ReadKeys += OnReadKeys;
 			emulationStatus = bus.UseBootRom ? EmulationStatus.Paused : EmulationStatus.Stopped;
 			if (container != null) container.Add(this);
+		}
+
+		public void Dispose()
+		{
+			if (bus != null)
+			{
+				bus.Dispose();
+				bus = null;
+				Disposed?.Invoke(this, EventArgs.Empty);
+			}
+		}
+
+		public bool IsDisposed { get { return bus == null; } }
+		
+		/// <summary>Raises an event on the main thread.</summary>
+		/// <param name="handler"></param>
+		private void NotifyMainThread(EventHandler handler)
+		{
+			if (handler != null)
+			{
+				synchronizationContext.Post(state => ((EventHandler)state)(this, EventArgs.Empty), handler);
+			}
 		}
 
 		#region IComponent Implementation
@@ -118,7 +131,7 @@ namespace CrystalBoy.Emulator
 			}
 
 			lastFrameTime = currentFrameTime;
-			currentFrameTime = frameRateStopwatch.Elapsed.TotalMilliseconds;
+			currentFrameTime = frameRateStopwatch.ElapsedTicks;
 
 			frameStopwatch.Reset();
 			frameStopwatch.Start();
@@ -128,20 +141,12 @@ namespace CrystalBoy.Emulator
 
 		private void OnReadKeys(object sender, ReadKeysEventArgs e) { if (e.JoypadIndex == 0) bus.PressedKeys = ReadKeys(); }
 
-		private void OnEmulationStarted(object sender, EventArgs e) { EmulationStatus = EmulationStatus.Running; }
-		private void OnEmulationStopped(object sender, EventArgs e) { Pause(!IsDisposed && Processor.Status == ProcessorStatus.Running); }
+		private void OnEmulationStarted(object sender, EventArgs e) => synchronizationContext.Post(HandleEmulationStarted, null);
+		private void OnEmulationStopped(object sender, EventArgs e) => synchronizationContext.Post(HandleEmulationStopped, null);
+		private void OnBorderChanged(object sender, EventArgs e) => NotifyMainThread(BorderChanged);
 
-		public void Dispose()
-		{
-			if (bus != null)
-			{
-				bus.Dispose();
-				bus = null;
-				if (Disposed != null) Disposed(this, EventArgs.Empty);
-			}
-		}
-
-		public bool IsDisposed { get { return bus == null; } }
+		private void HandleEmulationStarted(object state) => EmulationStatus = EmulationStatus.Running;
+		private void HandleEmulationStopped(object state) => Pause(!IsDisposed && Processor.Status == ProcessorStatus.Running);
 
 		public void Reset() { Reset(bus.HardwareType); }
 
@@ -202,34 +207,14 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		public double PreciseFrameRate
-		{
-			get
-			{
-				if (emulationStatus == EmulationStatus.Running)
-					return 1000d / (currentFrameTime - lastFrameTime);
-				else return 0;
-			}
-		}
+		public double EmulatedFrameRate => emulationStatus == EmulationStatus.Running ? Stopwatch.Frequency / (currentFrameTime - lastFrameTime) : 0;
 
-		public int FrameRate
-		{
-			get
-			{
-				if (emulationStatus == EmulationStatus.Running)
-					return (int)Math.Round(1000 / (currentFrameTime - lastFrameTime), 0);
-				else return 0;
-			}
-		}
+		public double EmulatedSpeed => EmulatedFrameRate / ReferenceFrameRate;
 
 		public bool EnableFramerateLimiter
 		{
 			get { return enableFramerateLimiter; }
-#if false
-			set { bus.ClockManager = (enableFramerateLimiter = value) ? this : null; }
-#else
 			set { enableFramerateLimiter = value; }
-#endif
 		}
 
 		public void Step()
@@ -304,44 +289,10 @@ namespace CrystalBoy.Emulator
 #endif
 		}
 
-		private void OnRomChanged(EventArgs e)
-		{
-			var handler = RomChanged;
-
-			if (handler != null)
-				handler(this, e);
-		}
-
-		private void OnPause(EventArgs e)
-		{
-			var handler = Paused;
-
-			if (handler != null)
-				handler(this, e);
-		}
-
-		private void OnBreak(EventArgs e)
-		{
-			var handler = Break;
-
-			if (handler != null)
-				handler(this, e);
-		}
-
-		private void OnAfterReset(EventArgs e)
-		{
-			var handler = AfterReset;
-
-			if (handler != null)
-				handler(this, e);
-		}
-
-		private void OnEmulationStatusChanged(EventArgs e)
-		{
-			var handler = EmulationStatusChanged;
-
-			if (handler != null)
-				handler(this, e);
-		}
+		private void OnRomChanged(EventArgs e) => RomChanged?.Invoke(this, e);
+		private void OnPause(EventArgs e) => Paused?.Invoke(this, e);
+		private void OnBreak(EventArgs e) => Break?.Invoke(this, e);
+		private void OnAfterReset(EventArgs e) => AfterReset?.Invoke(this, e);
+		private void OnEmulationStatusChanged(EventArgs e) => EmulationStatusChanged?.Invoke(this, e);
 	}
 }

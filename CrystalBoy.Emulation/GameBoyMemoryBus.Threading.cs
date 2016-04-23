@@ -28,35 +28,24 @@ namespace CrystalBoy.Emulation
 
 		private const double realFrameDuration = 1000d / 60d;
 
-		private SynchronizationContext synchronizationContext;
-		private SendOrPostCallback handlePostedNotification;
+		private Thread eventsThread;
 		private Thread processorThread;
 		private Thread audioFrameThread;
 		private volatile bool isRunning;
-		//private volatile bool isRenderingAudio; // Go on with locking for now since it is safer… Possibly need to rewrite this later once the audio emulation is ok.
 		private volatile IClockManager clockManager;
-
-		#region Events
-
+		
+		/// <summary>Notifies that a frame has been executed.</summary>
 		public event EventHandler FrameDone;
-		private NotificationHandler frameDoneHandler;
 
+		/// <summary>Notifies that emulation started.</summary>
 		public event EventHandler EmulationStarted;
-		private NotificationHandler emulationStartedHandler;
 
+		/// <summary>Notifies that emulation stopped.</summary>
 		public event EventHandler EmulationStopped;
-		private NotificationHandler emulationStoppedHandler;
-
-		#endregion
 
 		partial void InitializeThreading()
 		{
-			synchronizationContext = SynchronizationContext.Current;
-			handlePostedNotification = HandlePostedNotification;
-			frameDoneHandler = OnFrameDone;
 			clockManager = new GameBoyClockManager();
-			emulationStartedHandler = OnEmulationStarted;
-			emulationStoppedHandler = OnEmulationStopped;
 			processorThread = new Thread(RunProcessor) { IsBackground = true, Name = "GBZ80 Emulation" };
 			audioFrameThread = new Thread(RunAudioRenderer) { IsBackground = true };
 
@@ -82,14 +71,7 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-		/// <summary>Gets or sets the synchronization context used by this instance.</summary>
-		/// <value>The synchronization context.</value>
-		public SynchronizationContext SynchronizationContext
-		{
-			get { return synchronizationContext; }
-			set { lock (this) synchronizationContext = value; }
-		}
-
+		/// <summary>Runs the emulation for one frame.</summary>
 		public void RunFrame()
 		{
 			// Prevent dumb deadlocks by checking the value of “isRunning”.
@@ -98,6 +80,7 @@ namespace CrystalBoy.Emulation
 			if (!isRunning) lock (processorThread) Monitor.Pulse(processorThread);
 		}
 
+		/// <summary>Runs the emulation for one instruction.</summary>
 		public void Step()
 		{
 			if (isRunning) throw new InvalidOperationException();
@@ -106,20 +89,7 @@ namespace CrystalBoy.Emulation
 				processor.Emulate(false);
 		}
 
-		private void OnFrameDone(EventArgs e) { FrameDone?.Invoke(this, e); }
-
-		private void HandlePostedNotification(object state)
-		{
-			var handler = state as NotificationHandler;
-
-			handler?.Invoke(EventArgs.Empty);
-		}
-
-		private void PostUINotification(NotificationHandler handler)
-		{
-			if (synchronizationContext != null) synchronizationContext.Post(handlePostedNotification, handler);
-			else handler(EventArgs.Empty);
-		}
+		private void OnFrameDone(EventArgs e) => FrameDone?.Invoke(this, e);
 
 		public IClockManager ClockManager
 		{
@@ -133,14 +103,17 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
+		/// <summary>Runs the emulation continuously.</summary>
 		public void Run()
 		{
 			isRunning = true;
 			lock (processorThread) Monitor.Pulse(processorThread);
 		}
 
-		private void OnEmulationStarted(EventArgs e) { if (EmulationStarted != null) EmulationStarted(this, e); }
+		private void OnEmulationStarted(EventArgs e) => EmulationStarted?.Invoke(this, e);
+		private void OnEmulationStopped(EventArgs e) => EmulationStopped?.Invoke(this, e);
 
+		/// <summary>Stops the emulation.</summary>
 		public void Stop()
 		{
 			isRunning = false;
@@ -150,8 +123,8 @@ namespace CrystalBoy.Emulation
 #pragma warning restore 642
 		}
 
-		private void OnEmulationStopped(EventArgs e) { if (EmulationStopped != null) EmulationStopped(this, e); }
 
+		/// <summary>Suspends the emulation.</summary>
 		private void SuspendEmulation()
 		{
 			bool wasRunning = isRunning;
@@ -161,6 +134,7 @@ namespace CrystalBoy.Emulation
 			lock (processorThread) isRunning = wasRunning;
 		}
 
+		/// <summary>Resumes the emulation.</summary>
 		private void ResumeEmulation() { if (isRunning) lock (processorThread) Monitor.Pulse(processorThread); }
 		
 		private void RunProcessor()
@@ -173,7 +147,7 @@ namespace CrystalBoy.Emulation
 					
 					var clockManager = this.clockManager ?? NullClockManager.Default;
 
-					PostUINotification(emulationStartedHandler);
+					OnEmulationStarted(EventArgs.Empty);
 
 					clockManager.Reset();
 
@@ -191,7 +165,7 @@ namespace CrystalBoy.Emulation
 						if (shouldContinueRunning = processor.Emulate(true))
 						{
 							shouldContinueRunning &= isRunning;
-							PostUINotification(frameDoneHandler);
+							OnFrameDone(EventArgs.Empty);
 						}
 						else
 						{
@@ -200,7 +174,7 @@ namespace CrystalBoy.Emulation
 							else if (processor.Status == ProcessorStatus.Running)
 							{
 								isRunning = false;
-								PostUINotification(breakpointHandler);
+								OnBreakpoint(EventArgs.Empty);
 							}
 #endif
 							else shouldContinueRunning = true;
@@ -208,7 +182,7 @@ namespace CrystalBoy.Emulation
 					}
 					while (shouldContinueRunning);
 
-					PostUINotification(emulationStoppedHandler);
+					OnEmulationStopped(EventArgs.Empty);
 				}
 			}
 		}

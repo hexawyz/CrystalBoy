@@ -1,22 +1,4 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -27,11 +9,17 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
 using CrystalBoy.Emulation.Windows.Forms;
+using System.Threading;
+using System.Diagnostics;
 
 namespace CrystalBoy.Emulator
 {
 	partial class MainForm : Form
 	{
+		private static readonly long SpeedUpdateTicks = Stopwatch.Frequency / 10;
+
+		private readonly SynchronizationContext synchronizationContext;
+		private readonly Stopwatch speedUpdateStopwatch;
 		private DebuggerForm debuggerForm;
 		private TileViewerForm tileViewerForm;
 		private MapViewerForm mapViewerForm;
@@ -49,6 +37,8 @@ namespace CrystalBoy.Emulator
 
 		public MainForm()
 		{
+			synchronizationContext = SynchronizationContext.Current;
+			speedUpdateStopwatch = Stopwatch.StartNew();
 			InitializeComponent();
 			if (components == null) components = new System.ComponentModel.Container();
 			emulatedGameBoy = new EmulatedGameBoy(components);
@@ -63,7 +53,7 @@ namespace CrystalBoy.Emulator
 			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
 			AdjustSize(Settings.Default.ContentSize);
 			UpdateEmulationStatus();
-			UpdateFrameRate();
+			UpdateSpeed();
 			SetStatusTextHandler();
 			CreateRendererMenuItems();
 		}
@@ -458,14 +448,17 @@ namespace CrystalBoy.Emulator
 
 		#region Status Updates
 
-		private void UpdateEmulationStatus() { emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus == EmulationStatus.Running ? Resources.RunningText : Resources.PausedText; }
-
-		private void UpdateFrameRate()
+		private void UpdateEmulationStatus()
 		{
-			double frameRate = emulatedGameBoy.FrameRate;
+			emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus == EmulationStatus.Running ? Resources.RunningText : Resources.PausedText;
+		}
 
-			if (frameRate > 0) frameRateToolStripStatusLabel.Text = "FPS: " + frameRate.ToString();
-			else frameRateToolStripStatusLabel.Text = "FPS: -";
+		private void UpdateSpeed()
+		{
+			double speed = emulatedGameBoy.EmulatedSpeed;
+
+			if (speed > 0) speedToolStripStatusLabel.Text = "Speed: " + speed.ToString("P0");
+			else speedToolStripStatusLabel.Text = "Speed: -";
 		}
 
 		#endregion
@@ -514,7 +507,16 @@ namespace CrystalBoy.Emulator
 
 		private void OnEmulationStatusChanged(object sender, EventArgs e) { UpdateEmulationStatus(); }
 
-		private void OnNewFrame(object sender, EventArgs e) { UpdateFrameRate(); }
+		private void OnNewFrame(object sender, EventArgs e)
+		{
+			// This method should only be called from the "Processor" thread.
+			// Usage of the stopwatch here is safe.
+			if (speedUpdateStopwatch.ElapsedTicks > SpeedUpdateTicks)
+			{
+				speedUpdateStopwatch.Restart();
+				synchronizationContext.Post(state => UpdateSpeed(), null);
+			}
+		}
 
 		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e)
 		{
@@ -648,18 +650,21 @@ namespace CrystalBoy.Emulator
 				checkItem = zoom300toolStripMenuItem;
 			else if (renderSize == new Size(640, 576))
 				checkItem = zoom400toolStripMenuItem;
+			else if (renderSize == new Size(960, 864))
+				checkItem = zoom600toolStripMenuItem;
+			else if (renderSize == new Size(1280, 1152))
+				checkItem = zoom800toolStripMenuItem;
 
 			foreach (ToolStripMenuItem zoomMenuItem in zoomToolStripMenuItem.DropDownItems)
 				zoomMenuItem.Checked = zoomMenuItem == checkItem;
 		}
 
-		private void zoom100toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(1); }
-
-		private void zoom200toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(2); }
-
-		private void zoom300toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(3); }
-
-		private void zoom400toolStripMenuItem_Click(object sender, EventArgs e) { SetZoomFactor(4); }
+		private void zoom100toolStripMenuItem_Click(object sender, EventArgs e) => SetZoomFactor(1);
+		private void zoom200toolStripMenuItem_Click(object sender, EventArgs e) => SetZoomFactor(2);
+		private void zoom300toolStripMenuItem_Click(object sender, EventArgs e) => SetZoomFactor(3);
+		private void zoom400toolStripMenuItem_Click(object sender, EventArgs e) => SetZoomFactor(4);
+		private void zoom600toolStripMenuItem_Click(object sender, EventArgs e) => SetZoomFactor(6);
+		private void zoom800toolStripMenuItem_Click(object sender, EventArgs e) => SetZoomFactor(8);
 
 		#endregion
 
