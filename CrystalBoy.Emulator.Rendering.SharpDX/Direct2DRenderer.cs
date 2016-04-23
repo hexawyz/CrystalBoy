@@ -19,26 +19,26 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 	[Description("Renders video using Direct2D.")]
 	public sealed class Direct2DRenderer : ControlVideoRenderer
 	{
-		private Factory factory;
-		private WindowRenderTarget windowRenderTarget;
-		private BitmapRenderTarget compositeRenderTarget;
-		private BitmapRenderTarget screenRenderTarget;
-		private Bitmap borderBitmap;
-		private Bitmap bitmap1;
-		private Bitmap bitmap2;
-		private RawColor4 clearColor;
-		private RawRectangleF drawRectangle;
-		private readonly byte[] borderBuffer;
-		private readonly byte[] screenBuffer;
+		private Factory _factory;
+		private WindowRenderTarget _windowRenderTarget;
+		private BitmapRenderTarget _compositeRenderTarget;
+		private BitmapRenderTarget _screenRenderTarget;
+		private Bitmap _borderBitmap;
+		private Bitmap _screenBitmap1;
+		private Bitmap _screenBitmap2;
+		private RawColor4 _clearColor;
+		private RawRectangleF _drawRectangle;
+		private readonly byte[] _borderBuffer;
+		private readonly byte[] _screenBuffer;
 
 		public Direct2DRenderer(Control renderControl)
 			: base(renderControl)
 		{
-			borderBuffer = new byte[256 * 224 * 4];
-			screenBuffer = new byte[160 * 144 * 4];
+			_borderBuffer = new byte[256 * 224 * 4];
+			_screenBuffer = new byte[160 * 144 * 4];
 			//clearColor = new RawColor4(unchecked((int)LookupTables.StandardColorLookupTable32[ClearColor]));
-			clearColor = new RawColor4(1, 1, 1, 1);
-			factory = new Factory(FactoryType.SingleThreaded, DebugLevel.None);
+			_clearColor = new RawColor4(1, 1, 1, 1);
+			_factory = new Factory(FactoryType.SingleThreaded, DebugLevel.None);
 			ResetRendering();
 			RenderControl.FindForm().SizeChanged += OnSizeChanged;
 		}
@@ -48,8 +48,8 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			DisposeBitmaps();
 			DisposeRenderTargets();
 
-			if (factory != null) factory.Dispose();
-			factory = null;
+			if (_factory != null) _factory.Dispose();
+			_factory = null;
 
 			RenderControl.FindForm().SizeChanged -= OnSizeChanged;
 		}
@@ -65,7 +65,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 		private void OnSizeChanged(object sender, EventArgs e)
 		{
-			if (windowRenderTarget != null) windowRenderTarget.Resize(new Size2(RenderControl.ClientSize.Width, RenderControl.ClientSize.Height));
+			if (_windowRenderTarget != null) _windowRenderTarget.Resize(new Size2(RenderControl.ClientSize.Width, RenderControl.ClientSize.Height));
 			RecalculateDrawRectangle();
 		}
 
@@ -78,23 +78,23 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 			if (BorderVisible)
 			{
-				if ((s = (float)h * 256 / 224) <= w) drawRectangle = new RawRectangleF(t = 0.5f * (w - s), 0, t + s, h);
-				else if ((s = (float)w * 224 / 256) <= h) drawRectangle = new RawRectangleF(0, t = 0.5f * (h - s), w, t + s);
-				else drawRectangle = new RawRectangleF(0, 0, w, h);
+				if ((s = (float)h * 256 / 224) <= w) _drawRectangle = new RawRectangleF(t = 0.5f * (w - s), 0, t + s, h);
+				else if ((s = (float)w * 224 / 256) <= h) _drawRectangle = new RawRectangleF(0, t = 0.5f * (h - s), w, t + s);
+				else _drawRectangle = new RawRectangleF(0, 0, w, h);
 			}
 			else
 			{
-				if ((s = (float)h * 160 / 144) <= w) drawRectangle = new RawRectangleF(t = 0.5f * (w - s), 0, t + s, h);
-				else if ((s = (float)w * 144 / 160) <= h) drawRectangle = new RawRectangleF(0, t = 0.5f * (h - s), w, t + s);
-				else drawRectangle = new RawRectangleF(0, 0, w, h);
+				if ((s = (float)h * 160 / 144) <= w) _drawRectangle = new RawRectangleF(t = 0.5f * (w - s), 0, t + s, h);
+				else if ((s = (float)w * 144 / 160) <= h) _drawRectangle = new RawRectangleF(0, t = 0.5f * (h - s), w, t + s);
+				else _drawRectangle = new RawRectangleF(0, 0, w, h);
 			}
 		}
 
 		private void CreateRenderTargets()
 		{
-			windowRenderTarget = new WindowRenderTarget
+			_windowRenderTarget = new WindowRenderTarget
 			(
-				factory,
+				_factory,
 				new RenderTargetProperties()
 				{
 					PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore),
@@ -113,15 +113,15 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 				AntialiasMode = AntialiasMode.Aliased,
 			};
 			if (BorderVisible) CreateCompositeRenderTarget();
-			screenRenderTarget = new BitmapRenderTarget(windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(160, 144), new Size2(160, 144), null);
+			_screenRenderTarget = new BitmapRenderTarget(_windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(160, 144), new Size2(160, 144), null);
 			RecalculateDrawRectangle();
 		}
 
 		private void CreateCompositeRenderTarget()
 		{
-			if (compositeRenderTarget == null)
+			if (_compositeRenderTarget == null)
 			{
-				compositeRenderTarget = new BitmapRenderTarget(windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(256, 224), new Size2(256, 224), new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore))
+				_compositeRenderTarget = new BitmapRenderTarget(_windowRenderTarget, CompatibleRenderTargetOptions.None, new Size2F(256, 224), new Size2(256, 224), new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore))
 				{
 					DotsPerInch = new Size2F(96.0f, 96.0f),
 					AntialiasMode = AntialiasMode.Aliased,
@@ -131,37 +131,37 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 		private void DisposeRenderTargets()
 		{
-			if (compositeRenderTarget != null) compositeRenderTarget.Dispose();
-			compositeRenderTarget = null;
-			if (windowRenderTarget != null) windowRenderTarget.Dispose();
-			windowRenderTarget = null;
+			if (_compositeRenderTarget != null) _compositeRenderTarget.Dispose();
+			_compositeRenderTarget = null;
+			if (_windowRenderTarget != null) _windowRenderTarget.Dispose();
+			_windowRenderTarget = null;
 		}
 
 		private void CreateBitmaps()
 		{
-			borderBitmap = new Bitmap(windowRenderTarget, new Size2(256, 224), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied) });
-			borderBitmap.CopyFromMemory(borderBuffer, 256 * 4);
-			bitmap1 = new Bitmap(windowRenderTarget, new Size2(160, 144), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore) });
-			bitmap1.CopyFromMemory(screenBuffer, 160 * 4);
-			bitmap2 = new Bitmap(windowRenderTarget, new Size2(160, 144), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore) });
-			bitmap2.CopyFromBitmap(bitmap1);
+			_borderBitmap = new Bitmap(_windowRenderTarget, new Size2(256, 224), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied) });
+			_borderBitmap.CopyFromMemory(_borderBuffer, 256 * 4);
+			_screenBitmap1 = new Bitmap(_windowRenderTarget, new Size2(160, 144), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore) });
+			_screenBitmap1.CopyFromMemory(_screenBuffer, 160 * 4);
+			_screenBitmap2 = new Bitmap(_windowRenderTarget, new Size2(160, 144), new BitmapProperties() { PixelFormat = new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Ignore) });
+			_screenBitmap2.CopyFromBitmap(_screenBitmap1);
 		}
 
 		private void DisposeBitmaps()
 		{
-			if (borderBitmap != null) borderBitmap.Dispose();
-			borderBitmap = null;
-			if (bitmap1 != null) bitmap1.Dispose();
-			bitmap1 = null;
-			if (bitmap2 != null) bitmap2.Dispose();
-			bitmap2 = null;
+			if (_borderBitmap != null) _borderBitmap.Dispose();
+			_borderBitmap = null;
+			if (_screenBitmap1 != null) _screenBitmap1.Dispose();
+			_screenBitmap1 = null;
+			if (_screenBitmap2 != null) _screenBitmap2.Dispose();
+			_screenBitmap2 = null;
 		}
 
 		private void SwapBitmaps()
 		{
-			var temp = bitmap1;
-			bitmap1 = bitmap2;
-			bitmap2 = temp;
+			var temp = _screenBitmap1;
+			_screenBitmap1 = _screenBitmap2;
+			_screenBitmap2 = temp;
 		}
 		
 		private void Render(bool shouldRecompose) { Render(shouldRecompose, true); }
@@ -170,25 +170,25 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		{
 			var interpolationMode = false ? BitmapInterpolationMode.Linear : BitmapInterpolationMode.NearestNeighbor;
 
-			windowRenderTarget.BeginDraw();
+			_windowRenderTarget.BeginDraw();
 
 			if (BorderVisible)
 			{
 				CreateCompositeRenderTarget();
 
-				compositeRenderTarget.BeginDraw();
-				compositeRenderTarget.Clear(clearColor);
-				compositeRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, new RawRectangleF(48, 40, 48 + 160, 40 + 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
-				compositeRenderTarget.DrawBitmap(borderBitmap, 1.0f, BitmapInterpolationMode.NearestNeighbor);
-				compositeRenderTarget.EndDraw();
-				windowRenderTarget.DrawBitmap(compositeRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
+				_compositeRenderTarget.BeginDraw();
+				_compositeRenderTarget.Clear(_clearColor);
+				_compositeRenderTarget.DrawBitmap(_screenRenderTarget.Bitmap, new RawRectangleF(48, 40, 48 + 160, 40 + 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
+				_compositeRenderTarget.DrawBitmap(_borderBitmap, 1.0f, BitmapInterpolationMode.NearestNeighbor);
+				_compositeRenderTarget.EndDraw();
+				_windowRenderTarget.DrawBitmap(_compositeRenderTarget.Bitmap, _drawRectangle, 1.0f, interpolationMode);
 			}
 			else
 			{
-				windowRenderTarget.DrawBitmap(screenRenderTarget.Bitmap, drawRectangle, 1.0f, interpolationMode);
+				_windowRenderTarget.DrawBitmap(_screenRenderTarget.Bitmap, _drawRectangle, 1.0f, interpolationMode);
 			}
 
-			try { windowRenderTarget.EndDraw();}
+			try { _windowRenderTarget.EndDraw();}
 			catch (COMException)
 			{
 				// If needed, try to recreate the target.
@@ -202,12 +202,12 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		{
 			SwapBitmaps();
 
-			bitmap1.CopyFromMemory(screenBuffer, 160 * 4);
+			_screenBitmap1.CopyFromMemory(_screenBuffer, 160 * 4);
 
-			screenRenderTarget.BeginDraw();
-			screenRenderTarget.DrawBitmap(bitmap2, new RawRectangleF(0, 0, 160, 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
-			screenRenderTarget.DrawBitmap(bitmap1, new RawRectangleF(0, 0, 160, 144), 0.5f, BitmapInterpolationMode.NearestNeighbor);
-			screenRenderTarget.EndDraw();
+			_screenRenderTarget.BeginDraw();
+			_screenRenderTarget.DrawBitmap(_screenBitmap2, new RawRectangleF(0, 0, 160, 144), 1.0f, BitmapInterpolationMode.NearestNeighbor);
+			_screenRenderTarget.DrawBitmap(_screenBitmap1, new RawRectangleF(0, 0, 160, 144), 0.5f, BitmapInterpolationMode.NearestNeighbor);
+			_screenRenderTarget.EndDraw();
 
 			Render(true);
 
@@ -216,7 +216,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 
 		private void UpdateBorderAndPresent(object state)
 		{
-			borderBitmap.CopyFromMemory(borderBuffer, 256 * 4);
+			_borderBitmap.CopyFromMemory(_borderBuffer, 256 * 4);
 
 			Render(true);
 
@@ -243,7 +243,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		{
 			if (cancellationToken.IsCancellationRequested) return TaskHelper.CanceledTask;
 			
-			fixed (void* p = screenBuffer)
+			fixed (void* p = _screenBuffer)
 			{
 				renderer.RenderVideoFrame32(frame, (IntPtr)p, 160 * 4);
 			}
@@ -268,7 +268,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 
-			fixed (void* p = borderBuffer)
+			fixed (void* p = _borderBuffer)
 			{
 				renderer.RenderVideoBorder32(frame, (IntPtr)p, 256 * 4);
 			}
