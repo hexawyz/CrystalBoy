@@ -11,6 +11,7 @@ Have a better video emulation (Allow more dynamic changes during video rendering
 Do not have thread-aware handlers anymore: let the UI code do its own marshalling. ( => Less clutter on the UI thread, maybe no more UI thread freezes… )
 Use some kind of versioning to determine when to update data (e.g. SGB border) in VideoFrameData: Allow the most recent data to always be available, but minimize copying.
 Reorganize the GameBoyMemoryBus for the code to be more easy to locate.
+Implement a 2bit rendering for more accurate SGB emulation… ? The border update might then be done inside the video renderer itself.
 
 DONE:
 Totally rework the VideoRenderer infrastructure
