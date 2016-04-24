@@ -1,22 +1,4 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -24,12 +6,13 @@ using System.Text;
 using System.Windows.Forms;
 using CrystalBoy.Core;
 using System.Reflection;
+using CrystalBoy.Emulation;
 
 namespace CrystalBoy.Emulator
 {
 	partial class RomInformationForm : EmulatorForm
 	{
-		static Dictionary<RomType, string> descriptionCache = BuildDescriptionChache();
+		static Dictionary<RomType, string> _descriptionCache = BuildDescriptionChache();
 
 		private static Dictionary<RomType, string> BuildDescriptionChache()
 		{
@@ -47,20 +30,43 @@ namespace CrystalBoy.Emulator
 			return descriptionCache;
 		}
 
-		private string GetDescription(RomType romType)
+		private static string GetDescription(RomType romType)
 		{
 			string description;
 
-			if (descriptionCache.TryGetValue(romType, out description))
+			if (_descriptionCache.TryGetValue(romType, out description))
 				return description;
 			else
 				return romType.ToString();
 		}
 
+		private static void CopyPalette(Color[] destination, ColorPalette source)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				destination[i] = Color.FromArgb(unchecked((int)LookupTables.StandardColorLookupTable32[source[i]]));
+			}
+		}
+
+		private static void CopyPalette(Color[] destination, uint[] source)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				destination[i] = Color.FromArgb(unchecked((int)source[i]));
+			}
+		}
+
+		private readonly Color[] _backgroundColors = new Color[4];
+		private readonly Color[] _object0Colors = new Color[4];
+		private readonly Color[] _object1Colors = new Color[4];
+
 		public RomInformationForm(EmulatedGameBoy emulatedGameBoy)
 			: base(emulatedGameBoy)
 		{
 			InitializeComponent();
+			backgroundColorPaletteTableLayoutPanel.Tag = _backgroundColors;
+			object0ColorPaletteTableLayoutPanel.Tag = _object0Colors;
+			object1ColorPaletteTableLayoutPanel.Tag = _object1Colors;
 		}
 
 		private void UpdateRomInformation()
@@ -75,6 +81,10 @@ namespace CrystalBoy.Emulator
 				ramSizeValueLabel.Text = Common.FormatSize(EmulatedGameBoy.RomInformation.RamSize);
 				sgbCheckBox.Checked = EmulatedGameBoy.RomInformation.SupportsSuperGameBoy;
 				cgbCheckBox.Checked = EmulatedGameBoy.RomInformation.SupportsColorGameBoy;
+				var colorPalette = EmulatedGameBoy.RomInformation.AutomaticColorPalette;
+				colorPaletteGroupBox.Enabled = colorPalette != null;
+				if (colorPalette != null) CopyPalettes(colorPalette.GetValueOrDefault());
+				else ResetPalettes();
 			}
 			else
 			{
@@ -86,7 +96,27 @@ namespace CrystalBoy.Emulator
 				ramSizeValueLabel.Text = "-";
 				sgbCheckBox.Checked = false;
 				cgbCheckBox.Checked = false;
+				colorPaletteGroupBox.Enabled = false;
+				ResetPalettes();
 			}
+
+			backgroundColorPaletteTableLayoutPanel.Refresh();
+			object0ColorPaletteTableLayoutPanel.Refresh();
+			object1ColorPaletteTableLayoutPanel.Refresh();
+		}
+
+		private void CopyPalettes(FixedColorPalette colorPalette)
+		{
+			CopyPalette(_backgroundColors, colorPalette.BackgroundPalette);
+			CopyPalette(_object0Colors, colorPalette.ObjectPalette0);
+			CopyPalette(_object1Colors, colorPalette.ObjectPalette1);
+		}
+
+		private void ResetPalettes()
+		{
+			CopyPalette(_backgroundColors, LookupTables.GrayPalette);
+			CopyPalette(_object0Colors, LookupTables.GrayPalette);
+			CopyPalette(_object1Colors, LookupTables.GrayPalette);
 		}
 
 		protected override void OnShown(EventArgs e)
@@ -104,6 +134,12 @@ namespace CrystalBoy.Emulator
 		private void okButton_Click(object sender, EventArgs e)
 		{
 			Close();
+		}
+
+		private void OnPaletteCellPaint(object sender, TableLayoutCellPaintEventArgs e)
+		{
+			using (var brush = new SolidBrush(((Color[])((Control)sender).Tag)[e.Column]))
+				e.Graphics.FillRectangle(brush, e.CellBounds);
 		}
 	}
 }

@@ -112,26 +112,29 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="gameNameLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>35, 13</value>
+  </data>
   <data name="gameNameLabel.Text" xml:space="preserve">
-    <value>Nom : </value>
+    <value>Nom :</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="makerCodeLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>83, 13</value>
-  </data>
-  <data name="makerCodeLabel.Text" xml:space="preserve">
-    <value>Code créateur : </value>
-  </data>
-  <data name="makerNameLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>80, 13</value>
   </data>
+  <data name="makerCodeLabel.Text" xml:space="preserve">
+    <value>Code créateur :</value>
+  </data>
+  <data name="makerNameLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>77, 13</value>
+  </data>
   <data name="makerNameLabel.Text" xml:space="preserve">
-    <value>Nom créateur : </value>
+    <value>Nom créateur :</value>
   </data>
   <data name="gameGroupBox.Text" xml:space="preserve">
     <value>Jeu</value>
@@ -140,22 +143,22 @@
     <value>Matériel</value>
   </data>
   <data name="ramSizeLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>83, 13</value>
+    <value>80, 13</value>
   </data>
   <data name="ramSizeLabel.Text" xml:space="preserve">
-    <value>Taille de RAM : </value>
+    <value>Taille de RAM :</value>
   </data>
   <data name="romTypeLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>83, 13</value>
+    <value>80, 13</value>
   </data>
   <data name="romTypeLabel.Text" xml:space="preserve">
-    <value>Type de ROM : </value>
+    <value>Type de ROM :</value>
   </data>
   <data name="romSizeLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>84, 13</value>
+    <value>81, 13</value>
   </data>
   <data name="romSizeLabel.Text" xml:space="preserve">
-    <value>Taille de ROM : </value>
+    <value>Taille de ROM :</value>
   </data>
   <data name="sgbCheckBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>158, 17</value>
@@ -165,6 +168,27 @@
   </data>
   <data name="cgbCheckBox.Text" xml:space="preserve">
     <value>Fonctions Game Boy Color</value>
+  </data>
+  <data name="backgroundColorPalettelabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>66, 13</value>
+  </data>
+  <data name="backgroundColorPalettelabel.Text" xml:space="preserve">
+    <value>Arrière-plan :</value>
+  </data>
+  <data name="object0ColorPaletteLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>47, 13</value>
+  </data>
+  <data name="object0ColorPaletteLabel.Text" xml:space="preserve">
+    <value>Objet 0 :</value>
+  </data>
+  <data name="object1ColorPaletteLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>47, 13</value>
+  </data>
+  <data name="object1ColorPaletteLabel.Text" xml:space="preserve">
+    <value>Objet 1 :</value>
+  </data>
+  <data name="colorPaletteGroupBox.Text" xml:space="preserve">
+    <value>Palette de couleurs</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Informations sur la ROM</value>

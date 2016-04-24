@@ -1,22 +1,4 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
+﻿using System;
 
 namespace CrystalBoy.Core
 {
@@ -33,8 +15,8 @@ namespace CrystalBoy.Core
 		/// <exception cref="IndexOutOfRangeException">The specified offset is out of range.</exception>
 		public ColorPalette(short[] data, int offset)
 		{
-			if (data == null) throw new ArgumentNullException("data");
-			if (offset < 0 || offset + 3 >= data.Length) throw new IndexOutOfRangeException();
+			if (data == null) throw new ArgumentNullException(nameof(data));
+			if (offset < 0 || offset + 3 >= data.Length) throw new ArgumentOutOfRangeException(nameof(offset));
 
 			this.data = data;
 			this.offset = offset;
@@ -53,14 +35,6 @@ namespace CrystalBoy.Core
 		/// <summary>Gets the palette value at the specified index.</summary>
 		/// <value>15 bit color value.</value>
 		/// <exception cref="IndexOutOfRangeException">The specified index is out of range.</exception>
-		public short this[int index]
-		{
-			get
-			{
-				if (index < 0 || index > 3) throw new IndexOutOfRangeException();
-
-				return data[offset + index];
-			}
-		}
+		public short this[int index] => data[offset + index];
 	}
 }

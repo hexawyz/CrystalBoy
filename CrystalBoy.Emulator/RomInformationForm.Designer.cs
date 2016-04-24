@@ -1,22 +1,4 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-namespace CrystalBoy.Emulator
+﻿namespace CrystalBoy.Emulator
 {
 	partial class RomInformationForm
 	{
@@ -51,33 +33,49 @@ namespace CrystalBoy.Emulator
 			System.Windows.Forms.Label makerCodeLabel;
 			System.Windows.Forms.Label makerNameLabel;
 			System.Windows.Forms.GroupBox gameGroupBox;
+			System.Windows.Forms.TableLayoutPanel gameTableLayoutPanel;
 			System.Windows.Forms.GroupBox hardwareGroupBox;
+			System.Windows.Forms.TableLayoutPanel hardwareTableLayoutPanel;
 			System.Windows.Forms.Label ramSizeLabel;
 			System.Windows.Forms.Label romTypeLabel;
 			System.Windows.Forms.Label romSizeLabel;
-			this.gameTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+			System.Windows.Forms.TableLayoutPanel colorPaletteTableLayoutPanel;
+			System.Windows.Forms.Label backgroundColorPalettelabel;
+			System.Windows.Forms.Label object0ColorPaletteLabel;
+			System.Windows.Forms.Label object1ColorPaletteLabel;
 			this.makerNameValueLabel = new System.Windows.Forms.Label();
 			this.makerCodeValueLabel = new System.Windows.Forms.Label();
 			this.nameValueLabel = new System.Windows.Forms.Label();
-			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.ramSizeValueLabel = new System.Windows.Forms.Label();
 			this.romSizeValueLabel = new System.Windows.Forms.Label();
 			this.romTypeValueLabel = new System.Windows.Forms.Label();
 			this.sgbCheckBox = new System.Windows.Forms.CheckBox();
 			this.cgbCheckBox = new System.Windows.Forms.CheckBox();
+			this.object1ColorPaletteTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+			this.object0ColorPaletteTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+			this.backgroundColorPaletteTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.okButton = new System.Windows.Forms.Button();
+			this.colorPaletteGroupBox = new System.Windows.Forms.GroupBox();
 			gameNameLabel = new System.Windows.Forms.Label();
 			makerCodeLabel = new System.Windows.Forms.Label();
 			makerNameLabel = new System.Windows.Forms.Label();
 			gameGroupBox = new System.Windows.Forms.GroupBox();
+			gameTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			hardwareGroupBox = new System.Windows.Forms.GroupBox();
+			hardwareTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			ramSizeLabel = new System.Windows.Forms.Label();
 			romTypeLabel = new System.Windows.Forms.Label();
 			romSizeLabel = new System.Windows.Forms.Label();
+			colorPaletteTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+			backgroundColorPalettelabel = new System.Windows.Forms.Label();
+			object0ColorPaletteLabel = new System.Windows.Forms.Label();
+			object1ColorPaletteLabel = new System.Windows.Forms.Label();
 			gameGroupBox.SuspendLayout();
-			this.gameTableLayoutPanel.SuspendLayout();
+			gameTableLayoutPanel.SuspendLayout();
 			hardwareGroupBox.SuspendLayout();
-			this.tableLayoutPanel2.SuspendLayout();
+			hardwareTableLayoutPanel.SuspendLayout();
+			colorPaletteTableLayoutPanel.SuspendLayout();
+			this.colorPaletteGroupBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// gameNameLabel
@@ -98,20 +96,20 @@ namespace CrystalBoy.Emulator
 			// gameGroupBox
 			// 
 			resources.ApplyResources(gameGroupBox, "gameGroupBox");
-			gameGroupBox.Controls.Add(this.gameTableLayoutPanel);
+			gameGroupBox.Controls.Add(gameTableLayoutPanel);
 			gameGroupBox.Name = "gameGroupBox";
 			gameGroupBox.TabStop = false;
 			// 
 			// gameTableLayoutPanel
 			// 
-			resources.ApplyResources(this.gameTableLayoutPanel, "gameTableLayoutPanel");
-			this.gameTableLayoutPanel.Controls.Add(this.makerNameValueLabel, 1, 2);
-			this.gameTableLayoutPanel.Controls.Add(makerNameLabel, 0, 2);
-			this.gameTableLayoutPanel.Controls.Add(this.makerCodeValueLabel, 1, 1);
-			this.gameTableLayoutPanel.Controls.Add(this.nameValueLabel, 1, 0);
-			this.gameTableLayoutPanel.Controls.Add(gameNameLabel, 0, 0);
-			this.gameTableLayoutPanel.Controls.Add(makerCodeLabel, 0, 1);
-			this.gameTableLayoutPanel.Name = "gameTableLayoutPanel";
+			resources.ApplyResources(gameTableLayoutPanel, "gameTableLayoutPanel");
+			gameTableLayoutPanel.Controls.Add(this.makerNameValueLabel, 1, 2);
+			gameTableLayoutPanel.Controls.Add(makerNameLabel, 0, 2);
+			gameTableLayoutPanel.Controls.Add(this.makerCodeValueLabel, 1, 1);
+			gameTableLayoutPanel.Controls.Add(this.nameValueLabel, 1, 0);
+			gameTableLayoutPanel.Controls.Add(gameNameLabel, 0, 0);
+			gameTableLayoutPanel.Controls.Add(makerCodeLabel, 0, 1);
+			gameTableLayoutPanel.Name = "gameTableLayoutPanel";
 			// 
 			// makerNameValueLabel
 			// 
@@ -131,22 +129,22 @@ namespace CrystalBoy.Emulator
 			// hardwareGroupBox
 			// 
 			resources.ApplyResources(hardwareGroupBox, "hardwareGroupBox");
-			hardwareGroupBox.Controls.Add(this.tableLayoutPanel2);
+			hardwareGroupBox.Controls.Add(hardwareTableLayoutPanel);
 			hardwareGroupBox.Name = "hardwareGroupBox";
 			hardwareGroupBox.TabStop = false;
 			// 
-			// tableLayoutPanel2
+			// hardwareTableLayoutPanel
 			// 
-			resources.ApplyResources(this.tableLayoutPanel2, "tableLayoutPanel2");
-			this.tableLayoutPanel2.Controls.Add(this.ramSizeValueLabel, 1, 2);
-			this.tableLayoutPanel2.Controls.Add(ramSizeLabel, 0, 2);
-			this.tableLayoutPanel2.Controls.Add(this.romSizeValueLabel, 1, 1);
-			this.tableLayoutPanel2.Controls.Add(this.romTypeValueLabel, 1, 0);
-			this.tableLayoutPanel2.Controls.Add(romTypeLabel, 0, 0);
-			this.tableLayoutPanel2.Controls.Add(romSizeLabel, 0, 1);
-			this.tableLayoutPanel2.Controls.Add(this.sgbCheckBox, 0, 3);
-			this.tableLayoutPanel2.Controls.Add(this.cgbCheckBox, 0, 4);
-			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+			resources.ApplyResources(hardwareTableLayoutPanel, "hardwareTableLayoutPanel");
+			hardwareTableLayoutPanel.Controls.Add(this.ramSizeValueLabel, 1, 2);
+			hardwareTableLayoutPanel.Controls.Add(ramSizeLabel, 0, 2);
+			hardwareTableLayoutPanel.Controls.Add(this.romSizeValueLabel, 1, 1);
+			hardwareTableLayoutPanel.Controls.Add(this.romTypeValueLabel, 1, 0);
+			hardwareTableLayoutPanel.Controls.Add(romTypeLabel, 0, 0);
+			hardwareTableLayoutPanel.Controls.Add(romSizeLabel, 0, 1);
+			hardwareTableLayoutPanel.Controls.Add(this.sgbCheckBox, 0, 3);
+			hardwareTableLayoutPanel.Controls.Add(this.cgbCheckBox, 0, 4);
+			hardwareTableLayoutPanel.Name = "hardwareTableLayoutPanel";
 			// 
 			// ramSizeValueLabel
 			// 
@@ -182,7 +180,7 @@ namespace CrystalBoy.Emulator
 			// 
 			resources.ApplyResources(this.sgbCheckBox, "sgbCheckBox");
 			this.sgbCheckBox.AutoCheck = false;
-			this.tableLayoutPanel2.SetColumnSpan(this.sgbCheckBox, 2);
+			hardwareTableLayoutPanel.SetColumnSpan(this.sgbCheckBox, 2);
 			this.sgbCheckBox.Name = "sgbCheckBox";
 			this.sgbCheckBox.UseVisualStyleBackColor = true;
 			// 
@@ -190,9 +188,53 @@ namespace CrystalBoy.Emulator
 			// 
 			resources.ApplyResources(this.cgbCheckBox, "cgbCheckBox");
 			this.cgbCheckBox.AutoCheck = false;
-			this.tableLayoutPanel2.SetColumnSpan(this.cgbCheckBox, 2);
+			hardwareTableLayoutPanel.SetColumnSpan(this.cgbCheckBox, 2);
 			this.cgbCheckBox.Name = "cgbCheckBox";
 			this.cgbCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// colorPaletteTableLayoutPanel
+			// 
+			resources.ApplyResources(colorPaletteTableLayoutPanel, "colorPaletteTableLayoutPanel");
+			colorPaletteTableLayoutPanel.Controls.Add(this.object1ColorPaletteTableLayoutPanel, 1, 2);
+			colorPaletteTableLayoutPanel.Controls.Add(this.object0ColorPaletteTableLayoutPanel, 1, 1);
+			colorPaletteTableLayoutPanel.Controls.Add(backgroundColorPalettelabel, 0, 0);
+			colorPaletteTableLayoutPanel.Controls.Add(object0ColorPaletteLabel, 0, 1);
+			colorPaletteTableLayoutPanel.Controls.Add(object1ColorPaletteLabel, 0, 2);
+			colorPaletteTableLayoutPanel.Controls.Add(this.backgroundColorPaletteTableLayoutPanel, 1, 0);
+			colorPaletteTableLayoutPanel.Name = "colorPaletteTableLayoutPanel";
+			// 
+			// object1ColorPaletteTableLayoutPanel
+			// 
+			resources.ApplyResources(this.object1ColorPaletteTableLayoutPanel, "object1ColorPaletteTableLayoutPanel");
+			this.object1ColorPaletteTableLayoutPanel.Name = "object1ColorPaletteTableLayoutPanel";
+			this.object1ColorPaletteTableLayoutPanel.CellPaint += new System.Windows.Forms.TableLayoutCellPaintEventHandler(this.OnPaletteCellPaint);
+			// 
+			// object0ColorPaletteTableLayoutPanel
+			// 
+			resources.ApplyResources(this.object0ColorPaletteTableLayoutPanel, "object0ColorPaletteTableLayoutPanel");
+			this.object0ColorPaletteTableLayoutPanel.Name = "object0ColorPaletteTableLayoutPanel";
+			this.object0ColorPaletteTableLayoutPanel.CellPaint += new System.Windows.Forms.TableLayoutCellPaintEventHandler(this.OnPaletteCellPaint);
+			// 
+			// backgroundColorPalettelabel
+			// 
+			resources.ApplyResources(backgroundColorPalettelabel, "backgroundColorPalettelabel");
+			backgroundColorPalettelabel.Name = "backgroundColorPalettelabel";
+			// 
+			// object0ColorPaletteLabel
+			// 
+			resources.ApplyResources(object0ColorPaletteLabel, "object0ColorPaletteLabel");
+			object0ColorPaletteLabel.Name = "object0ColorPaletteLabel";
+			// 
+			// object1ColorPaletteLabel
+			// 
+			resources.ApplyResources(object1ColorPaletteLabel, "object1ColorPaletteLabel");
+			object1ColorPaletteLabel.Name = "object1ColorPaletteLabel";
+			// 
+			// backgroundColorPaletteTableLayoutPanel
+			// 
+			resources.ApplyResources(this.backgroundColorPaletteTableLayoutPanel, "backgroundColorPaletteTableLayoutPanel");
+			this.backgroundColorPaletteTableLayoutPanel.Name = "backgroundColorPaletteTableLayoutPanel";
+			this.backgroundColorPaletteTableLayoutPanel.CellPaint += new System.Windows.Forms.TableLayoutCellPaintEventHandler(this.OnPaletteCellPaint);
 			// 
 			// okButton
 			// 
@@ -201,10 +243,18 @@ namespace CrystalBoy.Emulator
 			this.okButton.UseVisualStyleBackColor = true;
 			this.okButton.Click += new System.EventHandler(this.okButton_Click);
 			// 
+			// colorPaletteGroupBox
+			// 
+			resources.ApplyResources(this.colorPaletteGroupBox, "colorPaletteGroupBox");
+			this.colorPaletteGroupBox.Controls.Add(colorPaletteTableLayoutPanel);
+			this.colorPaletteGroupBox.Name = "colorPaletteGroupBox";
+			this.colorPaletteGroupBox.TabStop = false;
+			// 
 			// RomInformationForm
 			// 
 			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.colorPaletteGroupBox);
 			this.Controls.Add(this.okButton);
 			this.Controls.Add(hardwareGroupBox);
 			this.Controls.Add(gameGroupBox);
@@ -214,27 +264,31 @@ namespace CrystalBoy.Emulator
 			this.Name = "RomInformationForm";
 			this.ShowInTaskbar = false;
 			gameGroupBox.ResumeLayout(false);
-			this.gameTableLayoutPanel.ResumeLayout(false);
-			this.gameTableLayoutPanel.PerformLayout();
+			gameTableLayoutPanel.ResumeLayout(false);
+			gameTableLayoutPanel.PerformLayout();
 			hardwareGroupBox.ResumeLayout(false);
-			this.tableLayoutPanel2.ResumeLayout(false);
-			this.tableLayoutPanel2.PerformLayout();
+			hardwareTableLayoutPanel.ResumeLayout(false);
+			hardwareTableLayoutPanel.PerformLayout();
+			colorPaletteTableLayoutPanel.ResumeLayout(false);
+			colorPaletteTableLayoutPanel.PerformLayout();
+			this.colorPaletteGroupBox.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
-
-		private System.Windows.Forms.TableLayoutPanel gameTableLayoutPanel;
 		private System.Windows.Forms.Label makerNameValueLabel;
 		private System.Windows.Forms.Label makerCodeValueLabel;
 		private System.Windows.Forms.Label nameValueLabel;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		private System.Windows.Forms.Label ramSizeValueLabel;
 		private System.Windows.Forms.Label romSizeValueLabel;
 		private System.Windows.Forms.Label romTypeValueLabel;
 		private System.Windows.Forms.Button okButton;
 		private System.Windows.Forms.CheckBox sgbCheckBox;
 		private System.Windows.Forms.CheckBox cgbCheckBox;
+		private System.Windows.Forms.GroupBox colorPaletteGroupBox;
+		private System.Windows.Forms.TableLayoutPanel object1ColorPaletteTableLayoutPanel;
+		private System.Windows.Forms.TableLayoutPanel object0ColorPaletteTableLayoutPanel;
+		private System.Windows.Forms.TableLayoutPanel backgroundColorPaletteTableLayoutPanel;
 	}
 }
