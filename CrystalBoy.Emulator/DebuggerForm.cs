@@ -46,7 +46,7 @@ namespace CrystalBoy.Emulator
 			Processor processor = EmulatedGameBoy.Processor;
 			CultureInfo invariantCulture = CultureInfo.InvariantCulture;
 
-			if (!(initialized && (EmulatedGameBoy.RomLoaded || EmulatedGameBoy.Bus.UseBootRom)))
+			if (!(initialized && (EmulatedGameBoy.IsRomLoaded || EmulatedGameBoy.Bus.UseBootRom)))
 			{
 			    disassemblyView.SelectedOffset = 0;
 			    disassemblyView.ScrollSelectionIntoView();
@@ -98,7 +98,7 @@ namespace CrystalBoy.Emulator
 
 		protected override void OnReset(EventArgs e)
 		{
-			disassemblyView.Memory = EmulatedGameBoy.RomLoaded || EmulatedGameBoy.Bus.UseBootRom ? EmulatedGameBoy.Bus : null;
+			disassemblyView.Memory = EmulatedGameBoy.IsRomLoaded || EmulatedGameBoy.Bus.UseBootRom ? EmulatedGameBoy.Bus : null;
 			UpdateInformation();
 		}
 

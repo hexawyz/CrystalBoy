@@ -11,6 +11,7 @@ using System.ComponentModel;
 using CrystalBoy.Emulation.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
+using CrystalBoy.Emulator.Joypads;
 
 namespace CrystalBoy.Emulator
 {
@@ -40,6 +41,7 @@ namespace CrystalBoy.Emulator
 			synchronizationContext = SynchronizationContext.Current;
 			speedUpdateStopwatch = Stopwatch.StartNew();
 			InitializeComponent();
+			ScaleStatusStrip(CurrentAutoScaleDimensions.Height / 96F); // In DPI scaling mode, CurrentAutoScaleDimensions is the current screen DPI.
 			if (components == null) components = new System.ComponentModel.Container();
 			emulatedGameBoy = new EmulatedGameBoy(components);
 			emulatedGameBoy.TryUsingBootRom = Settings.Default.UseBootstrapRom;
@@ -49,6 +51,7 @@ namespace CrystalBoy.Emulator
 			emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
 			emulatedGameBoy.NewFrame += OnNewFrame;
 			emulatedGameBoy.BorderChanged += OnBorderChanged;
+			emulatedGameBoy.Bus.SetJoypad(0, CreateKeyboardJoypad(0));
 			try { emulatedGameBoy.Reset(Settings.Default.HardwareType); }
 			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
 			AdjustSize(Settings.Default.ContentSize);
@@ -56,6 +59,33 @@ namespace CrystalBoy.Emulator
 			UpdateSpeed();
 			SetStatusTextHandler();
 			CreateRendererMenuItems();
+		}
+
+		/// <summary>Programatically scale the <see cref="StatusStrip"/> control and its child.</summary>
+		/// <remarks>This is a hack, because this control really sucks.</remarks>
+		/// <param name="factor">The scaling factor to apply.</param>
+		private void ScaleStatusStrip(float factor)
+		{
+			statusStrip.Height = (int)(statusStrip.Height * factor);
+			toolStripStatusLabel.Text = "DPI";
+			emulationStatusToolStripStatusLabel.Width = (int)(emulationStatusToolStripStatusLabel.Width * factor);
+			speedToolStripStatusLabel.Width = (int)(speedToolStripStatusLabel.Width * factor);
+			toolStripStatusLabel.Text = string.Empty;
+		}
+
+		private IJoypad CreateKeyboardJoypad(int joypadIndex)
+		{
+			// Here we provide an appropriate IJoypad implementation depending on the platform we are running on.
+			// If running on Win32, we'll use P/Invoke to read keyboard keys.
+			// Otherwise, we'll resort to using plain old Windows Forms events.
+			switch (Environment.OSVersion.Platform)
+			{
+				case PlatformID.Win32Windows:
+				case PlatformID.Win32NT:
+					return new Win32KeyboardJoypad(toolStripContainer.ContentPanel, joypadIndex);
+				default:
+					return new WindowsFormsKeyboardJoypad(toolStripContainer.ContentPanel, joypadIndex);
+			}
 		}
 
 		private void CreateRendererMenuItems()
@@ -687,7 +717,7 @@ namespace CrystalBoy.Emulator
 		private void useBootstrapRomToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Settings.Default.UseBootstrapRom = emulatedGameBoy.TryUsingBootRom = !emulatedGameBoy.TryUsingBootRom;
-			if (!emulatedGameBoy.RomLoaded || emulatedGameBoy.EmulationStatus == EmulationStatus.Stopped)
+			if (!emulatedGameBoy.IsRomLoaded || emulatedGameBoy.EmulationStatus == EmulationStatus.Stopped)
 				emulatedGameBoy.Reset();
 		}
 
@@ -701,7 +731,7 @@ namespace CrystalBoy.Emulator
 
 		private void SwitchHardware(HardwareType hardwareType)
 		{
-			if (!emulatedGameBoy.RomLoaded || MessageBox.Show(this, Resources.EmulationResetMessage, Resources.GenericMessageTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			if (!emulatedGameBoy.IsRomLoaded || MessageBox.Show(this, Resources.EmulationResetMessage, Resources.GenericMessageTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				emulatedGameBoy.Reset(Settings.Default.HardwareType = hardwareType);
 		}
 

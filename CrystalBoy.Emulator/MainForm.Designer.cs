@@ -577,6 +577,7 @@
 			this.Controls.Add(this.toolStripContainer);
 			this.MainMenuStrip = this.mainMenuStrip;
 			this.Name = "MainForm";
+			this.KeyPreview = true;
 			this.toolStripContainer.BottomToolStripPanel.ResumeLayout(false);
 			this.toolStripContainer.BottomToolStripPanel.PerformLayout();
 			this.toolStripContainer.TopToolStripPanel.ResumeLayout(false);

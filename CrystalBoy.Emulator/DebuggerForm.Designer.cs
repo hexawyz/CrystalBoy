@@ -350,7 +350,7 @@ namespace CrystalBoy.Emulator
 			// DebuggerForm
 			// 
 			resources.ApplyResources(this, "$this");
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.Controls.Add(this.cycleCounterGroupBox);
 			this.Controls.Add(this.gotoButton);
 			this.Controls.Add(this.gotoTextBox);

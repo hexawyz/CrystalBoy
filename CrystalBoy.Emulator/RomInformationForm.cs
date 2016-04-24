@@ -71,7 +71,7 @@ namespace CrystalBoy.Emulator
 
 		private void UpdateRomInformation()
 		{
-			if (EmulatedGameBoy.RomLoaded)
+			if (EmulatedGameBoy.IsRomLoaded)
 			{
 				nameValueLabel.Text = EmulatedGameBoy.RomInformation.Name;
 				makerCodeValueLabel.Text = EmulatedGameBoy.RomInformation.MakerCode;

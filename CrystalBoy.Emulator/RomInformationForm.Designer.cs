@@ -253,7 +253,7 @@
 			// RomInformationForm
 			// 
 			resources.ApplyResources(this, "$this");
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.Controls.Add(this.colorPaletteGroupBox);
 			this.Controls.Add(this.okButton);
 			this.Controls.Add(hardwareGroupBox);

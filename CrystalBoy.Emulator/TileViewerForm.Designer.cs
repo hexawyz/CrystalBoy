@@ -100,7 +100,7 @@ namespace CrystalBoy.Emulator
 			// 
 			this.AcceptButton = this.refreshButton;
 			resources.ApplyResources(this, "$this");
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.CancelButton = this.closeButton;
 			this.Controls.Add(this.closeButton);
 			this.Controls.Add(this.tileSet1GroupBox);

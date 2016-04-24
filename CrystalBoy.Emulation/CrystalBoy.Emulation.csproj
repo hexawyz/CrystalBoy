@@ -74,6 +74,7 @@
     <Compile Include="AudioSampleGenerator.cs" />
     <Compile Include="AudioStatusSnapshot.cs" />
     <Compile Include="BorderVisibility.cs" />
+    <Compile Include="Joypads\DummyJoypad.cs" />
     <Compile Include="GameBoyClockManager.cs" />
     <Compile Include="IClockManager.cs" />
     <Compile Include="IVideoRenderer.cs" />
@@ -84,7 +85,6 @@
     <Compile Include="Mappers\MemoryBankController3.cs" />
     <Compile Include="Mappers\MemoryBankController5.cs" />
     <Compile Include="Interrupt.cs" />
-    <Compile Include="GameBoyKeys.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="FrameEventArgs.cs" />
     <Compile Include="NullClockManager.cs" />

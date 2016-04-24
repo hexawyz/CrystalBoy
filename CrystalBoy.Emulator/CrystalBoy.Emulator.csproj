@@ -95,6 +95,7 @@
       <SubType>component</SubType>
     </Compile>
     <Compile Include="EmulationStatus.cs" />
+    <Compile Include="Joypads\WindowsFormsKeyboardJoypad.cs" />
     <Compile Include="Renderers\GdiPlusRenderer.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -112,6 +113,7 @@
     <Compile Include="PluginInformation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Joypads\Win32KeyboardJoypad.cs" />
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -124,6 +126,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.fr-FR.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

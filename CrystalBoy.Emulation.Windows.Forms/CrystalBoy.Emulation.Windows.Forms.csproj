@@ -51,10 +51,15 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
+    <Compile Include="ControlFocusedJoypad.cs" />
     <Compile Include="ControlVideoRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
+      <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
+      <Name>CrystalBoy.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CrystalBoy.Emulation\CrystalBoy.Emulation.csproj">
       <Project>{48489dfd-05fc-4af5-b238-15912ec77719}</Project>
       <Name>CrystalBoy.Emulation</Name>

@@ -55,9 +55,8 @@ namespace CrystalBoy.Emulator
 			bus.EmulationStopped += OnEmulationStopped;
 			bus.BorderChanged += OnBorderChanged;
 			bus.ClockManager = this;
-			bus.ReadKeys += OnReadKeys;
 			emulationStatus = bus.UseBootRom ? EmulationStatus.Paused : EmulationStatus.Stopped;
-			if (container != null) container.Add(this);
+			container?.Add(this);
 		}
 
 		public void Dispose()
@@ -70,7 +69,7 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		public bool IsDisposed { get { return bus == null; } }
+		public bool IsDisposed => bus == null;
 		
 		/// <summary>Raises an event on the main thread.</summary>
 		/// <param name="handler"></param>
@@ -139,8 +138,6 @@ namespace CrystalBoy.Emulator
 
 		#endregion
 
-		private void OnReadKeys(object sender, ReadKeysEventArgs e) { if (e.JoypadIndex == 0) bus.PressedKeys = ReadKeys(); }
-
 		private void OnEmulationStarted(object sender, EventArgs e) => synchronizationContext.Post(HandleEmulationStarted, null);
 		private void OnEmulationStopped(object sender, EventArgs e) => synchronizationContext.Post(HandleEmulationStopped, null);
 		private void OnBorderChanged(object sender, EventArgs e) => NotifyMainThread(BorderChanged);
@@ -178,21 +175,14 @@ namespace CrystalBoy.Emulator
 			set { bus.TryUsingBootRom = value; }
 		}
 
-		public HardwareType HardwareType { get { return bus.HardwareType; } }
-
-		public RomInformation RomInformation { get { return bus.RomInformation; } }
-
-		public bool RomLoaded { get { return bus.RomLoaded; } }
-
-		public bool HasCustomBorder { get { return bus.HasCustomBorder; } }
-
-		public GameBoyMemoryBus Bus { get { return bus; } }
-
-		public Mapper Mapper { get { return bus.Mapper; } }
-
-		public Processor Processor { get { return bus.Processor; } }
-
-		public MemoryBlock ExternalRam { get { return bus.ExternalRam; } }
+		public HardwareType HardwareType => bus.HardwareType;
+		public RomInformation RomInformation => bus.RomInformation;
+		public bool IsRomLoaded => bus.RomLoaded;
+		public bool HasCustomBorder => bus.HasCustomBorder;
+		public GameBoyMemoryBus Bus => bus;
+		public Mapper Mapper => bus.Mapper;
+		public Processor Processor => bus.Processor;
+		public MemoryBlock ExternalRam => bus.ExternalRam;
 
 		public EmulationStatus EmulationStatus
 		{
@@ -247,47 +237,7 @@ namespace CrystalBoy.Emulator
 			else OnPause(EventArgs.Empty);
 		}
 
-		public GameBoyKeys PressedKeys
-		{
-			get { return bus.PressedKeys; }
-			set { bus.PressedKeys = value; }
-		}
-
-		public void NotifyPressedKeys(GameBoyKeys pressedKeys) { bus.Joypads.NotifyPressedKeys(pressedKeys); }
-
-		public void NotifyReleasedKeys(GameBoyKeys releasedKeys) { bus.Joypads.NotifyReleasedKeys(releasedKeys); }
-
 		private void RunFrameInternal() { bus.RunFrame(); }
-
-#if PINVOKE
-		private bool IsKeyDown(Keys vKey) { return (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0; }
-#endif
-
-		private GameBoyKeys ReadKeys()
-		{
-#if PINVOKE
-			GameBoyKeys keys = GameBoyKeys.None;
-
-			if (IsKeyDown(Keys.Right))
-				keys |= GameBoyKeys.Right;
-			if (IsKeyDown(Keys.Left))
-				keys |= GameBoyKeys.Left;
-			if (IsKeyDown(Keys.Up))
-				keys |= GameBoyKeys.Up;
-			if (IsKeyDown(Keys.Down))
-				keys |= GameBoyKeys.Down;
-			if (IsKeyDown(Keys.X))
-				keys |= GameBoyKeys.A;
-			if (IsKeyDown(Keys.Z))
-				keys |= GameBoyKeys.B;
-			if (IsKeyDown(Keys.RShiftKey))
-				keys |= GameBoyKeys.Select;
-			if (IsKeyDown(Keys.Return))
-				keys |= GameBoyKeys.Start;
-
-			return keys;
-#endif
-		}
 
 		private void OnRomChanged(EventArgs e) => RomChanged?.Invoke(this, e);
 		private void OnPause(EventArgs e) => Paused?.Invoke(this, e);
