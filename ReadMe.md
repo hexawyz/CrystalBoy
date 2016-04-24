@@ -44,6 +44,10 @@ The author shall not be held responsible for any bus or data losses caused by us
 
   * New rendering infrastructure making a better use of threads.
   * More accurate clock emulation (The target is 60 FPS for now, not 59.7FPS like on regular GB)
+  * The status bar now displays the speed as a % of the target speed instead of virtual FPS.
+  * The GDI+ renderer is embedded into the main binary.
+  * The GDI+ renderer is now able to display the border (still a WIP, as this is subjet to frameskipping)
+  * The emulator is high DPI aware.
 
 
 ### Version 1.5
