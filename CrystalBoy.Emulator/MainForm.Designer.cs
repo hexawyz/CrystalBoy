@@ -575,9 +575,9 @@
 			resources.ApplyResources(this, "$this");
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
 			this.Controls.Add(this.toolStripContainer);
+			this.KeyPreview = true;
 			this.MainMenuStrip = this.mainMenuStrip;
 			this.Name = "MainForm";
-			this.KeyPreview = true;
 			this.toolStripContainer.BottomToolStripPanel.ResumeLayout(false);
 			this.toolStripContainer.BottomToolStripPanel.PerformLayout();
 			this.toolStripContainer.TopToolStripPanel.ResumeLayout(false);

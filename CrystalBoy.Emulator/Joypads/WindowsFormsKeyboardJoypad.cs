@@ -1,14 +1,13 @@
-﻿using CrystalBoy.Emulation.Windows.Forms;
-using System;
+﻿using CrystalBoy.Core;
+using CrystalBoy.Emulation.Windows.Forms;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Windows.Forms;
-using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulator.Joypads
 {
+	[DisplayName("Windows Forms Keyboard Events")]
+	[Description("Emulates a joypad by processing keyboard events.")]
 	public sealed class WindowsFormsKeyboardJoypad : ControlFocusedJoypad
 	{
 		public override GameBoyKeys DownKeys => _keys;

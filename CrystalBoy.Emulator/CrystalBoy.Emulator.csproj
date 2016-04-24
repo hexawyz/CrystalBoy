@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="EmulationStatus.cs" />
     <Compile Include="Joypads\WindowsFormsKeyboardJoypad.cs" />
+    <Compile Include="PluginKind.cs" />
     <Compile Include="Renderers\GdiPlusRenderer.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

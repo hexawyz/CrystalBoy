@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="VideoRenderer" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Direct3D9Renderer</Value>
+      <Value Profile="(Default)">Direct2DRenderer</Value>
     </Setting>
     <Setting Name="ContentSize" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">320, 288</Value>
@@ -34,6 +34,9 @@
     </Setting>
     <Setting Name="AudioRenderer" Type="System.String" Scope="User">
       <Value Profile="(Default)">XAudio2Renderer</Value>
+    </Setting>
+    <Setting Name="MainJoypadPlugin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Win32KeyboardJoypad</Value>
     </Setting>
   </Settings>
 </SettingsFile>

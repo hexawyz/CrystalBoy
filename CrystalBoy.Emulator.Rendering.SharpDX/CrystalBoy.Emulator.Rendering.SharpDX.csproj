@@ -65,6 +65,10 @@
       <HintPath>..\packages\SharpDX.XAudio2.3.0.2\lib\net45\SharpDX.XAudio2.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SharpDX.XInput, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.XInput.3.0.2\lib\net45\SharpDX.XInput.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -84,6 +88,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TransformedTexturedVertex.cs" />
     <Compile Include="XAudio2Renderer.cs" />
+    <Compile Include="XInputJoypad.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CrystalBoy.snk">

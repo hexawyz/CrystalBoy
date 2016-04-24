@@ -2,10 +2,13 @@
 
 using CrystalBoy.Core;
 using CrystalBoy.Emulation.Windows.Forms;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace CrystalBoy.Emulator.Joypads
 {
+	[DisplayName("Win32 Keyboard")]
+	[Description("Emulates a joypad by reading keys directly from the keyboard.")]
 	internal sealed class Win32KeyboardJoypad : ControlFocusedJoypad
 	{
 		private Form RenderForm { get; }
@@ -38,7 +41,7 @@ namespace CrystalBoy.Emulator.Joypads
 			}
 		}
 
-		private static bool IsKeyDown(Keys vKey) { return (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0; }
+		private static bool IsKeyDown(Keys vKey) => (NativeMethods.GetAsyncKeyState(vKey) & 0x8000) != 0;
 	}
 }
 

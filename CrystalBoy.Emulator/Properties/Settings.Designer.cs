@@ -25,7 +25,7 @@ namespace CrystalBoy.Emulator.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Direct3D9Renderer")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Direct2DRenderer")]
         public string VideoRenderer {
             get {
                 return ((string)(this["VideoRenderer"]));
@@ -142,6 +142,18 @@ namespace CrystalBoy.Emulator.Properties {
             }
             set {
                 this["AudioRenderer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Win32KeyboardJoypad")]
+        public string MainJoypadPlugin {
+            get {
+                return ((string)(this["MainJoypadPlugin"]));
+            }
+            set {
+                this["MainJoypadPlugin"] = value;
             }
         }
     }

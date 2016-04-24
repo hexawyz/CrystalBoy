@@ -1,6 +1,7 @@
 ﻿using CrystalBoy.Core;
 using CrystalBoy.Emulation.Joypads;
 using System;
+using System.Threading;
 
 namespace CrystalBoy.Emulation
 {
@@ -12,10 +13,10 @@ namespace CrystalBoy.Emulation
 		#region Variables
 		
 		private volatile GameBoyKeys baseKeys;
-		private volatile IJoypad joypad0;
-		private volatile IJoypad joypad1;
-		private volatile IJoypad joypad2;
-		private volatile IJoypad joypad3;
+		private IJoypad joypad0;
+		private IJoypad joypad1;
+		private IJoypad joypad2;
+		private IJoypad joypad3;
 		private bool joypadRow0;
 		private bool joypadRow1;
 
@@ -25,10 +26,10 @@ namespace CrystalBoy.Emulation
 
 		partial void InitializeJoypad()
 		{
-			joypad0 = DummyJoypad.Instance;
-			joypad1 = DummyJoypad.Instance;
-			joypad2 = DummyJoypad.Instance;
-			joypad3 = DummyJoypad.Instance;
+			Volatile.Write(ref joypad0, DummyJoypad.Instance);
+			Volatile.Write(ref joypad1, DummyJoypad.Instance);
+			Volatile.Write(ref joypad2, DummyJoypad.Instance);
+			Volatile.Write(ref joypad3, DummyJoypad.Instance);
 		}
 
 		#endregion
@@ -47,17 +48,25 @@ namespace CrystalBoy.Emulation
 		/// <summary>Assigns a specific joypad.</summary>
 		/// <param name="joypadIndex">The idnex of the joypad to assign.</param>
 		/// <param name="joypad">The joypad instance to use, or null to unassign.</param>
-		public void SetJoypad(int joypadIndex, IJoypad joypad)
+		public IJoypad SetJoypad(int joypadIndex, IJoypad joypad)
 		{
 			joypad = joypad ?? DummyJoypad.Instance;
 
 			switch (joypadIndex)
 			{
-				case 0: joypad0 = joypad; break;
-				case 1: joypad1 = joypad; break;
-				case 2: joypad2 = joypad; break;
-				case 3: joypad3 = joypad; break;
+				case 0: return SwapJoypad(ref joypad0, joypad);
+				case 1: return SwapJoypad(ref joypad1, joypad);
+				case 2: return SwapJoypad(ref joypad2, joypad);
+				case 3: return SwapJoypad(ref joypad3, joypad);
+				default: throw new ArgumentOutOfRangeException(nameof(joypad));
 			}
+		}
+
+		private static IJoypad SwapJoypad(ref IJoypad storage, IJoypad newValue)
+		{
+			var oldValue = Interlocked.Exchange(ref storage, newValue);
+
+			return oldValue is DummyJoypad ? null : oldValue;
 		}
 
 		#region Joypad
@@ -98,10 +107,10 @@ namespace CrystalBoy.Emulation
 
 			switch (joypadIndex)
 			{
-				case 0: keys = joypad0.DownKeys; break;
-				case 1: keys = joypad1.DownKeys; break;
-				case 2: keys = joypad2.DownKeys; break;
-				case 3: keys = joypad3.DownKeys; break;
+				case 0: keys = Volatile.Read(ref joypad0).DownKeys; break;
+				case 1: keys = Volatile.Read(ref joypad1).DownKeys; break;
+				case 2: keys = Volatile.Read(ref joypad2).DownKeys; break;
+				case 3: keys = Volatile.Read(ref joypad3).DownKeys; break;
 			}
 
 			baseKeys = keys;

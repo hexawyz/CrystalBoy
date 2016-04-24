@@ -28,6 +28,7 @@ namespace CrystalBoy.Emulator
 		private EmulatedGameBoy emulatedGameBoy;
 		private ControlVideoRenderer videoRenderer;
 		private AudioRenderer audioRenderer;
+		private Dictionary<Type, ToolStripMenuItem> joypadPluginMenuItemDictionary;
 		private Dictionary<Type, ToolStripMenuItem> videoRendererMenuItemDictionary;
 		private Dictionary<Type, ToolStripMenuItem> audioRendererMenuItemDictionary;
 		private BinaryWriter ramSaveWriter;
@@ -51,7 +52,6 @@ namespace CrystalBoy.Emulator
 			emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
 			emulatedGameBoy.NewFrame += OnNewFrame;
 			emulatedGameBoy.BorderChanged += OnBorderChanged;
-			emulatedGameBoy.Bus.SetJoypad(0, CreateKeyboardJoypad(0));
 			try { emulatedGameBoy.Reset(Settings.Default.HardwareType); }
 			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
 			AdjustSize(Settings.Default.ContentSize);
@@ -73,42 +73,47 @@ namespace CrystalBoy.Emulator
 			toolStripStatusLabel.Text = string.Empty;
 		}
 
-		private IJoypad CreateKeyboardJoypad(int joypadIndex)
-		{
-			// Here we provide an appropriate IJoypad implementation depending on the platform we are running on.
-			// If running on Win32, we'll use P/Invoke to read keyboard keys.
-			// Otherwise, we'll resort to using plain old Windows Forms events.
-			switch (Environment.OSVersion.Platform)
-			{
-				case PlatformID.Win32Windows:
-				case PlatformID.Win32NT:
-					return new Win32KeyboardJoypad(toolStripContainer.ContentPanel, joypadIndex);
-				default:
-					return new WindowsFormsKeyboardJoypad(toolStripContainer.ContentPanel, joypadIndex);
-			}
-		}
-
 		private void CreateRendererMenuItems()
 		{
+			joypadPluginMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
 			videoRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
 			audioRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
 
 			foreach (var plugin in Program.PluginCollection)
 			{
-				bool isAudioRenderer = plugin.Type.IsSubclassOf(typeof(AudioRenderer));
+				Dictionary<Type, ToolStripMenuItem> menuItemDictionary;
+				ToolStripMenuItem pluginListMenuItem;
+				EventHandler pluginSelectionHandler;
 
-				// Skip the plugins which are neither AudioRenderer nor VideoRenderer, for future-proofing the code a little bit.
-				if (!(isAudioRenderer || typeof(ControlVideoRenderer).IsAssignableFrom(plugin.Type))) continue;
+				switch (plugin.Kind)
+				{
+					case PluginKind.Joypad:
+						menuItemDictionary = joypadPluginMenuItemDictionary;
+						pluginListMenuItem = joypadToolStripMenuItem;
+						pluginSelectionHandler = OnJoypadPluginMenuItemClick;
+						break;
+					case PluginKind.Video:
+						menuItemDictionary = videoRendererMenuItemDictionary;
+						pluginListMenuItem = videoRendererToolStripMenuItem;
+						pluginSelectionHandler = OnVideoRendererMenuItemClick;
+						break;
+					case PluginKind.Audio:
+						menuItemDictionary = audioRendererMenuItemDictionary;
+						pluginListMenuItem = audioRendererToolStripMenuItem;
+						pluginSelectionHandler = OnAudioRendererMenuItemClick;
+						break;
+					default: // Skip unknown plugin types.
+						continue;
+				}
 
 				var rendererMenuItem = new ToolStripMenuItem(plugin.DisplayName);
 
-				rendererMenuItem.Click += isAudioRenderer ? new EventHandler(audioRendererMenuItem_Click) : new EventHandler(videoRendererMenuItem_Click);
+				rendererMenuItem.Click += pluginSelectionHandler;
 				rendererMenuItem.ToolTipText = plugin.Description;
 				rendererMenuItem.Tag = plugin.Type;
 
-				(isAudioRenderer ? audioRendererMenuItemDictionary : videoRendererMenuItemDictionary).Add(plugin.Type, rendererMenuItem);
-
-				(isAudioRenderer ? audioRendererToolStripMenuItem : videoRendererToolStripMenuItem).DropDownItems.Add(rendererMenuItem);
+				menuItemDictionary.Add(plugin.Type, rendererMenuItem);
+				pluginListMenuItem.DropDownItems.Add(rendererMenuItem);
 			}
 		}
 
@@ -170,7 +175,7 @@ namespace CrystalBoy.Emulator
 				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedRendererMenuItem;
 
 			// Store the FullName once we know the type of render method to use
-			Settings.Default.AudioRenderer = rendererType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
+			Settings.Default.AudioRenderer = rendererType.ToString(); // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 
 			emulatedGameBoy.Bus.AudioRenderer = audioRenderer;
 		}
@@ -200,9 +205,31 @@ namespace CrystalBoy.Emulator
 				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedRendererMenuItem;
 
 			// Store the FullName once we know the type of render method to use
-			Settings.Default.VideoRenderer = rendererType.FullName; // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
+			Settings.Default.VideoRenderer = rendererType.ToString(); // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 
 			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
+		}
+
+		#endregion
+
+		#region Joypad Plugin Management
+
+		private ControlFocusedJoypad CreateJoypadPlugin(int joypadIndex, Type pluginType) => (ControlFocusedJoypad)Activator.CreateInstance(pluginType, new object[] { toolStripContainer.ContentPanel, joypadIndex });
+
+		private void SwitchJoypadPlugin(int joypadIndex, Type pluginType)
+		{
+			var oldJoypad = emulatedGameBoy.Bus.SetJoypad(joypadIndex, null) as IDisposable;
+			if (oldJoypad != null) oldJoypad.Dispose();
+
+			emulatedGameBoy.Bus.SetJoypad(joypadIndex, CreateJoypadPlugin(joypadIndex, pluginType));
+
+			var selectedRendererMenuItem = joypadPluginMenuItemDictionary[pluginType];
+
+			foreach (var joypadPluginMenuItem in joypadPluginMenuItemDictionary.Values)
+				joypadPluginMenuItem.Checked = joypadPluginMenuItem == selectedRendererMenuItem;
+
+			// Store the FullName once we know the type of render method to use
+			Settings.Default.MainJoypadPlugin = pluginType.ToString(); // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 		}
 
 		#endregion
@@ -211,35 +238,45 @@ namespace CrystalBoy.Emulator
 		{
 			string audioRendererName = Settings.Default.AudioRenderer;
 			string videoRendererName = Settings.Default.VideoRenderer;
+			string joypadPluginName = Settings.Default.MainJoypadPlugin;
 
-			// Try to find the type by simple reflexion (will work for embedded types and AssemblyQualifiedNames)
-			Type audioRendererType = Type.GetType(audioRendererName);
-			Type videoRendererType = Type.GetType(videoRendererName);
-
-			Type firstAudioRendererType = null;
+			Type firstJoypadPluginType = null;
 			Type firstVideoRendererType = null;
+			Type firstAudioRendererType = null;
+
+			Type joypadPluginType = null;
+			Type videoRendererType = null;
+			Type audioRendererType = null;
 
 			// If simple reflexion fails, try using Name and FullName matches (there may be multiple matches in that case but it is better to avoid writing the full AssemblyQualifiedName in initial configurtaion files)
-			if (audioRendererType == null && videoRendererType == null)
-				foreach (var plugin in Program.PluginCollection)
+			foreach (var plugin in Program.PluginCollection)
+			{
+				switch (plugin.Kind)
 				{
-					bool isAudioRenderer = plugin.Type.IsSubclassOf(typeof(AudioRenderer));
-					bool isVideoRenderer = !isAudioRenderer && plugin.Type.IsSubclassOf(typeof(IVideoRenderer));
-
-					if (audioRendererType == null && isAudioRenderer) audioRendererType = plugin.Type;
-					else if (firstVideoRendererType == null && isVideoRenderer) firstVideoRendererType = plugin.Type;
-
-					if (audioRendererType == null && (plugin.Type.Name == audioRendererName || plugin.Type.FullName == audioRendererName))
-						audioRendererType = plugin.Type;
-					if (videoRendererType == null && (plugin.Type.Name == videoRendererName || plugin.Type.FullName == videoRendererName))
-						videoRendererType = plugin.Type;
+					case PluginKind.Joypad:
+						if (firstJoypadPluginType == null) firstJoypadPluginType = plugin.Type;
+						if (plugin.Type.ToString() == joypadPluginName) joypadPluginType = plugin.Type;
+						break;
+					case PluginKind.Video:
+						if (firstVideoRendererType == null) firstVideoRendererType = plugin.Type;
+						if (plugin.Type.ToString() == videoRendererName) videoRendererType = plugin.Type;
+						break;
+					case PluginKind.Audio:
+						if (firstAudioRendererType == null) firstAudioRendererType = plugin.Type;
+						if (plugin.Type.ToString() == audioRendererName) audioRendererType = plugin.Type;
+						break;
+					default:
+						continue;
 				}
+			}
 
 			audioRendererType = audioRendererType ?? firstAudioRendererType;
 			videoRendererType = videoRendererType ?? firstVideoRendererType;
+			joypadPluginType = joypadPluginType ?? firstJoypadPluginType;
 
 			if (audioRendererType != null) SwitchAudioRenderer(audioRendererType);
 			if (videoRendererType != null) SwitchVideoRenderer(videoRendererType);
+			if (joypadPluginType != null) SwitchJoypadPlugin(0, joypadPluginType);
 		}
 
 		#endregion
@@ -622,16 +659,23 @@ namespace CrystalBoy.Emulator
 			//interpolationToolStripMenuItem.Checked = videoRenderer.Interpolation;
 		}
 
-		private void audioRendererMenuItem_Click(object sender, EventArgs e)
+		private void OnAudioRendererMenuItemClick(object sender, EventArgs e)
 		{
 			ToolStripMenuItem renderMethodMenuItem = (ToolStripMenuItem)sender;
 		}
 
-		private void videoRendererMenuItem_Click(object sender, EventArgs e)
+		private void OnVideoRendererMenuItemClick(object sender, EventArgs e)
 		{
 			ToolStripMenuItem renderMethodMenuItem = (ToolStripMenuItem)sender;
 
 			SwitchVideoRenderer((Type)renderMethodMenuItem.Tag);
+		}
+
+		private void OnJoypadPluginMenuItemClick(object sender, EventArgs e)
+		{
+			ToolStripMenuItem renderMethodMenuItem = (ToolStripMenuItem)sender;
+
+			SwitchJoypadPlugin(0, (Type)renderMethodMenuItem.Tag);
 		}
 
 		#region Border

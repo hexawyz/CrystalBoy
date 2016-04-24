@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using CrystalBoy.Emulation;
 using CrystalBoy.Emulator.Properties;
 using CrystalBoy.Emulation.Windows.Forms;
+using CrystalBoy.Emulator.Joypads;
 
 namespace CrystalBoy.Emulator
 {
@@ -195,60 +196,21 @@ namespace CrystalBoy.Emulator
 					try
 					{
 						// Ignore any abstract type, as we want only real renderers here…
-						if (type.IsAbstract) continue;
+						if (type.IsAbstract || type.IsGenericTypeDefinition) continue;
 
 						// Simplify things for now…
-						if (typeof(ControlVideoRenderer).IsAssignableFrom(type) && !type.IsGenericTypeDefinition)
+						if (typeof(ControlVideoRenderer).IsAssignableFrom(type))
 						{
-							pluginList.Add(new PluginInformation(type));
+							pluginList.Add(new PluginInformation(PluginKind.Video, type));
 						}
-
-						//// We are going to do generic argument resolution here.
-						//// For each generic type we encounter, the rules are quite simple.
-						//// When it comes to unbound generic arguments, the only ones supported are the one defined by the base classes.
-						//// The generic parameters when there are some (mandatory for AudioRenderer, optional for VideoRenderer) must be either unbound or of a type supported by the application.
-						//// Typically, the application will use integral types for audio samples, and Control or IWin32Window for render objects.
-						//var genericArguments = type.IsGenericType ? type.GetGenericArguments() : Type.EmptyTypes;
-
-						//// We only allow for one generic argument, as of now…
-						//if (genericArguments.Length > 1) continue;
-
-						//var parentType = type;
-
-						//var genericRendererType = !type.IsSubclassOf(typeof(AudioRenderer)) ? !type.IsSubclassOf(typeof(VideoRenderer)) ? null : typeof(VideoRenderer<>) : typeof(AudioRenderer<>);
-
-						//if (genericRendererType != null)
-						//{
-						//	// A renderer can come in two flavors:
-						//	// A generic version with a constructor taking the render object, where the generic argument matches the rules mentioned before.
-						//	// A non-generic version with an empty constructor.
-						//	do
-						//	{
-						//		parentType = type.BaseType;
-
-						//		if (parentType.IsGenericType)
-						//		{
-						//			var parentTypeDefinition = parentType.GetGenericTypeDefinition();
-						//			var parentTypeGenericArguments = parentType.GetGenericArguments();
-
-						//			if (parentTypeDefinition == genericRendererType)
-						//			{
-						//				if (IsGenericArgumentTypeSupported(parentTypeGenericArguments[0], supportedRenderObjectTypes, type.IsGenericType, !type.IsGenericType, GenericParameterAttributes.ReferenceTypeConstraint | GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.ReferenceTypeConstraint)
-						//					&& type.GetConstructor(new[] { parentTypeGenericArguments[0] }) != null)
-						//				{
-						//					pluginList.Add(new PluginInformation(type));
-						//					break;
-						//				}
-						//			}
-						//		}
-						//		else if (parentType == genericRendererType.BaseType)
-						//		{
-						//			if (!type.IsGenericType && type.GetConstructor(Type.EmptyTypes) != null) pluginList.Add(new PluginInformation(type));
-						//			break;
-						//		}
-						//	}
-						//	while (true);
-						//}
+						else if (typeof(ControlFocusedJoypad).IsAssignableFrom(type))
+						{
+							// Hides the Win32 P/Invoke joypad plugin if we aren't running on Windows NT.
+							if (Environment.OSVersion.Platform == PlatformID.Win32NT || type != typeof(Win32KeyboardJoypad))
+							{
+								pluginList.Add(new PluginInformation(PluginKind.Joypad, type));
+							}
+						}
 					}
 					catch (TypeLoadException ex)
 					{
