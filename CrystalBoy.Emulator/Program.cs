@@ -253,8 +253,17 @@ namespace CrystalBoy.Emulator
 		#endregion
 
 #if DEBUG
+		private enum ProcessDpiAwareness
+		{
+			DpiUnaware = 0,
+			SystemDpiAware = 1,
+			PerMonitorDpiAware = 2,
+		}
+
 		[System.Runtime.InteropServices.DllImport("user32", SetLastError = true)]
 		private static extern bool SetProcessDPIAware();
+		[System.Runtime.InteropServices.DllImport("user32", SetLastError = true)]
+		private static extern bool SetProcessDpiAwareness(ProcessDpiAwareness value);
 #endif
 
 		/// <summary>Application entry point.</summary>
@@ -264,7 +273,8 @@ namespace CrystalBoy.Emulator
 			Console.SetError(new StreamWriter(new ErrorStream(Console.OpenStandardError(), "CrystalBoy.Emulator.log")) { AutoFlush = true });
 
 #if DEBUG // When debugging in Visual Studio, this will enable DPI-awareness for our application
-			SetProcessDPIAware();
+			try { SetProcessDpiAwareness(ProcessDpiAwareness.PerMonitorDpiAware); }
+			catch (EntryPointNotFoundException) { SetProcessDPIAware(); }
 #endif
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
