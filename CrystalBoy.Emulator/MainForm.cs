@@ -15,7 +15,7 @@ using CrystalBoy.Emulator.Joypads;
 
 namespace CrystalBoy.Emulator
 {
-	partial class MainForm : Form
+	partial class MainForm : DpiAwareForm
 	{
 		private static readonly long SpeedUpdateTicks = Stopwatch.Frequency / 10;
 

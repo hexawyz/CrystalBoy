@@ -25,11 +25,28 @@ using System.Windows.Forms;
 namespace CrystalBoy.Emulator
 {
 #if PINVOKE
-	static class NativeMethods
+	internal static class NativeMethods
 	{
 		[SuppressUnmanagedCodeSecurity]
 		[DllImport("user32.dll", ExactSpelling = true)]
 		public static extern ushort GetAsyncKeyState(Keys vKey);
+
+		[StructLayout(LayoutKind.Sequential)]
+		public struct Rect
+		{
+			public int Left;
+			public int Top;
+			public int Right;
+			public int Bottom;
+
+			public Rect(int left, int top, int right, int bottom)
+			{
+				Left = left;
+				Top = top;
+				Right = right;
+				Bottom = bottom;
+			}
+		}
 	}
 #endif
 }
