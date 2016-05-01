@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{145C91F8-4DEC-42D3-B51D-7E7543E8FBCE}"
 	ProjectSection(SolutionItems) = preProject
@@ -24,6 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Core", "CrystalB
 	ProjectSection(ProjectDependencies) = postProject
 		{64472336-07E7-4879-9A07-A8DD98B763A1} = {64472336-07E7-4879-9A07-A8DD98B763A1}
 		{71B95B4F-60ED-4E17-8F7B-281C8F07DC17} = {71B95B4F-60ED-4E17-8F7B-281C8F07DC17}
+		{4F8015C9-70E1-44CD-83D3-8A1E9D6CF74E} = {4F8015C9-70E1-44CD-83D3-8A1E9D6CF74E}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator", "CrystalBoy.Emulator\CrystalBoy.Emulator.csproj", "{576E8DDB-67FD-4948-9B83-1C732AAC3175}"
@@ -39,6 +40,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulator.Rendering.SharpDX", "CrystalBoy.Emulator.Rendering.SharpDX\CrystalBoy.Emulator.Rendering.SharpDX.csproj", "{7FD501EC-302B-4D7B-BCA3-F96F187E5A4E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrystalBoy.Emulation.Windows.Forms", "CrystalBoy.Emulation.Windows.Forms\CrystalBoy.Emulation.Windows.Forms.csproj", "{8D6C649A-4058-47FF-849A-66ACD22FE5AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weavers", "Weavers\Weavers.csproj", "{4F8015C9-70E1-44CD-83D3-8A1E9D6CF74E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,6 +89,10 @@ Global
 		{8D6C649A-4058-47FF-849A-66ACD22FE5AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D6C649A-4058-47FF-849A-66ACD22FE5AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D6C649A-4058-47FF-849A-66ACD22FE5AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F8015C9-70E1-44CD-83D3-8A1E9D6CF74E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F8015C9-70E1-44CD-83D3-8A1E9D6CF74E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F8015C9-70E1-44CD-83D3-8A1E9D6CF74E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F8015C9-70E1-44CD-83D3-8A1E9D6CF74E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
