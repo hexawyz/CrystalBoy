@@ -51,6 +51,7 @@
     <Compile Include="..\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
+    <Compile Include="ControlBasedPlugin.cs" />
     <Compile Include="ControlFocusedJoypad.cs" />
     <Compile Include="ControlVideoRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace CrystalBoy.Emulation.Windows.Forms
 {
-	public abstract class ControlVideoRenderer : IVideoRenderer
+	public abstract class ControlVideoRenderer : ControlBasedPlugin, IVideoRenderer
 	{
 		private volatile bool _borderVisible;
 
@@ -25,20 +25,8 @@ namespace CrystalBoy.Emulation.Windows.Forms
 			}
 		}
 
-		protected Control RenderControl { get; }
-		protected SynchronizationContext SynchronizationContext { get; }
-
 		public ControlVideoRenderer(Control renderControl)
-		{
-			if (renderControl == null) throw new ArgumentNullException(nameof(renderControl));
-
-			RenderControl = renderControl;
-			SynchronizationContext = renderControl.InvokeRequired ?
-				(SynchronizationContext)renderControl.Invoke((Func<SynchronizationContext>)(() => SynchronizationContext.Current)) :
-				SynchronizationContext.Current;
-		}
-
-		public virtual void Dispose()
+			: base(renderControl)
 		{
 		}
 		
