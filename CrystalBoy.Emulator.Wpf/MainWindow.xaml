@@ -1,0 +1,53 @@
+﻿<Window x:Class="CrystalBoy.Emulator.MainWindow"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CrystalBoy.Emulator"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        mc:Ignorable="d"
+        Title="CrystalBoy" Height="350" Width="350" ResizeMode="CanResizeWithGrip" UseLayoutRounding="True">
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Open" CanExecute="OnCanExecuteAlways" Executed="OnOpenExecuted" />
+        <CommandBinding Command="local:EmulatorCommands.ShowRomInformation" CanExecute="OnShowRomInformationCanExecute" Executed="OnShowRomInformationExecuted" />
+        <CommandBinding Command="local:EmulatorCommands.Exit" CanExecute="OnCanExecuteAlways" Executed="OnExitExecuted" />
+    </Window.CommandBindings>
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Command="ApplicationCommands.Open" />
+                <Separator />
+                <MenuItem Command="local:EmulatorCommands.ShowRomInformation" />
+                <Separator />
+                <MenuItem Command="local:EmulatorCommands.Exit" />
+            </MenuItem>
+            <MenuItem Header="_Emulation">
+                <MenuItem Command="local:EmulatorCommands.Pause" />
+                <MenuItem Header="Video">
+                    <MenuItem Header="Zoom" ItemsSource="{Binding ZoomLevels}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Header" Value="{Binding Value}" />
+                                <Setter Property="HeaderStringFormat" Value="{}{0:P0}" />
+                                <Setter Property="IsChecked" Value="{Binding IsSelected, Mode=OneWay}" />
+                                <EventSetter Event="Click" Handler="OnZoomLevelMenuItemClick" />
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Tools">
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Command="local:EmulatorCommands.About" />
+            </MenuItem>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding RelativeSpeed}" ContentStringFormat="Speed: {0:P0}" />
+        </StatusBar>
+        <WindowsFormsHost>
+            <wf:Control x:Name="renderTarget" />
+        </WindowsFormsHost>
+    </DockPanel>
+</Window>

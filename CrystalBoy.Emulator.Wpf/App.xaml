@@ -1,0 +1,14 @@
+﻿<Application x:Class="CrystalBoy.Emulator.App"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CrystalBoy.Emulator"
+        xmlns:converters="clr-namespace:CrystalBoy.Emulator.Converters"
+        StartupUri="MainWindow.xaml">
+	<Application.Resources>
+		<converters:Color15ToBrushConverter x:Key="Color15ToBrushConverter" />
+		<Style TargetType="{x:Type Button}">
+			<Setter Property="Width" Value="75" />
+			<Setter Property="Height" Value="23" />
+		</Style>
+	</Application.Resources>
+</Application>
