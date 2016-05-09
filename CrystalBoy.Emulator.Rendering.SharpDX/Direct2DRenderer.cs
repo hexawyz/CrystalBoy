@@ -40,7 +40,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			_clearColor = new RawColor4(1, 1, 1, 1);
 			_factory = new Factory(FactoryType.SingleThreaded, DebugLevel.None);
 			ResetRendering();
-			RenderControl.FindForm().SizeChanged += OnSizeChanged;
+			(RenderControl.TopLevelControl ?? RenderControl).SizeChanged += OnSizeChanged;
 		}
 
 		public void Dispose()
@@ -51,7 +51,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			if (_factory != null) _factory.Dispose();
 			_factory = null;
 
-			RenderControl.FindForm().SizeChanged -= OnSizeChanged;
+			(RenderControl.TopLevelControl ?? RenderControl).SizeChanged -= OnSizeChanged;
 		}
 
 		private void ResetRendering()

@@ -643,7 +643,7 @@
     <value>borderOffToolStripMenuItem</value>
   </data>
   <data name="openFileDialog.Filter" xml:space="preserve">
-    <value>GameBoy ROMs (*.gb;*.gbc;*.gbc)|*.gb;*.gbc;*.gbc|All Files (*.*)|*.*</value>
+    <value>GameBoy ROMs (*.gb;*.gbc;*.cgb)|*.gb;*.gbc;*.cgb|All Files (*.*)|*.*</value>
   </data>
   <data name="zoom800toolStripMenuItem.ToolTipText" xml:space="preserve">
     <value>Zoom to 800%.</value>

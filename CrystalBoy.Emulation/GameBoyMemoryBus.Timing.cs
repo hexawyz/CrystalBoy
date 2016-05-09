@@ -29,17 +29,16 @@ namespace CrystalBoy.Emulation
 
 		public int LcdCycleCount { get { return rasterCycles; } }
 
-		public bool AddCycles(int count) { return AddVariableCycles(count); }
+		public bool AddCycles(int count) => AddVariableCycles(count);
 
-		internal bool AddVariableCycles(int count)
+		private bool AddVariableCycles(int count)
 		{
 #if WITH_DEBUGGING && DEBUG_CYCLE_COUNTER
 			debugCycleCount += count;
 #endif
 			AddFixedCycles(doubleSpeed ? count >> 1 : count);
 
-			if (!frameDone) return true;
-			else return frameDone = false;
+			return !frameDone || (frameDone = false);
 		}
 
 		internal unsafe void AddFixedCycles(int count)

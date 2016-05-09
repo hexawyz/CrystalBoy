@@ -19,8 +19,8 @@ namespace CrystalBoy.Emulator
 		private EmulationStatus emulationStatus;
 		private Stopwatch frameStopwatch;
 		private Stopwatch frameRateStopwatch;
-		private double lastFrameTime;
-		private double currentFrameTime;
+		private long lastFrameTime;
+		private long currentFrameTime;
 		private bool enableFramerateLimiter;
 
 		public event EventHandler AfterReset;
@@ -129,8 +129,8 @@ namespace CrystalBoy.Emulator
 				}
 			}
 
-			lastFrameTime = currentFrameTime;
-			currentFrameTime = frameRateStopwatch.ElapsedTicks;
+			Volatile.Write(ref lastFrameTime, currentFrameTime);
+			Volatile.Write(ref currentFrameTime, frameRateStopwatch.ElapsedTicks);
 
 			frameStopwatch.Reset();
 			frameStopwatch.Start();
@@ -197,7 +197,7 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		public double EmulatedFrameRate => emulationStatus == EmulationStatus.Running ? Stopwatch.Frequency / (currentFrameTime - lastFrameTime) : 0;
+		public double EmulatedFrameRate => emulationStatus == EmulationStatus.Running ? Stopwatch.Frequency / (double)(currentFrameTime - lastFrameTime) : 0;
 
 		public double EmulatedSpeed => EmulatedFrameRate / ReferenceFrameRate;
 
