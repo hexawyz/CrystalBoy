@@ -44,7 +44,7 @@ namespace CrystalBoy.Emulator.Renderers
 			_stopwatch = Stopwatch.StartNew();
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 			_compositeBitmap.Dispose();
 			_borderBitmapTripleBufferingSystem.Dispose();
