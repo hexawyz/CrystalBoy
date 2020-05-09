@@ -43,7 +43,7 @@ namespace CrystalBoy.Emulator.Rendering.SharpDX
 			(RenderControl.TopLevelControl ?? RenderControl).SizeChanged += OnSizeChanged;
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 			DisposeBitmaps();
 			DisposeRenderTargets();

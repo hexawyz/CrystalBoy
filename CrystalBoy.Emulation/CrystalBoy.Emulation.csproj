@@ -1,210 +1,43 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{48489DFD-05FC-4AF5-B238-15912EC77719}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CrystalBoy.Emulation</RootNamespace>
-    <AssemblyName>CrystalBoy.Emulation</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net451</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <DefineConstants>$(DefineConstants);WITH_DEBUGGING;WITH_THREADING</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WITH_DEBUGGING;WITH_THREADING</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Debug\CrystalBoy.Emulation.xml</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;WITH_DEBUGGING;WITH_THREADING</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\CrystalBoy.Emulation.xml</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
+  <PropertyGroup Label="AssemblyInfo">
+    <Description>CrystalBoy Emulation Core</Description>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\AssemblyInfo.Common.cs">
-      <Link>Properties\AssemblyInfo.Common.cs</Link>
+    <Compile Update="GameBoyMemoryBus.*.cs">
+      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
     </Compile>
-    <Compile Include="AudioBuffer.cs" />
-    <Compile Include="AudioRenderer.cs" />
-    <Compile Include="AudioSampleGenerator.cs" />
-    <Compile Include="AudioStatusSnapshot.cs" />
-    <Compile Include="BorderVisibility.cs" />
-    <Compile Include="Joypads\DummyJoypad.cs" />
-    <Compile Include="GameBoyClockManager.cs" />
-    <Compile Include="IClockManager.cs" />
-    <Compile Include="IVideoRenderer.cs" />
-    <Compile Include="Mappers\RomController.cs" />
-    <Compile Include="Mappers\MemoryBankController.cs" />
-    <Compile Include="Mappers\MemoryBankController1.cs" />
-    <Compile Include="Mappers\MemoryBankController2.cs" />
-    <Compile Include="Mappers\MemoryBankController3.cs" />
-    <Compile Include="Mappers\MemoryBankController5.cs" />
-    <Compile Include="Interrupt.cs" />
-    <Compile Include="Mapper.cs" />
-    <Compile Include="FrameEventArgs.cs" />
-    <Compile Include="NullClockManager.cs" />
-    <Compile Include="PaletteAccess.cs" />
-    <Compile Include="Port.cs" />
-    <Compile Include="Processor.cs" />
-    <Compile Include="Processor.Generated.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Update="Processor.Generated.cs">
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Processor.Generated.tt</DependentUpon>
     </Compile>
-    <Compile Include="ProcessorStatus.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PortAccess.cs" />
-    <Compile Include="ReadKeysEventArgs.cs" />
-    <Compile Include="RealTimeClockState.cs" />
-    <Compile Include="SuperGameBoyCommand.cs" />
-    <Compile Include="VideoFrameData.cs" />
-    <Compile Include="RumbleEventArgs.cs" />
-    <Compile Include="VideoMemorySnapshot.cs" />
-    <Compile Include="GameBoyMemoryBus.cs" />
-    <Compile Include="GameBoyMemoryBus.Threading.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Snapshot.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LookupTables.cs" />
-    <Compile Include="VideoFrameRenderer.cs" />
-    <Compile Include="VideoRenderingEngine.cs" />
-    <Compile Include="GameBoyMemoryBus.Processor.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HardwareType.cs" />
-    <Compile Include="GameBoyMemoryBus.Rom.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Debug.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Interrupts.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Joypad.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Timer.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Ports.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Audio.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Video.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Memory.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.Timing.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.BootRom.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameBoyMemoryBus.SuperGameBoy.cs">
-      <DependentUpon>GameBoyMemoryBus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="RtcRegister.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj">
-      <Project>{021D266F-0D9F-4FCD-A0A9-25D0823A46B6}</Project>
-      <Name>CrystalBoy.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="OriginalDrawFrame.txt" />
-    <Content Include="Timings.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\CrystalBoy.snk">
-      <Link>CrystalBoy.snk</Link>
-    </None>
-    <EmbeddedResource Condition="Exists('$(ProjectDir)cgb.rom')" Include="cgb.rom" />
-    <EmbeddedResource Condition="Exists('$(ProjectDir)dmg.rom')" Include="dmg.rom" />
-    <EmbeddedResource Condition="Exists('$(ProjectDir)sgb.rom')" Include="sgb.rom" />
-    <None Include="Processor.Generated.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
+    <None Update="Processor.Generated.tt" Generator="TextTemplatingFileGenerator">
       <LastGenOutput>Processor.Generated.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <ItemGroup>
+    <None Include="..\CrystalBoy.snk" Link="CrystalBoy.snk" />
+    <BiosArchitecture Include="cgb;dmg;sgb" />
+    <BiosRomFiles Include="@(BiosArchitecture->'%(Filename).rom')" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  <Target Name="EmbedRomFiles" BeforeTargets="AssignTargetPaths">
+    <ItemGroup>
+      <EmbeddedResource Include="@(BiosRomFiles)" Condition="Exists('%(Filename)%(Extension)')" />
+    </ItemGroup>
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

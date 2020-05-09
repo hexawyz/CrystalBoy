@@ -14,6 +14,9 @@ namespace CrystalBoy.Core
 {
 	public static class MakerDictionary
 	{
+		/// <summary>Gets the name of the maker with the specified maker code.</summary>
+		/// <param name="makerCode">A maker code.</param>
+		/// <returns></returns>
 		public static string GetMakerName(string makerCode)
 		{
 			string result;

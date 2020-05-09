@@ -1,26 +1,14 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Fody;
 using Mono.Cecil;
-using Mono.Cecil.Rocks;
 using Mono.Cecil.Cil;
 
 namespace Weavers
 {
-	public class ModuleWeaver
+    public class ModuleWeaver : BaseModuleWeaver
 	{
-		// Will log an informational message to MSBuild
-		public Action<string> LogInfo { get; set; }
-
-		// An instance of Mono.Cecil.ModuleDefinition for processing
-		public ModuleDefinition ModuleDefinition { get; set; }
-
-		// Init logging delegates to make testing easier
-		public ModuleWeaver()
-		{
-			LogInfo = m => { };
-		}
-
-		public void Execute()
+		public override void Execute()
 		{
 			var memoryType =
 			(
@@ -57,7 +45,7 @@ namespace Weavers
 				).Single()
 			);
 
-			LogInfo("Weaving of memory methods completed.");
+			WriteInfo("Weaving of memory methods completed.");
 		}
 
 		private static bool IsVoidPointer(TypeReference type) => type.IsPointer && IsVoid(type.GetElementType());
@@ -90,5 +78,7 @@ namespace Weavers
 			ilProcessor.Emit(OpCodes.Initblk);
 			ilProcessor.Emit(OpCodes.Ret);
 		}
-	}
+
+		public override IEnumerable<string> GetAssembliesForScanning() => Enumerable.Empty<string>();
+    }
 }

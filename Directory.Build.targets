@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <SharpDXVersion>3.0.2</SharpDXVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Update="Fody" Version="6.1.1" PrivateAssets="All" />
+    <PackageReference Update="FodyHelpers" Version="6.1.1" PrivateAssets="All" />
+    <PackageReference Update="SharpDX" Version="$(SharpDXVersion)" />
+    <PackageReference Update="SharpDX.D3DCompiler" Version="$(SharpDXVersion)" />
+    <PackageReference Update="SharpDX.Direct2D1" Version="$(SharpDXVersion)" />
+    <PackageReference Update="SharpDX.Direct3D11" Version="$(SharpDXVersion)" />
+    <PackageReference Update="SharpDX.DXGI" Version="$(SharpDXVersion)" />
+    <PackageReference Update="SharpDX.XAudio2" Version="$(SharpDXVersion)" />
+    <PackageReference Update="SharpDX.XInput" Version="$(SharpDXVersion)" />
+  </ItemGroup>
+</Project>

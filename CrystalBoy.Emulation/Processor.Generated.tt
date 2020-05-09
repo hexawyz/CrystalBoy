@@ -1,5 +1,6 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
-<#@ assembly name="$(SolutionDir)CrystalBoy.Core.OpcodeTableGenerator\$(OutDir)OpcodeTableGenerator.dll" #>
+<#@ assembly name="netstandard" #>
+<#@ assembly name="$(SolutionDir)CrystalBoy.Core.OpcodeTableGenerator\bin\$(Configuration)\netstandard2.0\OpcodeTableGenerator.dll" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Globalization" #>
 <#@ import namespace="System.Reflection" #>

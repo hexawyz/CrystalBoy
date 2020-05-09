@@ -1,12 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30105.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{145C91F8-4DEC-42D3-B51D-7E7543E8FBCE}"
 	ProjectSection(SolutionItems) = preProject
 		AssemblyInfo.Common.cs = AssemblyInfo.Common.cs
+		AssemblyInfo.props = AssemblyInfo.props
 		CrystalBoy.snk = CrystalBoy.snk
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 		ReadMe.md = ReadMe.md
 		ToDo.txt = ToDo.txt
 	EndProjectSection
@@ -102,5 +105,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C9275E82-8DDB-4A57-AC02-0413C167F24F}
 	EndGlobalSection
 EndGlobal
