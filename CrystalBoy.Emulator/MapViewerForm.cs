@@ -26,24 +26,24 @@ namespace CrystalBoy.Emulator
 {
 	partial class MapViewerForm : EmulatorForm
 	{
-		Bitmap backgroundMapBitmap,
-			windowMapBitmap,
-			customMapBitmap;
-		unsafe uint[] colors;
+        private readonly Bitmap _backgroundMapBitmap;
+        private readonly Bitmap _windowMapBitmap;
+        private readonly Bitmap _customMapBitmap;
+        private readonly unsafe uint[] _colors;
 
 		public MapViewerForm(EmulatedGameBoy emulatedGameBoy)
 			: base(emulatedGameBoy)
 		{
 			InitializeComponent();
-			backgroundMapBitmap = new Bitmap(256, 256);
-			windowMapBitmap = new Bitmap(256, 256);
-			customMapBitmap = new Bitmap(256, 256);
+			_backgroundMapBitmap = new Bitmap(256, 256);
+			_windowMapBitmap = new Bitmap(256, 256);
+			_customMapBitmap = new Bitmap(256, 256);
 
-			backgroundMapPanel.Bitmap = backgroundMapBitmap;
-			windowMapPanel.Bitmap = windowMapBitmap;
-			customMapPanel.Bitmap = customMapBitmap;
+			backgroundMapPanel.Bitmap = _backgroundMapBitmap;
+			windowMapPanel.Bitmap = _windowMapBitmap;
+			customMapPanel.Bitmap = _customMapBitmap;
 
-			colors = new uint[32]; // 8 palettes of 4 colors each
+			_colors = new uint[32]; // 8 palettes of 4 colors each
 		}
 
 		protected override void OnVisibleChanged(EventArgs e)
@@ -88,15 +88,15 @@ namespace CrystalBoy.Emulator
 
 		private unsafe void UpdateColorPalettes(ushort *paletteMemory)
 		{
-			for (int i = 0; i < colors.Length; i++)
-				colors[i] = LookupTables.StandardColorLookupTable32[*paletteMemory++];
+			for (int i = 0; i < _colors.Length; i++)
+				_colors[i] = LookupTables.StandardColorLookupTable32[*paletteMemory++];
 		}
 
 		private unsafe void UpdateGreyPalette(byte bgp)
 		{
 			for (int i = 0; i < 4; i++)
 			{
-				colors[i] = LookupTables.GrayPalette[bgp & 3];
+				_colors[i] = LookupTables.GrayPalette[bgp & 3];
 				bgp >>= 2;
 			}
 		}
@@ -116,24 +116,24 @@ namespace CrystalBoy.Emulator
 					signedIndex = (lcdc & 0x10) == 0;
 					tileSetOffset = signedIndex ? 0x1000 : 0x0000;
 
-					fixed (uint* colors = this.colors)
+					fixed (uint* colors = this._colors)
 					{
 						if (EmulatedGameBoy.Bus.ColorMode)
 						{
-							UpdateColorMapBitmap(backgroundMapBitmap, videoRam + bgOffset, videoRam + bgOffset + 0x2000, (ushort*)(videoRam + tileSetOffset), (ushort*)(videoRam + tileSetOffset + 0x2000), signedIndex, colors);
-							UpdateColorMapBitmap(windowMapBitmap, videoRam + winOffset, videoRam + winOffset + 0x2000, (ushort*)(videoRam + tileSetOffset), (ushort*)(videoRam + tileSetOffset + 0x2000), signedIndex, colors);
+							UpdateColorMapBitmap(_backgroundMapBitmap, videoRam + bgOffset, videoRam + bgOffset + 0x2000, (ushort*)(videoRam + tileSetOffset), (ushort*)(videoRam + tileSetOffset + 0x2000), signedIndex, colors);
+							UpdateColorMapBitmap(_windowMapBitmap, videoRam + winOffset, videoRam + winOffset + 0x2000, (ushort*)(videoRam + tileSetOffset), (ushort*)(videoRam + tileSetOffset + 0x2000), signedIndex, colors);
 						}
 						else
 						{
-							UpdateMapBitmap(backgroundMapBitmap, videoRam + bgOffset, (ushort*)(videoRam + tileSetOffset), signedIndex, colors);
-							UpdateMapBitmap(windowMapBitmap, videoRam + winOffset, (ushort*)(videoRam + tileSetOffset), signedIndex, colors);
+							UpdateMapBitmap(_backgroundMapBitmap, videoRam + bgOffset, (ushort*)(videoRam + tileSetOffset), signedIndex, colors);
+							UpdateMapBitmap(_windowMapBitmap, videoRam + winOffset, (ushort*)(videoRam + tileSetOffset), signedIndex, colors);
 						}
 					}
 				}
 			else
 			{
-				Common.ClearBitmap(backgroundMapBitmap);
-				Common.ClearBitmap(windowMapBitmap);
+				Common.ClearBitmap(_backgroundMapBitmap);
+				Common.ClearBitmap(_windowMapBitmap);
 			}
 			backgroundMapPanel.Invalidate();
 			windowMapPanel.Invalidate();
@@ -148,16 +148,16 @@ namespace CrystalBoy.Emulator
 				int mapOffset = mapData0RadioButton.Checked ? 0x1800 : 0x1C00;
 				int tileSetOffset = tileData0RadioButton.Checked ? 0 : 0x1000;
 
-				fixed (uint* colors = this.colors)
+				fixed (uint* colors = this._colors)
 				{
 					if (EmulatedGameBoy.Bus.ColorMode)
-						UpdateColorMapBitmap(customMapBitmap, videoRam + mapOffset, videoRam + mapOffset + 0x2000, (ushort*)(videoRam + tileSetOffset), (ushort*)(videoRam + tileSetOffset + 0x2000), tileData1RadioButton.Checked, colors);
+						UpdateColorMapBitmap(_customMapBitmap, videoRam + mapOffset, videoRam + mapOffset + 0x2000, (ushort*)(videoRam + tileSetOffset), (ushort*)(videoRam + tileSetOffset + 0x2000), tileData1RadioButton.Checked, colors);
 					else
-						UpdateMapBitmap(customMapBitmap, videoRam + mapOffset, (ushort*)(videoRam + tileSetOffset), tileData1RadioButton.Checked, colors);
+						UpdateMapBitmap(_customMapBitmap, videoRam + mapOffset, (ushort*)(videoRam + tileSetOffset), tileData1RadioButton.Checked, colors);
 				}
 			}
 			else
-				Common.ClearBitmap(customMapBitmap);
+				Common.ClearBitmap(_customMapBitmap);
 			customMapPanel.Invalidate();
 		}
 

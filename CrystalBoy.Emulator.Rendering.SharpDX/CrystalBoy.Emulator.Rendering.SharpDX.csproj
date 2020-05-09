@@ -1,9 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>$(NetCoreTargetFramework)</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>Rendering.SharpDX</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Label="AssemblyInfo">

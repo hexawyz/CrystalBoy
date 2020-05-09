@@ -1,18 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>$(NetCoreTargetFramework)</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Label="AssemblyInfo">
     <Description>CrystalBoy Disassembly Utilities for Windows Forms</Description>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj" />
+    <None Remove="DisassemblyView.bmp" />
+    <None Remove="symbols.png" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
+    <EmbeddedResource Include="DisassemblyView.bmp" />
+    <EmbeddedResource Include="symbols.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalBoy.Core\CrystalBoy.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 <Project>
-  <PropertyGroup>
-    <SharpDXVersion>3.0.2</SharpDXVersion>
+  <PropertyGroup Label="Package Versions">
+    <SharpDXVersion>4.0.0</SharpDXVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Update="Fody" Version="6.1.1" PrivateAssets="All" />

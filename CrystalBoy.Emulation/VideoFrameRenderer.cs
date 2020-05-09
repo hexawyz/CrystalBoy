@@ -1,19 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using CrystalBoy.Core;
 
 namespace CrystalBoy.Emulation
 {
-	public sealed class VideoFrameRenderer : IDisposable
+    public sealed class VideoFrameRenderer : IDisposable
 	{
-		private MemoryBlock renderPaletteMemoryBlock;
+		private MemoryBlock _renderPaletteMemoryBlock;
 
-		private unsafe uint** backgroundPalettes32, spritePalettes32;
-		private unsafe ushort** backgroundPalettes16, spritePalettes16;
+        private unsafe uint** _backgroundPalettes32;
+        private unsafe uint** _spritePalettes32;
+        private unsafe ushort** _backgroundPalettes16;
+        private unsafe ushort** _spritePalettes16;
 
-		private uint[] backgroundPalette;
-		private uint[] objectPalette1;
-		private uint[] objectPalette2;
+        private uint[] _backgroundPalette;
+		private uint[] _objectPalette1;
+		private uint[] _objectPalette2;
 		
 		public unsafe VideoFrameRenderer()
 		{
@@ -21,40 +22,40 @@ namespace CrystalBoy.Emulation
 			uint* paletteTable;
 
 			// We will allocate memory for 16 palettes of 4 colors each, and for a palette pointer table of 16 pointers
-			renderPaletteMemoryBlock = new MemoryBlock(2 * 8 * sizeof(uint*) + 2 * 8 * 4 * sizeof(uint));
+			_renderPaletteMemoryBlock = new MemoryBlock(2 * 8 * sizeof(uint*) + 2 * 8 * 4 * sizeof(uint));
 
-			pointerTable = (uint**)renderPaletteMemoryBlock.Pointer; // Take 16 uint* at the beginning for pointer table
+			pointerTable = (uint**)_renderPaletteMemoryBlock.Pointer; // Take 16 uint* at the beginning for pointer table
 			paletteTable = (uint*)(pointerTable + 16); // Take the rest for palette array
 
 			// Fill the pointer table with palette
 			for (int i = 0; i < 16; i++)
 				pointerTable[i] = paletteTable + 4 * i; // Each palette is 4 uint wide
 
-			backgroundPalettes32 = pointerTable; // First 8 pointers are for the 8 background palettes
-			spritePalettes32 = backgroundPalettes32 + 8; // Other 8 pointers are for the 8 sprite palettes
+			_backgroundPalettes32 = pointerTable; // First 8 pointers are for the 8 background palettes
+			_spritePalettes32 = _backgroundPalettes32 + 8; // Other 8 pointers are for the 8 sprite palettes
 
 			// We'll use the same memory for 16 and 32 bit palettes, because only one will be used at once
-			backgroundPalettes16 = (ushort**)backgroundPalettes32;
-			spritePalettes16 = backgroundPalettes16 + 8;
+			_backgroundPalettes16 = (ushort**)_backgroundPalettes32;
+			_spritePalettes16 = _backgroundPalettes16 + 8;
 
-			backgroundPalette = new uint[4];
-			objectPalette1 = new uint[4];
-			objectPalette2 = new uint[4];
+			_backgroundPalette = new uint[4];
+			_objectPalette1 = new uint[4];
+			_objectPalette2 = new uint[4];
 		}
 
 		internal void Reset(bool colorHardware, bool useBootRom)
 		{
 			if (!colorHardware || useBootRom)
 			{
-				Buffer.BlockCopy(LookupTables.GrayPalette, 0, backgroundPalette, 0, 4 * sizeof(uint));
-				Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette1, 0, 4 * sizeof(uint));
-				Buffer.BlockCopy(LookupTables.GrayPalette, 0, objectPalette2, 0, 4 * sizeof(uint));
+				Buffer.BlockCopy(LookupTables.GrayPalette, 0, _backgroundPalette, 0, 4 * sizeof(uint));
+				Buffer.BlockCopy(LookupTables.GrayPalette, 0, _objectPalette1, 0, 4 * sizeof(uint));
+				Buffer.BlockCopy(LookupTables.GrayPalette, 0, _objectPalette2, 0, 4 * sizeof(uint));
 			}
 		}
 		
 		public void Dispose()
 		{
-			renderPaletteMemoryBlock.Dispose();
+			_renderPaletteMemoryBlock.Dispose();
 		}
 
 		public unsafe void RenderVideoBorder32(VideoFrameData frame, IntPtr buffer, int stride)
@@ -107,17 +108,17 @@ namespace CrystalBoy.Emulation
 
 		private unsafe void SyncGreyscalePalettes()
 		{
-			for (int i = 0; i < backgroundPalette.Length; i++)
-				backgroundPalette[i] = backgroundPalettes32[0][i];
-			for (int i = 0; i < objectPalette1.Length; i++)
-				objectPalette1[i] = spritePalettes32[0][i];
-			for (int i = 0; i < objectPalette2.Length; i++)
-				objectPalette2[i] = spritePalettes32[1][i];
+			for (int i = 0; i < _backgroundPalette.Length; i++)
+				_backgroundPalette[i] = _backgroundPalettes32[0][i];
+			for (int i = 0; i < _objectPalette1.Length; i++)
+				_objectPalette1[i] = _spritePalettes32[0][i];
+			for (int i = 0; i < _objectPalette2.Length; i++)
+				_objectPalette2[i] = _spritePalettes32[1][i];
 		}
 		
 		private unsafe void FillPalettes16(ushort* paletteData)
 		{
-			ushort* dest = backgroundPalettes16[0];
+			ushort* dest = _backgroundPalettes16[0];
 
 			for (int i = 0; i < 64; i++)
 				*dest++ = LookupTables.StandardColorLookupTable16[*paletteData++];
@@ -125,7 +126,7 @@ namespace CrystalBoy.Emulation
 
 		private unsafe void FillPalettes32(ushort* paletteData)
 		{
-			uint* dest = backgroundPalettes32[0];
+			uint* dest = _backgroundPalettes32[0];
 
 			for (int i = 0; i < 64; i++)
 				*dest++ = LookupTables.StandardColorLookupTable32[*paletteData++];
@@ -170,8 +171,7 @@ namespace CrystalBoy.Emulation
 			public bool Priority;
 		}
 
-		ObjectData[] objectData = new ObjectData[10];
-
+		ObjectData[] _objectData = new ObjectData[10];
 
 		/// <summary>Draws the SGB border into a 32 BPP buffer.</summary>
 		/// <param name="frame">The frame for which to draw the border.</param>
@@ -256,10 +256,10 @@ namespace CrystalBoy.Emulation
 			int objHeight, objCount;
 			uint objColor = 0;
 
-			bgPalettes = this.backgroundPalettes32;
-			objPalettes = this.spritePalettes32;
+			bgPalettes = this._backgroundPalettes32;
+			objPalettes = this._spritePalettes32;
 
-			fixed (ObjectData* objectData = this.objectData)
+			fixed (ObjectData* objectData = this._objectData)
 			fixed (ushort* paletteIndexTable = LookupTables.PaletteLookupTable,
 				flippedPaletteIndexTable = LookupTables.FlippedPaletteLookupTable)
 			{
@@ -476,7 +476,6 @@ namespace CrystalBoy.Emulation
 		/// <param name="frame">The frame to render.</param>
 		/// <param name="buffer">The destination buffer.</param>
 		/// <param name="stride">The stride of a buffer line.</param>
-		[CLSCompliant(false)]
 		private unsafe void DrawFrame32(VideoFrameData frame, byte* buffer, int stride)
 		{
 			// WARNING: Very looooooooooong code :D
@@ -503,13 +502,13 @@ namespace CrystalBoy.Emulation
 			int objHeight, objCount;
 			uint objColor = 0;
 
-			bgPalettes = this.backgroundPalettes32;
-			objPalettes = this.spritePalettes32;
+			bgPalettes = this._backgroundPalettes32;
+			objPalettes = this._spritePalettes32;
 
-			fixed (ObjectData* objectData = this.objectData)
+			fixed (ObjectData* objectData = this._objectData)
 			fixed (ushort* paletteIndexTable = LookupTables.PaletteLookupTable,
 				flippedPaletteIndexTable = LookupTables.FlippedPaletteLookupTable)
-			fixed (uint* backgroundPalette = this.backgroundPalette, objectPalette1 = this.objectPalette1, objectPalette2 = this.objectPalette2)
+			fixed (uint* backgroundPalette = this._backgroundPalette, objectPalette1 = this._objectPalette1, objectPalette2 = this._objectPalette2)
 			{
 				tilePalette = bgPalettes[0];
 

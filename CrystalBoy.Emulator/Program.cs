@@ -31,226 +31,226 @@ using CrystalBoy.Emulator.Joypads;
 
 namespace CrystalBoy.Emulator
 {
-	internal static class Program
-	{
-		#region ErrorStream Class
+    internal static class Program
+    {
+        #region ErrorStream Class
 
-		private sealed class ErrorStream : Stream
-		{
-			private Stream standardErrorStream;
-			private Stream fileStream;
-			private string logFileName;
-			private bool fileStreamCreationFailed;
+        private sealed class ErrorStream : Stream
+        {
+            private Stream standardErrorStream;
+            private Stream fileStream;
+            private string logFileName;
+            private bool fileStreamCreationFailed;
 
-			public ErrorStream(Stream standardErrorStream, string logFileName)
-			{
-				this.standardErrorStream = standardErrorStream;
-				this.logFileName = Path.IsPathRooted(logFileName) ? logFileName : Path.Combine(Environment.CurrentDirectory, logFileName);
-			}
+            public ErrorStream(Stream standardErrorStream, string logFileName)
+            {
+                this.standardErrorStream = standardErrorStream;
+                this.logFileName = Path.IsPathRooted(logFileName) ? logFileName : Path.Combine(Environment.CurrentDirectory, logFileName);
+            }
 
-			protected override void Dispose(bool disposing)
-			{
-				if (disposing)
-				{
-					if (standardErrorStream != null) standardErrorStream.Dispose();
-					standardErrorStream = null;
-					if (fileStream != null) fileStream.Close();
-					fileStream = null;
-				}
-				base.Dispose(disposing);
-			}
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    if (standardErrorStream != null) standardErrorStream.Dispose();
+                    standardErrorStream = null;
+                    if (fileStream != null) fileStream.Close();
+                    fileStream = null;
+                }
+                base.Dispose(disposing);
+            }
 
-			public override bool CanRead { get { return false; } }
-			public override bool CanSeek { get { return false; } }
-			public override bool CanWrite { get { return true; } }
-			public override void Flush()
-			{
-				if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
-				standardErrorStream.Flush();
-				if (fileStream != null) fileStream.Flush();
-			}
+            public override bool CanRead { get { return false; } }
+            public override bool CanSeek { get { return false; } }
+            public override bool CanWrite { get { return true; } }
+            public override void Flush()
+            {
+                if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
+                standardErrorStream.Flush();
+                if (fileStream != null) fileStream.Flush();
+            }
 
-			public override long Length
-			{
-				get
-				{
-					if (fileStreamCreationFailed) throw new NotSupportedException();
-					if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
-					return fileStream != null ? fileStream.Length : 0;
-				}
-			}
+            public override long Length
+            {
+                get
+                {
+                    if (fileStreamCreationFailed) throw new NotSupportedException();
+                    if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
+                    return fileStream != null ? fileStream.Length : 0;
+                }
+            }
 
-			public override long Position
-			{
-				get { throw new NotSupportedException(); }
-				set { throw new NotSupportedException(); }
-			}
+            public override long Position
+            {
+                get { throw new NotSupportedException(); }
+                set { throw new NotSupportedException(); }
+            }
 
-			public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state) { throw new NotSupportedException(); }
-			public override int Read(byte[] buffer, int offset, int count) { throw new NotSupportedException(); }
-			public override int ReadByte() { throw new NotSupportedException(); }
+            public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state) { throw new NotSupportedException(); }
+            public override int Read(byte[] buffer, int offset, int count) { throw new NotSupportedException(); }
+            public override int ReadByte() { throw new NotSupportedException(); }
 
-			public override long Seek(long offset, SeekOrigin origin) { throw new NotSupportedException(); }
-			public override void SetLength(long value) { throw new NotSupportedException(); }
+            public override long Seek(long offset, SeekOrigin origin) { throw new NotSupportedException(); }
+            public override void SetLength(long value) { throw new NotSupportedException(); }
 
-			public override void Write(byte[] buffer, int offset, int count)
-			{
-				if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                if (standardErrorStream == null) throw new ObjectDisposedException(GetType().FullName);
 
-				// First write to the standard error stream (which may already have been redirected, but we don't care, really)
-				standardErrorStream.Write(buffer, offset, count);
+                // First write to the standard error stream (which may already have been redirected, but we don't care, really)
+                standardErrorStream.Write(buffer, offset, count);
 
-				// Then attempt to write to the error log file (which may fail *once* and print an error on its own)
-				if (fileStream == null) TryCreateFileStream();
+                // Then attempt to write to the error log file (which may fail *once* and print an error on its own)
+                if (fileStream == null) TryCreateFileStream();
 
-				if (fileStream != null)
-					try { fileStream.Write(buffer, offset, count); }
-					catch (IOException ex)
-					{
-						fileStreamCreationFailed = true;
-						try { fileStream.Close(); }
-						finally { fileStream = null; }
-						// Writes the exception to the error stream (the Write method will be re-entered…)
-						Console.Error.WriteLine(ex);
-					}
-			}
+                if (fileStream != null)
+                    try { fileStream.Write(buffer, offset, count); }
+                    catch (IOException ex)
+                    {
+                        fileStreamCreationFailed = true;
+                        try { fileStream.Close(); }
+                        finally { fileStream = null; }
+                        // Writes the exception to the error stream (the Write method will be re-entered…)
+                        Console.Error.WriteLine(ex);
+                    }
+            }
 
-			private void TryCreateFileStream()
-			{
-				// Only try to create the stream once.
-				if (fileStreamCreationFailed) return;
+            private void TryCreateFileStream()
+            {
+                // Only try to create the stream once.
+                if (fileStreamCreationFailed) return;
 
-				try { fileStream = File.Create(logFileName, 4096, FileOptions.SequentialScan); }
-				catch (Exception ex)
-				{
-					// Set the fail flag first
-					fileStreamCreationFailed = true;
-					// Then write to the error stream (the Write method wil be re-entered, but that shouldn't be a problem…)
-					Console.Error.WriteLine(ex);
-				}
-			}
-		}
+                try { fileStream = File.Create(logFileName, 4096, FileOptions.SequentialScan); }
+                catch (Exception ex)
+                {
+                    // Set the fail flag first
+                    fileStreamCreationFailed = true;
+                    // Then write to the error stream (the Write method wil be re-entered, but that shouldn't be a problem…)
+                    Console.Error.WriteLine(ex);
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		private static readonly Type[] supportedSampleTypes = { typeof(short) };
-		private static readonly Type[] supportedRenderObjectTypes = { typeof(Control), typeof(IWin32Window) };
+        private static readonly Type[] supportedSampleTypes = { typeof(short) };
+        private static readonly Type[] supportedRenderObjectTypes = { typeof(Control), typeof(IWin32Window) };
 
-		private static readonly List<Assembly> pluginAssemblyList = new List<Assembly>();
-		private static readonly List<PluginInformation> pluginList = new List<PluginInformation>();
+        private static readonly List<Assembly> pluginAssemblyList = new List<Assembly>();
+        private static readonly List<PluginInformation> pluginList = new List<PluginInformation>();
 
-		public static readonly ReadOnlyCollection<Assembly> PluginAssemblyCollection = new ReadOnlyCollection<Assembly>(pluginAssemblyList);
-		public static readonly ReadOnlyCollection<PluginInformation> PluginCollection = new ReadOnlyCollection<PluginInformation>(pluginList);
+        public static readonly ReadOnlyCollection<Assembly> PluginAssemblyCollection = new ReadOnlyCollection<Assembly>(pluginAssemblyList);
+        public static readonly ReadOnlyCollection<PluginInformation> PluginCollection = new ReadOnlyCollection<PluginInformation>(pluginList);
 
-		#region Plugin Management
+        #region Plugin Management
 
-		private static void LoadPluginAssemblies()
-		{
-			var pluginAssemblies = new System.Collections.Specialized.StringCollection();
-			bool updateNeeded = false;
-			
-			foreach (string pluginAssembly in Settings.Default.PluginAssemblies)
-			{
-				try
-				{
-					var assembly = Assembly.LoadFrom(pluginAssembly);
+        private static void LoadPluginAssemblies()
+        {
+            var pluginAssemblies = new System.Collections.Specialized.StringCollection();
+            bool updateNeeded = false;
 
-					FindPlugins(assembly);
-					pluginAssemblyList.Add(assembly);
+            foreach (string pluginAssembly in Settings.Default.PluginAssemblies)
+            {
+                try
+                {
+                    var assembly = Assembly.LoadFrom(pluginAssembly);
 
-					pluginAssemblies.Add(pluginAssembly);
-				}
-				catch (FileNotFoundException ex)
-				{
-					Console.Error.WriteLine(ex);
-					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyNotFoundErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-					updateNeeded = true;
-				}
-				catch (BadImageFormatException ex)
-				{
-					Console.Error.WriteLine(ex);
-					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyArchitectureErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-					updateNeeded = true;
-				}
-				catch (Exception ex)
-				{
-					Console.Error.WriteLine(ex);
-					MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyLoadErrorMessage, pluginAssembly, ex), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-					updateNeeded = true;
-				}
-			}
+                    FindPlugins(assembly);
+                    pluginAssemblyList.Add(assembly);
 
-			if (updateNeeded)
-			{
-				Settings.Default.PluginAssemblies = pluginAssemblies;
-				Settings.Default.Save();
-			}
-		}
-		
-		private static void FindPlugins(Assembly assembly)
-		{
-			try
-			{
-				foreach (var type in assembly.GetTypes())
-				{
-					try
-					{
-						// Ignore any abstract type, as we want only real renderers here…
-						if (type.IsAbstract || type.IsGenericTypeDefinition) continue;
+                    pluginAssemblies.Add(pluginAssembly);
+                }
+                catch (FileNotFoundException ex)
+                {
+                    Console.Error.WriteLine(ex);
+                    MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyNotFoundErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    updateNeeded = true;
+                }
+                catch (BadImageFormatException ex)
+                {
+                    Console.Error.WriteLine(ex);
+                    MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyArchitectureErrorMessage, pluginAssembly), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    updateNeeded = true;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                    MessageBox.Show(string.Format(Resources.Culture, Resources.AssemblyLoadErrorMessage, pluginAssembly, ex), Resources.AssemblyLoadErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    updateNeeded = true;
+                }
+            }
 
-						// Simplify things for now…
-						if (typeof(ControlVideoRenderer).IsAssignableFrom(type))
-						{
-							pluginList.Add(new PluginInformation(PluginKind.Video, type));
-						}
-						else if (typeof(ControlFocusedJoypad).IsAssignableFrom(type))
-						{
-							// Hides the Win32 P/Invoke joypad plugin if we aren't running on Windows NT.
-							if (Environment.OSVersion.Platform == PlatformID.Win32NT || type != typeof(Win32KeyboardJoypad))
-							{
-								pluginList.Add(new PluginInformation(PluginKind.Joypad, type));
-							}
-						}
-					}
-					catch (TypeLoadException ex)
-					{
-						Console.Error.WriteLine(ex);
-						MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-					}
-				}
-			}
-			catch (ReflectionTypeLoadException ex)
-			{
-				Console.Error.WriteLine(ex);
-				foreach (Exception lex in ex.LoaderExceptions)
-					Console.Error.WriteLine(lex);
-				MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
-		}
+            if (updateNeeded)
+            {
+                Settings.Default.PluginAssemblies = pluginAssemblies;
+                Settings.Default.Save();
+            }
+        }
 
-		private static bool IsGenericArgumentTypeSupported
-		(
-			Type argumentType,
-			Type[] supportedTypes,
-			bool allowOpen = false,
-			bool allowClosed = true,
-			GenericParameterAttributes allowedParameterAttributes = GenericParameterAttributes.SpecialConstraintMask | GenericParameterAttributes.DefaultConstructorConstraint | GenericParameterAttributes.VarianceMask,
-			GenericParameterAttributes requiredParameterAttributes = GenericParameterAttributes.None
-		)
-		{
-			if (argumentType.IsGenericParameter)
-				return allowOpen
-					&& (argumentType.GenericParameterAttributes & ~allowedParameterAttributes) == GenericParameterAttributes.None
-					&& (argumentType.GenericParameterAttributes & requiredParameterAttributes) == requiredParameterAttributes;
-			else if (!allowClosed) return false;
+        private static void FindPlugins(Assembly assembly)
+        {
+            try
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    try
+                    {
+                        // Ignore any abstract type, as we want only real renderers here…
+                        if (type.IsAbstract || type.IsGenericTypeDefinition) continue;
 
-			foreach (var supportedType in supportedTypes)
-				if (argumentType == supportedType) return true;
+                        // Simplify things for now…
+                        if (typeof(ControlVideoRenderer).IsAssignableFrom(type))
+                        {
+                            pluginList.Add(new PluginInformation(PluginKind.Video, type));
+                        }
+                        else if (typeof(ControlFocusedJoypad).IsAssignableFrom(type))
+                        {
+                            // Hides the Win32 P/Invoke joypad plugin if we aren't running on Windows NT.
+                            if (Environment.OSVersion.Platform == PlatformID.Win32NT || type != typeof(Win32KeyboardJoypad))
+                            {
+                                pluginList.Add(new PluginInformation(PluginKind.Joypad, type));
+                            }
+                        }
+                    }
+                    catch (TypeLoadException ex)
+                    {
+                        Console.Error.WriteLine(ex);
+                        MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                }
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                Console.Error.WriteLine(ex);
+                foreach (Exception lex in ex.LoaderExceptions)
+                    Console.Error.WriteLine(lex);
+                MessageBox.Show(ex.ToString(), Resources.TypeLoadingErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
 
-			return false;
-		}
+        private static bool IsGenericArgumentTypeSupported
+        (
+            Type argumentType,
+            Type[] supportedTypes,
+            bool allowOpen = false,
+            bool allowClosed = true,
+            GenericParameterAttributes allowedParameterAttributes = GenericParameterAttributes.SpecialConstraintMask | GenericParameterAttributes.DefaultConstructorConstraint | GenericParameterAttributes.VarianceMask,
+            GenericParameterAttributes requiredParameterAttributes = GenericParameterAttributes.None
+        )
+        {
+            if (argumentType.IsGenericParameter)
+                return allowOpen
+                    && (argumentType.GenericParameterAttributes & ~allowedParameterAttributes) == GenericParameterAttributes.None
+                    && (argumentType.GenericParameterAttributes & requiredParameterAttributes) == requiredParameterAttributes;
+            else if (!allowClosed) return false;
 
-		#endregion
+            foreach (var supportedType in supportedTypes)
+                if (argumentType == supportedType) return true;
+
+            return false;
+        }
+
+        #endregion
 
 #if DEBUG
 		private enum ProcessDpiAwareness
@@ -266,35 +266,36 @@ namespace CrystalBoy.Emulator
 		private static extern bool SetProcessDpiAwareness(ProcessDpiAwareness value);
 #endif
 
-		/// <summary>Application entry point.</summary>
-		[STAThread]
-		private static void Main()
-		{
-			Console.SetError(new StreamWriter(new ErrorStream(Console.OpenStandardError(), "CrystalBoy.Emulator.log")) { AutoFlush = true });
+        /// <summary>Application entry point.</summary>
+        [STAThread]
+        private static void Main()
+        {
+            Console.SetError(new StreamWriter(new ErrorStream(Console.OpenStandardError(), "CrystalBoy.Emulator.log")) { AutoFlush = true });
 
 #if DEBUG // When debugging in Visual Studio, this will enable DPI-awareness for our application
 			try { SetProcessDpiAwareness(ProcessDpiAwareness.PerMonitorDpiAware); }
 			catch (EntryPointNotFoundException) { SetProcessDPIAware(); }
 #endif
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
+            Application.EnableVisualStyles();
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
+            Application.SetCompatibleTextRenderingDefault(false);
 
-			ToolStripManager.VisualStylesEnabled = true;
-			ToolStripManager.RenderMode = ToolStripManagerRenderMode.Professional;
+            ToolStripManager.VisualStylesEnabled = true;
+            ToolStripManager.RenderMode = ToolStripManagerRenderMode.Professional;
 
-			RuntimeHelpers.RunClassConstructor(typeof(LookupTables).TypeHandle);
+            RuntimeHelpers.RunClassConstructor(typeof(LookupTables).TypeHandle);
 
-			// Check for embedded plugins
-			// This will be useful for providing an all-in-one assembly using ILMerge
-			FindPlugins(typeof(Program).Assembly);
+            // Check for embedded plugins
+            // This will be useful for providing an all-in-one assembly using ILMerge
+            FindPlugins(typeof(Program).Assembly);
 
-			// Load plugin assembles and check for external plugins
-			LoadPluginAssemblies();
+            // Load plugin assembles and check for external plugins
+            LoadPluginAssemblies();
 
-			// Attempt to clean the garbage left by the plugin loading process
-			GC.Collect();
+            // Attempt to clean the garbage left by the plugin loading process
+            GC.Collect();
 
-			Application.Run(new MainForm());
-		}
-	}
+            Application.Run(new MainForm());
+        }
+    }
 }

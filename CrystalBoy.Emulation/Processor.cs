@@ -1,28 +1,7 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
-using CrystalBoy.Core;
-
-namespace CrystalBoy.Emulation
+﻿namespace CrystalBoy.Emulation
 {
-	// It seems the CPU used in GB hardware is Sharp LR35902 (aka GB-Z80)
-	public sealed partial class Processor
+    // It seems the CPU used in GB hardware is Sharp LR35902 (aka GB-Z80)
+    public sealed partial class Processor
 	{
 		public const byte CFlag = 0x10;
 		public const byte HFlag = 0x20;
@@ -77,7 +56,6 @@ namespace CrystalBoy.Emulation
 
 		#region 16 bit Registers
 
-		[CLSCompliant(false)]
 		public ushort AF
 		{
 			get { return (ushort)((a << 8) | f); }
@@ -88,7 +66,6 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-		[CLSCompliant(false)]
 		public ushort BC
 		{
 			get { return (ushort)((b << 8) | c); }
@@ -99,7 +76,6 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-		[CLSCompliant(false)]
 		public ushort DE
 		{
 			get { return (ushort)((d << 8) | e); }
@@ -110,7 +86,6 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-		[CLSCompliant(false)]
 		public ushort HL
 		{
 			get { return (ushort)((h << 8) | l); }
@@ -121,14 +96,12 @@ namespace CrystalBoy.Emulation
 			}
 		}
 
-		[CLSCompliant(false)]
 		public ushort SP
 		{
 			get { return sp; }
 			set { sp = value; }
 		}
 
-		[CLSCompliant(false)]
 		public ushort PC
 		{
 			get { return pc; }

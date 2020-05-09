@@ -1,8 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
+    <TargetFramework>$(NetCoreTargetFramework)</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Label="AssemblyInfo">
     <Description>Common Windows Forms Layer for CrystalBoy</Description>

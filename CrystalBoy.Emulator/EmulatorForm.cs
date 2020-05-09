@@ -3,30 +3,26 @@ using System.Windows.Forms;
 
 namespace CrystalBoy.Emulator
 {
-	class EmulatorForm : DpiAwareForm
+	internal class EmulatorForm : Form
 	{
-		EmulatedGameBoy emulatedGameBoy;
-
-		private EmulatorForm()
+        private EmulatorForm()
 		{
 		}
 
 		public EmulatorForm(EmulatedGameBoy emulatedGameBoy)
 		{
-			if (emulatedGameBoy == null)
-				throw new ArgumentNullException("emulatedGameBoy");
-			this.emulatedGameBoy = emulatedGameBoy;
-			this.emulatedGameBoy.AfterReset += OnAfterResetInternal;
-			this.emulatedGameBoy.RomChanged += OnRomChangedInternal;
-			this.emulatedGameBoy.Paused += OnPausedInternal;
-			this.emulatedGameBoy.Break += OnBreakInternal;
-			this.emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChangedInternal;
-			this.emulatedGameBoy.NewFrame += OnNewFrameInternal;
+			EmulatedGameBoy = emulatedGameBoy ?? throw new ArgumentNullException(nameof(emulatedGameBoy));
+			EmulatedGameBoy.AfterReset += OnAfterResetInternal;
+			EmulatedGameBoy.RomChanged += OnRomChangedInternal;
+			EmulatedGameBoy.Paused += OnPausedInternal;
+			EmulatedGameBoy.Break += OnBreakInternal;
+			EmulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChangedInternal;
+			EmulatedGameBoy.NewFrame += OnNewFrameInternal;
 		}
 
-		protected EmulatedGameBoy EmulatedGameBoy { get { return emulatedGameBoy; } }
+        protected EmulatedGameBoy EmulatedGameBoy { get; }
 
-		protected override void OnFormClosing(FormClosingEventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs e)
 		{
 			if (e.CloseReason == CloseReason.UserClosing)
 			{

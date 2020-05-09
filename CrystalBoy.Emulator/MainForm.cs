@@ -15,45 +15,45 @@ using CrystalBoy.Emulator.Joypads;
 
 namespace CrystalBoy.Emulator
 {
-	partial class MainForm : DpiAwareForm
+	partial class MainForm : Form
 	{
 		private static readonly long SpeedUpdateTicks = Stopwatch.Frequency / 10;
 
-		private readonly SynchronizationContext synchronizationContext;
-		private readonly Stopwatch speedUpdateStopwatch;
-		private DebuggerForm debuggerForm;
-		private TileViewerForm tileViewerForm;
-		private MapViewerForm mapViewerForm;
-		private RomInformationForm romInformationForm;
-		private EmulatedGameBoy emulatedGameBoy;
-		private ControlVideoRenderer videoRenderer;
-		private AudioRenderer audioRenderer;
-		private Dictionary<Type, ToolStripMenuItem> joypadPluginMenuItemDictionary;
-		private Dictionary<Type, ToolStripMenuItem> videoRendererMenuItemDictionary;
-		private Dictionary<Type, ToolStripMenuItem> audioRendererMenuItemDictionary;
-		private BinaryWriter ramSaveWriter;
-		private BinaryReader ramSaveReader;
-		private bool pausedTemporarily;
+		private readonly SynchronizationContext _synchronizationContext;
+		private readonly Stopwatch _speedUpdateStopwatch;
+		private DebuggerForm _debuggerForm;
+		private TileViewerForm _tileViewerForm;
+		private MapViewerForm _mapViewerForm;
+		private RomInformationForm _romInformationForm;
+		private EmulatedGameBoy _emulatedGameBoy;
+		private ControlVideoRenderer _videoRenderer;
+		private AudioRenderer _audioRenderer;
+		private Dictionary<Type, ToolStripMenuItem> _joypadPluginMenuItemDictionary;
+		private Dictionary<Type, ToolStripMenuItem> _videoRendererMenuItemDictionary;
+		private Dictionary<Type, ToolStripMenuItem> _audioRendererMenuItemDictionary;
+		private BinaryWriter _ramSaveWriter;
+		private BinaryReader _ramSaveReader;
+		private bool _pausedTemporarily;
 
 		#region Constructor and Initialization
 
 		public MainForm()
 		{
-			synchronizationContext = SynchronizationContext.Current;
-			speedUpdateStopwatch = Stopwatch.StartNew();
+			_synchronizationContext = SynchronizationContext.Current;
+			_speedUpdateStopwatch = Stopwatch.StartNew();
 			InitializeComponent();
 			ScaleStatusStrip(CurrentAutoScaleDimensions.Height / 96F); // In DPI scaling mode, CurrentAutoScaleDimensions is the current screen DPI.
 			if (components == null) components = new System.ComponentModel.Container();
-			emulatedGameBoy = new EmulatedGameBoy(components);
-			emulatedGameBoy.TryUsingBootRom = Settings.Default.UseBootstrapRom;
-			emulatedGameBoy.EnableFramerateLimiter = Settings.Default.LimitSpeed;
-			emulatedGameBoy.RomChanged += OnRomChanged;
-			emulatedGameBoy.AfterReset += OnAfterReset;
-			emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
-			emulatedGameBoy.NewFrame += OnNewFrame;
-			emulatedGameBoy.BorderChanged += OnBorderChanged;
-			try { emulatedGameBoy.Reset(Settings.Default.HardwareType); }
-			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = emulatedGameBoy.HardwareType; }
+			_emulatedGameBoy = new EmulatedGameBoy(components);
+			_emulatedGameBoy.TryUsingBootRom = Settings.Default.UseBootstrapRom;
+			_emulatedGameBoy.EnableFramerateLimiter = Settings.Default.LimitSpeed;
+			_emulatedGameBoy.RomChanged += OnRomChanged;
+			_emulatedGameBoy.AfterReset += OnAfterReset;
+			_emulatedGameBoy.EmulationStatusChanged += OnEmulationStatusChanged;
+			_emulatedGameBoy.NewFrame += OnNewFrame;
+			_emulatedGameBoy.BorderChanged += OnBorderChanged;
+			try { _emulatedGameBoy.Reset(Settings.Default.HardwareType); }
+			catch (ArgumentOutOfRangeException) { Settings.Default.HardwareType = _emulatedGameBoy.HardwareType; }
 			AdjustSize(Settings.Default.ContentSize);
 			UpdateEmulationStatus();
 			UpdateSpeed();
@@ -75,9 +75,9 @@ namespace CrystalBoy.Emulator
 
 		private void CreateRendererMenuItems()
 		{
-			joypadPluginMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
-			videoRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
-			audioRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
+			_joypadPluginMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
+			_videoRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
+			_audioRendererMenuItemDictionary = new Dictionary<Type, ToolStripMenuItem>();
 
 			foreach (var plugin in Program.PluginCollection)
 			{
@@ -88,17 +88,17 @@ namespace CrystalBoy.Emulator
 				switch (plugin.Kind)
 				{
 					case PluginKind.Joypad:
-						menuItemDictionary = joypadPluginMenuItemDictionary;
+						menuItemDictionary = _joypadPluginMenuItemDictionary;
 						pluginListMenuItem = joypadToolStripMenuItem;
 						pluginSelectionHandler = OnJoypadPluginMenuItemClick;
 						break;
 					case PluginKind.Video:
-						menuItemDictionary = videoRendererMenuItemDictionary;
+						menuItemDictionary = _videoRendererMenuItemDictionary;
 						pluginListMenuItem = videoRendererToolStripMenuItem;
 						pluginSelectionHandler = OnVideoRendererMenuItemClick;
 						break;
 					case PluginKind.Audio:
-						menuItemDictionary = audioRendererMenuItemDictionary;
+						menuItemDictionary = _audioRendererMenuItemDictionary;
 						pluginListMenuItem = audioRendererToolStripMenuItem;
 						pluginSelectionHandler = OnAudioRendererMenuItemClick;
 						break;
@@ -160,24 +160,24 @@ namespace CrystalBoy.Emulator
 
 		private void SwitchAudioRenderer(Type rendererType)
 		{
-			if (audioRenderer != null)
+			if (_audioRenderer != null)
 			{
-				emulatedGameBoy.Bus.AudioRenderer = null;
-				audioRenderer.Dispose();
-				audioRenderer = null;
+				_emulatedGameBoy.Bus.AudioRenderer = null;
+				_audioRenderer.Dispose();
+				_audioRenderer = null;
 			}
 
-			audioRenderer = CreateAudioRenderer(rendererType);
+			_audioRenderer = CreateAudioRenderer(rendererType);
 
-			ToolStripMenuItem selectedRendererMenuItem = audioRendererMenuItemDictionary[rendererType];
+			ToolStripMenuItem selectedRendererMenuItem = _audioRendererMenuItemDictionary[rendererType];
 
-			foreach (ToolStripMenuItem renderMethodMenuItem in audioRendererMenuItemDictionary.Values)
+			foreach (ToolStripMenuItem renderMethodMenuItem in _audioRendererMenuItemDictionary.Values)
 				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedRendererMenuItem;
 
 			// Store the FullName once we know the type of render method to use
 			Settings.Default.AudioRenderer = rendererType.ToString(); // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 
-			emulatedGameBoy.Bus.AudioRenderer = audioRenderer;
+			_emulatedGameBoy.Bus.AudioRenderer = _audioRenderer;
 		}
 
 		#endregion
@@ -188,26 +188,26 @@ namespace CrystalBoy.Emulator
 
 		private void SwitchVideoRenderer(Type rendererType)
 		{
-			if (videoRenderer != null)
+			if (_videoRenderer != null)
 			{
-				emulatedGameBoy.Bus.VideoRenderer = null;
-				videoRenderer.Dispose();
-				videoRenderer = null;
+				_emulatedGameBoy.Bus.VideoRenderer = null;
+				_videoRenderer.Dispose();
+				_videoRenderer = null;
 			}
 
-			videoRenderer = CreateVideoRenderer(rendererType);
+			_videoRenderer = CreateVideoRenderer(rendererType);
 			//videoRenderer.Interpolation = false;
-			videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder;
+			_videoRenderer.BorderVisible = Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && _emulatedGameBoy.HasCustomBorder;
 
-			ToolStripMenuItem selectedRendererMenuItem = videoRendererMenuItemDictionary[rendererType];
+			ToolStripMenuItem selectedRendererMenuItem = _videoRendererMenuItemDictionary[rendererType];
 
-			foreach (ToolStripMenuItem renderMethodMenuItem in videoRendererMenuItemDictionary.Values)
+			foreach (ToolStripMenuItem renderMethodMenuItem in _videoRendererMenuItemDictionary.Values)
 				renderMethodMenuItem.Checked = renderMethodMenuItem == selectedRendererMenuItem;
 
 			// Store the FullName once we know the type of render method to use
 			Settings.Default.VideoRenderer = rendererType.ToString(); // Don't use AssemblyQualifiedName for easing updates, though it should be a better choice
 
-			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
+			_emulatedGameBoy.Bus.VideoRenderer = _videoRenderer;
 		}
 
 		#endregion
@@ -218,14 +218,14 @@ namespace CrystalBoy.Emulator
 
 		private void SwitchJoypadPlugin(int joypadIndex, Type pluginType)
 		{
-			var oldJoypad = emulatedGameBoy.Bus.SetJoypad(joypadIndex, null) as IDisposable;
+			var oldJoypad = _emulatedGameBoy.Bus.SetJoypad(joypadIndex, null) as IDisposable;
 			if (oldJoypad != null) oldJoypad.Dispose();
 
-			emulatedGameBoy.Bus.SetJoypad(joypadIndex, CreateJoypadPlugin(joypadIndex, pluginType));
+			_emulatedGameBoy.Bus.SetJoypad(joypadIndex, CreateJoypadPlugin(joypadIndex, pluginType));
 
-			var selectedRendererMenuItem = joypadPluginMenuItemDictionary[pluginType];
+			var selectedRendererMenuItem = _joypadPluginMenuItemDictionary[pluginType];
 
-			foreach (var joypadPluginMenuItem in joypadPluginMenuItemDictionary.Values)
+			foreach (var joypadPluginMenuItem in _joypadPluginMenuItemDictionary.Values)
 				joypadPluginMenuItem.Checked = joypadPluginMenuItem == selectedRendererMenuItem;
 
 			// Store the FullName once we know the type of render method to use
@@ -287,9 +287,9 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				if (debuggerForm == null)
-					debuggerForm = new DebuggerForm(emulatedGameBoy);
-				return debuggerForm;
+				if (_debuggerForm == null)
+					_debuggerForm = new DebuggerForm(_emulatedGameBoy);
+				return _debuggerForm;
 			}
 		}
 
@@ -297,9 +297,9 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				if (tileViewerForm == null)
-					tileViewerForm = new TileViewerForm(emulatedGameBoy);
-				return tileViewerForm;
+				if (_tileViewerForm == null)
+					_tileViewerForm = new TileViewerForm(_emulatedGameBoy);
+				return _tileViewerForm;
 			}
 		}
 
@@ -307,9 +307,9 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				if (mapViewerForm == null)
-					mapViewerForm = new MapViewerForm(emulatedGameBoy);
-				return mapViewerForm;
+				if (_mapViewerForm == null)
+					_mapViewerForm = new MapViewerForm(_emulatedGameBoy);
+				return _mapViewerForm;
 			}
 		}
 
@@ -317,9 +317,9 @@ namespace CrystalBoy.Emulator
 		{
 			get
 			{
-				if (romInformationForm == null)
-					romInformationForm = new RomInformationForm(emulatedGameBoy);
-				return romInformationForm;
+				if (_romInformationForm == null)
+					_romInformationForm = new RomInformationForm(_emulatedGameBoy);
+				return _romInformationForm;
 			}
 		}
 
@@ -329,20 +329,20 @@ namespace CrystalBoy.Emulator
 
 		private void UnloadRom()
 		{
-			emulatedGameBoy.Pause();
+			_emulatedGameBoy.Pause();
 
-			if (ramSaveWriter != null)
+			if (_ramSaveWriter != null)
 			{
 				WriteRam();
 
-				ramSaveWriter.Close();
-				ramSaveWriter = null;
+				_ramSaveWriter.Close();
+				_ramSaveWriter = null;
 
-				if (ramSaveReader != null) ramSaveReader.Close();
-				ramSaveReader = null;
+				if (_ramSaveReader != null) _ramSaveReader.Close();
+				_ramSaveReader = null;
 			}
 
-			emulatedGameBoy.UnloadRom();
+			_emulatedGameBoy.UnloadRom();
 		}
 
 		private void LoadRom(string fileName)
@@ -357,59 +357,59 @@ namespace CrystalBoy.Emulator
 			if (romFileInfo.Length > 8 * 1024 * 1024)
 				throw new InvalidOperationException("ROM files cannot exceed 8MB.");
 
-			emulatedGameBoy.LoadRom(MemoryUtility.ReadFile(romFileInfo, true));
+			_emulatedGameBoy.LoadRom(MemoryUtility.ReadFile(romFileInfo, true));
 
-			if (emulatedGameBoy.RomInformation.HasRam && emulatedGameBoy.RomInformation.HasBattery)
+			if (_emulatedGameBoy.RomInformation.HasRam && _emulatedGameBoy.RomInformation.HasBattery)
 			{
 				var ramFileInfo = new FileInfo(Path.Combine(romFileInfo.DirectoryName, Path.GetFileNameWithoutExtension(romFileInfo.Name)) + ".sav");
 
 				var ramSaveStream = ramFileInfo.Open(FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-				ramSaveStream.SetLength(emulatedGameBoy.Mapper.SavedRamSize + (emulatedGameBoy.RomInformation.HasTimer ? 48 : 0));
-				ramSaveStream.Read(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
-				ramSaveWriter = new BinaryWriter(ramSaveStream);
+				ramSaveStream.SetLength(_emulatedGameBoy.Mapper.SavedRamSize + (_emulatedGameBoy.RomInformation.HasTimer ? 48 : 0));
+				ramSaveStream.Read(_emulatedGameBoy.ExternalRam, 0, _emulatedGameBoy.Mapper.SavedRamSize);
+				_ramSaveWriter = new BinaryWriter(ramSaveStream);
 
-				if (emulatedGameBoy.RomInformation.HasTimer)
+				if (_emulatedGameBoy.RomInformation.HasTimer)
 				{
-					var mbc3 = emulatedGameBoy.Mapper as CrystalBoy.Emulation.Mappers.MemoryBankController3;
+					var mbc3 = _emulatedGameBoy.Mapper as CrystalBoy.Emulation.Mappers.MemoryBankController3;
 
 					if (mbc3 != null)
 					{
 						var rtcState = mbc3.RtcState;
-						ramSaveReader = new BinaryReader(ramSaveStream);
+						_ramSaveReader = new BinaryReader(ramSaveStream);
 
 						rtcState.Frozen = true;
 
-						rtcState.Seconds = (byte)ramSaveReader.ReadInt32();
-						rtcState.Minutes = (byte)ramSaveReader.ReadInt32();
-						rtcState.Hours = (byte)ramSaveReader.ReadInt32();
-						rtcState.Days = (short)((byte)ramSaveReader.ReadInt32() + ((byte)ramSaveReader.ReadInt32() << 8));
+						rtcState.Seconds = (byte)_ramSaveReader.ReadInt32();
+						rtcState.Minutes = (byte)_ramSaveReader.ReadInt32();
+						rtcState.Hours = (byte)_ramSaveReader.ReadInt32();
+						rtcState.Days = (short)((byte)_ramSaveReader.ReadInt32() + ((byte)_ramSaveReader.ReadInt32() << 8));
 
-						rtcState.LatchedSeconds = (byte)ramSaveReader.ReadInt32();
-						rtcState.LatchedMinutes = (byte)ramSaveReader.ReadInt32();
-						rtcState.LatchedHours = (byte)ramSaveReader.ReadInt32();
-						rtcState.LatchedDays = (short)((byte)ramSaveReader.ReadInt32() + ((byte)ramSaveReader.ReadInt32() << 8));
+						rtcState.LatchedSeconds = (byte)_ramSaveReader.ReadInt32();
+						rtcState.LatchedMinutes = (byte)_ramSaveReader.ReadInt32();
+						rtcState.LatchedHours = (byte)_ramSaveReader.ReadInt32();
+						rtcState.LatchedDays = (short)((byte)_ramSaveReader.ReadInt32() + ((byte)_ramSaveReader.ReadInt32() << 8));
 
-						rtcState.DateTime = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(ramSaveReader.ReadInt64());
+						rtcState.DateTime = new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(_ramSaveReader.ReadInt64());
 
 						rtcState.Frozen = false;
 					}
 				}
 
-				emulatedGameBoy.Mapper.RamUpdated += Mapper_RamUpdated;
+				_emulatedGameBoy.Mapper.RamUpdated += Mapper_RamUpdated;
 			}
 
-			emulatedGameBoy.Run();
+			_emulatedGameBoy.Run();
 		}
 
-		private void Mapper_RamUpdated(object sender, EventArgs e) { if (ramSaveWriter != null) WriteRam(); }
+		private void Mapper_RamUpdated(object sender, EventArgs e) { if (_ramSaveWriter != null) WriteRam(); }
 
 		private void WriteRam()
 		{
-			ramSaveWriter.Seek(0, SeekOrigin.Begin);
-			ramSaveWriter.Write(emulatedGameBoy.ExternalRam, 0, emulatedGameBoy.Mapper.SavedRamSize);
-			if (emulatedGameBoy.RomInformation.HasTimer)
+			_ramSaveWriter.Seek(0, SeekOrigin.Begin);
+			_ramSaveWriter.Write(_emulatedGameBoy.ExternalRam, 0, _emulatedGameBoy.Mapper.SavedRamSize);
+			if (_emulatedGameBoy.RomInformation.HasTimer)
 			{
-				var mbc3 = emulatedGameBoy.Mapper as CrystalBoy.Emulation.Mappers.MemoryBankController3;
+				var mbc3 = _emulatedGameBoy.Mapper as CrystalBoy.Emulation.Mappers.MemoryBankController3;
 
 				if (mbc3 != null)
 				{
@@ -418,19 +418,19 @@ namespace CrystalBoy.Emulator
 					// I'll save the date using the same format as VBA in order to be more compatible, but i originally planned to store it whithout wasting bytes…
 					// Luckily enough, it seems we use the same iternal representation… (But there probably is no other way to do it)
 
-					ramSaveWriter.Write((int)rtcState.Seconds & 0xFF);
-					ramSaveWriter.Write((int)rtcState.Minutes & 0xFF);
-					ramSaveWriter.Write((int)rtcState.Hours & 0xFF);
-					ramSaveWriter.Write((int)rtcState.Days & 0xFF);
-					ramSaveWriter.Write((rtcState.Days >> 8) & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.Seconds & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.Minutes & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.Hours & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.Days & 0xFF);
+					_ramSaveWriter.Write((rtcState.Days >> 8) & 0xFF);
 
-					ramSaveWriter.Write((int)rtcState.LatchedSeconds & 0xFF);
-					ramSaveWriter.Write((int)rtcState.LatchedMinutes & 0xFF);
-					ramSaveWriter.Write((int)rtcState.LatchedHours & 0xFF);
-					ramSaveWriter.Write((int)rtcState.LatchedDays & 0xFF);
-					ramSaveWriter.Write((rtcState.LatchedDays >> 8) & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.LatchedSeconds & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.LatchedMinutes & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.LatchedHours & 0xFF);
+					_ramSaveWriter.Write((int)rtcState.LatchedDays & 0xFF);
+					_ramSaveWriter.Write((rtcState.LatchedDays >> 8) & 0xFF);
 
-					ramSaveWriter.Write((long)((rtcState.DateTime - new DateTime(1970, 1, 1)).TotalSeconds));
+					_ramSaveWriter.Write((long)((rtcState.DateTime - new DateTime(1970, 1, 1)).TotalSeconds));
 				}
 			}
 		}
@@ -441,7 +441,7 @@ namespace CrystalBoy.Emulator
 
 		#region Border Visibility Management
 
-		private void OnAfterReset(object sender, EventArgs e) { SetBorderVisibility(Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder); }
+		private void OnAfterReset(object sender, EventArgs e) { SetBorderVisibility(Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && _emulatedGameBoy.HasCustomBorder); }
 
 		private void OnBorderChanged(object sender, EventArgs e) { if (Settings.Default.BorderVisibility == BorderVisibility.Auto) ShowBorder(); }
 
@@ -449,22 +449,22 @@ namespace CrystalBoy.Emulator
 
 		private void ShowBorder()
 		{
-			if (videoRenderer != null && !videoRenderer.BorderVisible)
+			if (_videoRenderer != null && !_videoRenderer.BorderVisible)
 			{
 				var panelSize = toolStripContainer.ContentPanel.ClientSize;
 
-				videoRenderer.BorderVisible = true;
+				_videoRenderer.BorderVisible = true;
 				AdjustSize(panelSize.Width * 256 / 160, panelSize.Height * 224 / 144);
 			}
 		}
 
 		private void HideBorder()
 		{
-			if (videoRenderer != null && videoRenderer.BorderVisible)
+			if (_videoRenderer != null && _videoRenderer.BorderVisible)
 			{
 				var panelSize = toolStripContainer.ContentPanel.ClientSize;
 
-				videoRenderer.BorderVisible = false;
+				_videoRenderer.BorderVisible = false;
 				AdjustSize(panelSize.Width * 160 / 256, panelSize.Height * 144 / 224);
 			}
 		}
@@ -473,7 +473,7 @@ namespace CrystalBoy.Emulator
 
 		private void SetZoomFactor(int factor)
 		{
-			var referenceSize = videoRenderer?.BorderVisible ?? false ? new Size(256, 224) : new Size(160, 144);
+			var referenceSize = _videoRenderer?.BorderVisible ?? false ? new Size(256, 224) : new Size(160, 144);
 
 			if (factor <= 0) throw new ArgumentOutOfRangeException("factor");
 			Settings.Default.ZoomFactor = factor;
@@ -507,9 +507,9 @@ namespace CrystalBoy.Emulator
 			}
 		}
 
-		protected override void OnResizeBegin(EventArgs e) { if (pausedTemporarily = emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause(); }
+		protected override void OnResizeBegin(EventArgs e) { if (_pausedTemporarily = _emulatedGameBoy.EmulationStatus == EmulationStatus.Running) _emulatedGameBoy.Pause(); }
 
-		protected override void OnResizeEnd(EventArgs e) { if (pausedTemporarily) emulatedGameBoy.Run(); }
+		protected override void OnResizeEnd(EventArgs e) { if (_pausedTemporarily) _emulatedGameBoy.Run(); }
 
 		#endregion
 
@@ -517,12 +517,12 @@ namespace CrystalBoy.Emulator
 
 		private void UpdateEmulationStatus()
 		{
-			emulationStatusToolStripStatusLabel.Text = emulatedGameBoy.EmulationStatus == EmulationStatus.Running ? Resources.RunningText : Resources.PausedText;
+			emulationStatusToolStripStatusLabel.Text = _emulatedGameBoy.EmulationStatus == EmulationStatus.Running ? Resources.RunningText : Resources.PausedText;
 		}
 
 		private void UpdateSpeed()
 		{
-			double speed = emulatedGameBoy.EmulatedSpeed;
+			double speed = _emulatedGameBoy.EmulatedSpeed;
 
 			if (speed > 0) speedToolStripStatusLabel.Text = "Speed: " + speed.ToString("P0");
 			else speedToolStripStatusLabel.Text = "Speed: -";
@@ -535,26 +535,26 @@ namespace CrystalBoy.Emulator
 		protected override void OnShown(EventArgs e)
 		{
 			InitializePlugins();
-			emulatedGameBoy.Bus.VideoRenderer = videoRenderer;
+			_emulatedGameBoy.Bus.VideoRenderer = _videoRenderer;
 			base.OnShown(e);
 		}
 
 		protected override void OnActivated(EventArgs e)
 		{
-			if (emulatedGameBoy != null && pausedTemporarily) emulatedGameBoy.Run();
+			if (_emulatedGameBoy != null && _pausedTemporarily) _emulatedGameBoy.Run();
 			base.OnActivated(e);
 		}
 
 		protected override void OnDeactivate(EventArgs e)
 		{
-			if (emulatedGameBoy != null && (pausedTemporarily = emulatedGameBoy.EmulationStatus == EmulationStatus.Running)) emulatedGameBoy.Pause();
+			if (_emulatedGameBoy != null && (_pausedTemporarily = _emulatedGameBoy.EmulationStatus == EmulationStatus.Running)) _emulatedGameBoy.Pause();
 			base.OnDeactivate(e);
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			// Make sure that the emulated system is stopped before closing
-			emulatedGameBoy.Pause();
+			_emulatedGameBoy.Pause();
 			UnloadRom();
 			// Calling DoEvents here will make sure that everything gets executed in order, but it should work without.
 			Application.DoEvents();
@@ -565,12 +565,12 @@ namespace CrystalBoy.Emulator
 		{
 			Size renderSize = toolStripContainer.ContentPanel.ClientSize;
 
-			Settings.Default.ContentSize = Settings.Default.BorderVisibility != BorderVisibility.On && (videoRenderer?.BorderVisible ?? false) ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
+			Settings.Default.ContentSize = Settings.Default.BorderVisibility != BorderVisibility.On && (_videoRenderer?.BorderVisible ?? false) ? new Size(renderSize.Width * 160 / 256, renderSize.Height * 144 / 224) : renderSize;
 			Settings.Default.Save();
 			base.OnClosed(e);
 		}
 
-		private void OnRomChanged(object sender, EventArgs e) { SetBorderVisibility(Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && emulatedGameBoy.HasCustomBorder); }
+		private void OnRomChanged(object sender, EventArgs e) { SetBorderVisibility(Settings.Default.BorderVisibility == BorderVisibility.On || Settings.Default.BorderVisibility == BorderVisibility.Auto && _emulatedGameBoy.HasCustomBorder); }
 
 		private void OnEmulationStatusChanged(object sender, EventArgs e) { UpdateEmulationStatus(); }
 
@@ -578,16 +578,16 @@ namespace CrystalBoy.Emulator
 		{
 			// This method should only be called from the "Processor" thread.
 			// Usage of the stopwatch here is safe.
-			if (speedUpdateStopwatch.ElapsedTicks > SpeedUpdateTicks)
+			if (_speedUpdateStopwatch.ElapsedTicks > SpeedUpdateTicks)
 			{
-				speedUpdateStopwatch.Restart();
-				synchronizationContext.Post(state => UpdateSpeed(), null);
+				_speedUpdateStopwatch.Restart();
+				_synchronizationContext.Post(state => UpdateSpeed(), null);
 			}
 		}
 
 		private void toolStripContainer_ContentPanel_Paint(object sender, PaintEventArgs e)
 		{
-			videoRenderer?.Refresh();
+			_videoRenderer?.Refresh();
 		}
 
 		#region Menus
@@ -625,30 +625,30 @@ namespace CrystalBoy.Emulator
 
 		private void emulationToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
-			pauseToolStripMenuItem.Enabled = emulatedGameBoy.EmulationStatus != EmulationStatus.Stopped;
-			resetToolStripMenuItem.Enabled = emulatedGameBoy.EmulationStatus != EmulationStatus.Stopped;
-			pauseToolStripMenuItem.Checked = emulatedGameBoy.EmulationStatus == EmulationStatus.Paused;
-			limitSpeedToolStripMenuItem.Checked = emulatedGameBoy.EnableFramerateLimiter;
+			pauseToolStripMenuItem.Enabled = _emulatedGameBoy.EmulationStatus != EmulationStatus.Stopped;
+			resetToolStripMenuItem.Enabled = _emulatedGameBoy.EmulationStatus != EmulationStatus.Stopped;
+			pauseToolStripMenuItem.Checked = _emulatedGameBoy.EmulationStatus == EmulationStatus.Paused;
+			limitSpeedToolStripMenuItem.Checked = _emulatedGameBoy.EnableFramerateLimiter;
 		}
 
 		private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Paused) emulatedGameBoy.Run();
-			else if (emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause();
+			if (_emulatedGameBoy.EmulationStatus == EmulationStatus.Paused) _emulatedGameBoy.Run();
+			else if (_emulatedGameBoy.EmulationStatus == EmulationStatus.Running) _emulatedGameBoy.Pause();
 		}
 
 		private void runFrameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Running) emulatedGameBoy.Pause();
-			if (emulatedGameBoy.EmulationStatus == EmulationStatus.Paused) emulatedGameBoy.RunFrame();
+			if (_emulatedGameBoy.EmulationStatus == EmulationStatus.Running) _emulatedGameBoy.Pause();
+			if (_emulatedGameBoy.EmulationStatus == EmulationStatus.Paused) _emulatedGameBoy.RunFrame();
 		}
 
-		private void resetToolStripMenuItem_Click(object sender, EventArgs e) { emulatedGameBoy.Reset(); }
+		private void resetToolStripMenuItem_Click(object sender, EventArgs e) { _emulatedGameBoy.Reset(); }
 
 		private void limitSpeedToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Settings.Default.LimitSpeed =
-				emulatedGameBoy.EnableFramerateLimiter = limitSpeedToolStripMenuItem.Checked;
+				_emulatedGameBoy.EnableFramerateLimiter = limitSpeedToolStripMenuItem.Checked;
 		}
 
 		#region Video
@@ -692,7 +692,7 @@ namespace CrystalBoy.Emulator
 		private void borderAutoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Settings.Default.BorderVisibility = BorderVisibility.Auto;
-			SetBorderVisibility(emulatedGameBoy.HasCustomBorder);
+			SetBorderVisibility(_emulatedGameBoy.HasCustomBorder);
 		}
 
 		private void borderOnToolStripMenuItem_Click(object sender, EventArgs e)
@@ -750,19 +750,19 @@ namespace CrystalBoy.Emulator
 
 		private void hardwareToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
-			useBootstrapRomToolStripMenuItem.Checked = emulatedGameBoy.TryUsingBootRom;
+			useBootstrapRomToolStripMenuItem.Checked = _emulatedGameBoy.TryUsingBootRom;
 			// The tags have been set by manually editing the designed form code.
 			// This should work fine as long as the tag isn't modified in the Windows Forms editor.
 			foreach (ToolStripItem item in hardwareToolStripMenuItem.DropDownItems)
 				if (item.Tag is HardwareType)
-					(item as ToolStripMenuItem).Checked = (HardwareType)item.Tag == emulatedGameBoy.HardwareType;
+					(item as ToolStripMenuItem).Checked = (HardwareType)item.Tag == _emulatedGameBoy.HardwareType;
 		}
 
 		private void useBootstrapRomToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.Default.UseBootstrapRom = emulatedGameBoy.TryUsingBootRom = !emulatedGameBoy.TryUsingBootRom;
-			if (!emulatedGameBoy.IsRomLoaded || emulatedGameBoy.EmulationStatus == EmulationStatus.Stopped)
-				emulatedGameBoy.Reset();
+			Settings.Default.UseBootstrapRom = _emulatedGameBoy.TryUsingBootRom = !_emulatedGameBoy.TryUsingBootRom;
+			if (!_emulatedGameBoy.IsRomLoaded || _emulatedGameBoy.EmulationStatus == EmulationStatus.Stopped)
+				_emulatedGameBoy.Reset();
 		}
 
 		private void randomHardwareToolStripMenuItem_Click(object sender, EventArgs e)
@@ -775,8 +775,8 @@ namespace CrystalBoy.Emulator
 
 		private void SwitchHardware(HardwareType hardwareType)
 		{
-			if (!emulatedGameBoy.IsRomLoaded || MessageBox.Show(this, Resources.EmulationResetMessage, Resources.GenericMessageTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-				emulatedGameBoy.Reset(Settings.Default.HardwareType = hardwareType);
+			if (!_emulatedGameBoy.IsRomLoaded || MessageBox.Show(this, Resources.EmulationResetMessage, Resources.GenericMessageTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				_emulatedGameBoy.Reset(Settings.Default.HardwareType = hardwareType);
 		}
 
 		#endregion

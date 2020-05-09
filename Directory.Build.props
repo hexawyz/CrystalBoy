@@ -1,3 +1,11 @@
 <Project>
+  <PropertyGroup>
+    <NetCoreTargetFramework>netcoreapp3.1</NetCoreTargetFramework>
+    <NetStandardTargetFramework>netstandard2.1</NetStandardTargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Label="Strong Naming">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <Import Project="AssemblyInfo.props" />
 </Project>

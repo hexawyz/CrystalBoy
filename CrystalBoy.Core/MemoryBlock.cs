@@ -147,7 +147,6 @@ namespace CrystalBoy.Core
 
 		/// <summary>Gets the pointer to the memory block.</summary>
 		/// <value>The pointer to the memory block.</value>
-		[CLSCompliant(false)]
 		public void* Pointer { get { return memoryPointer; } }
 
 		/// <summary>Gets the length of the memory block.</summary>
@@ -182,10 +181,8 @@ namespace CrystalBoy.Core
 			Memory.Copy((void*)destination, (void*)source, length);
 		}
 
-		[CLSCompliant(false)]
 		public static void Copy(void* destination, void* source, int length) { Memory.Copy(destination, source, length); }
 
-		[CLSCompliant(false)]
 		public static void Copy(void* destination, void* source, uint length) { Memory.Copy(destination, source, length); }
 
 		#endregion
@@ -212,10 +209,8 @@ namespace CrystalBoy.Core
 			Memory.Set((void*)destination, value, (uint)length);
 		}
 
-		[CLSCompliant(false)]
 		public static void Set(void* destination, byte value, int length) { Memory.Set(destination, value, length); }
 
-		[CLSCompliant(false)]
 		public static void Set(void* destination, byte value, uint length) { Memory.Set(destination, value, length); }
 
 		#endregion

@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
+    <TargetFramework>$(NetStandardTargetFramework)</TargetFramework>
     <DefineConstants>$(DefineConstants);GCHANDLE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefaultItemExcludes>*.bin;$(DefaultItemExcludes)</DefaultItemExcludes>

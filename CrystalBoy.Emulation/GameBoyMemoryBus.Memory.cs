@@ -231,7 +231,6 @@ namespace CrystalBoy.Emulation
 
 		#region Memory Mapping Information
 
-		[CLSCompliant(false)]
 		public MemoryType GetMapping(ushort offset)
 		{
 			if (offset < 0x8000) return MemoryType.ExternalRom;
@@ -245,7 +244,6 @@ namespace CrystalBoy.Emulation
 			else return MemoryType.InterruptEnableRegister;
 		}
 
-		[CLSCompliant(false)]
 		public MemoryType GetMapping(ushort offset, out int bank)
 		{
 			bank = 0;
@@ -311,7 +309,6 @@ namespace CrystalBoy.Emulation
 
 		/// <summary>Reads or writes a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
 		/// <value><see cref="System.Byte"/> value.</value>
-		[CLSCompliant(false)]
 		public byte this[ushort offset]
 		{
 			get { return ReadByte(offset); }
@@ -329,7 +326,6 @@ namespace CrystalBoy.Emulation
 		/// <summary>Reads a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
 		/// <param name="offset">The offset.</param>
 		/// <returns><see cref="System.Byte"/> representing the value at the specified offset.</returns>
-		[CLSCompliant(false)]
 		public unsafe byte ReadByte(ushort offset)
 		{
 			return offset < 0xFF00 ? segmentArray[offset >> 8][offset & 0xFF] : ReadPort((byte)offset);
@@ -347,7 +343,6 @@ namespace CrystalBoy.Emulation
 		/// <summary>Writes a <see cref="System.Byte"/> at the specified offset in Game Boy memory.</summary>
 		/// <param name="offset">The offset.</param>
 		/// <param name="value">The value to write.</param>
-		[CLSCompliant(false)]
 		public unsafe void WriteByte(ushort offset, byte value)
 		{
 			MemoryWriteHandler handler = segmentWriteHandlerArray[offset >> 8];

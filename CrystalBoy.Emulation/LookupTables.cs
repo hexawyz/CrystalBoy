@@ -1,37 +1,13 @@
-﻿#region Copyright Notice
-// This file is part of CrystalBoy.
-// Copyright © 2008-2011 Fabien Barbier
-// 
-// CrystalBoy is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// CrystalBoy is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#endregion
-
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace CrystalBoy.Emulation
 {
-	public static class LookupTables
+    public static class LookupTables
 	{
-		[CLSCompliant(false)]
 		public static readonly uint[] StandardColorLookupTable32 = InitializeStandardColorLookupTable32();
-		[CLSCompliant(false)]
 		public static readonly ushort[] StandardColorLookupTable16 = InitializeStandardColorLookupTable16();
 
-		[CLSCompliant(false)]
 		public static readonly uint[] GrayPalette = BuildPalette();
-		[CLSCompliant(false)]
 		public static readonly ushort[] PaletteLookupTable, FlippedPaletteLookupTable;
 
 		static LookupTables()
@@ -106,7 +82,6 @@ namespace CrystalBoy.Emulation
 
 		#region Standard Colors
 
-		[CLSCompliant(false)]
 		public static void GetStandardColors16(ushort[] lookupTable)
 		{
 			// This should give “High quality” color interpolation.
@@ -115,7 +90,6 @@ namespace CrystalBoy.Emulation
 				lookupTable[i] = (ushort)((i << 1) & 0xFFC0 | ((i & 0x200) != 0 ? (ushort)0x20 : (ushort)0x00) | i & 0x1F);
 		}
 
-		[CLSCompliant(false)]
 		public static unsafe void GetStandardColors32(uint[] lookupTable)
 		{
 			byte* values = stackalloc byte[0x20];

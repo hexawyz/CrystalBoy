@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>$(NetStandardTargetFramework)</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\CrystalBoy.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>$(DefineConstants);WITH_DEBUGGING;WITH_THREADING</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Label="AssemblyInfo">
